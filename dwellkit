@@ -499,7 +499,7 @@ cmd_class() {
       echo "    INVALID line $LINE_NO: GitHub user '$github_username' does not exist (student '$student_id')"
       INVALID=$((INVALID+1))
     fi
-  done < "$ROSTER"
+  done < <(cat "$ROSTER"; echo)
 
   echo "    valid: ${#ROWS[@]}    invalid: $INVALID"
   if [ "$INVALID" -gt 0 ]; then
@@ -739,7 +739,7 @@ cmd_status() {
         MISSING=$((MISSING+1))
       fi
     fi
-  done < "$RESULTS"
+  done < <(cat "$RESULTS"; echo)
 
   echo
   echo "==> accepted: $ACCEPTED    pending: $PENDING    problems: $MISSING"
