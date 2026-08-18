@@ -88,6 +88,108 @@ directly only to:
 
 ---
 
+## Command reference
+
+Every command assumes `GH_TOKEN` and `GH_ORG` are exported. `class` additionally requires `KIT_SALT`.
+
+### Deploying
+
+```bash
+./dwellkit class roster.csv --dry-run
+```
+Validates every GitHub username in the roster against the API and reports duplicates, missing
+usernames, and malformed rows. **Creates nothing.** Refuses the whole run if any row is bad.
+
+```bash
+./dwellkit class roster.csv
+```
+Builds one private repository per row, invites each student at `push` permission, and writes
+`dwellkit-results-<org>-<timestamp>.csv`. Safe to re-run — existing repos are skipped and
+invitations are re-sent.
+
+```bash
+CONCURRENCY=10 ./dwellkit class roster.csv
+```
+Same, ten builds in parallel instead of five. Raise it for a large cohort; lower it to 2–3 if you
+start seeing secondary rate limits, which trigger on burst concurrency rather than total volume.
+
+```bash
+KIT_PREFIX=comp2103- ./dwellkit class roster.csv
+```
+Names repositories `comp2103-amara` instead of `hackathon-starter-amara`. Useful for separating
+two cohorts in one org. **Use the same prefix for `status` afterwards**, or it won't find them.
+
+### Checking on a cohort
+
+```bash
+./dwellkit status dwellkit-results-your-org-20260818-143022.csv
+```
+Reports `accepted` / `PENDING` / problems per student. Run daily in the week before class — an
+unaccepted invitation means a student cannot clone. Refuses to run if `GH_ORG` doesn't match the
+org recorded in the file.
+
+```bash
+./dwellkit status dwellkit-results-*.csv --remind
+```
+Same, and re-sends every pending invitation (deletes and recreates it, which triggers a fresh
+notification email).
+
+### One-off builds
+
+```bash
+./dwellkit build pilot1
+```
+Builds a single repository. Use this once in a new organisation before any fan-out — it is the
+only way to discover whether push protection blocks the credential format, which would fail
+every student identically.
+
+```bash
+./dwellkit build amara-retry
+```
+Rebuilds for one student. There is no reset path once a student has rotated and rewritten, and
+re-running `class` will *not* rebuild — it skips repositories that already exist.
+
+```bash
+unset KIT_SALT; ./dwellkit build scratch1
+```
+Without `KIT_SALT` the credential is random rather than derived. Correct for throwaway builds;
+wrong for a cohort, where you want to re-derive values later.
+
+### Recovering a credential
+
+```bash
+printf 'sk_staging_%s\n' "$(printf '%s' "amara${KIT_SALT}" | sha256sum | cut -c1-40)"
+```
+Re-derives a student's credential from their `student_id` and the cohort salt. No clone, no API
+call — this is why `KIT_SALT` is worth keeping. Same value the build used.
+
+### Housekeeping
+
+```bash
+gh repo list "$GH_ORG" --limit 100 --json name --jq '.[].name' | grep '^hackathon-starter-'
+```
+Lists everything the kit created in this org.
+
+```bash
+gh repo list "$GH_ORG" --limit 100 --json name --jq '.[].name' \
+  | grep '^hackathon-starter-' \
+  | xargs -I{} gh repo delete "$GH_ORG/{}" --yes
+```
+Deletes them all. Needs a token with `delete_repo` scope, which the build token lacks by default.
+**Also remove the students as collaborators** — they consume paid seats until you do.
+
+```bash
+gh run list --repo "$GH_ORG/hackathon-starter-amara" --limit 1
+```
+Checks one student's CI state. Red is correct before they start; green means they have rotated.
+
+```bash
+./dwellkit help
+```
+Prints the usage block and every environment variable.
+
+---
+
 ## Deploying to a class
 
 The commands are in [Quick start](#quick-start) above. This section is the surrounding
