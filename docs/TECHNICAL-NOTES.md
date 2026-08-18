@@ -1,6 +1,6 @@
 # Technical Notes — The Secret You Can't Delete
 
-> **This is a point-in-time report of the original build-out.** Work has continued since: the tail was rebuilt for proper burial, and class-scale fan-out (`dwellkit class`, `dwellkit status`) has been built and verified. For current status see `TODO.md`; for deployment see `DEPLOY-RUNBOOK.md` and `FANOUT-DESIGN.md`.
+> **This is a point-in-time report of the original build-out.** Work has continued since: the tail was rebuilt for proper burial, and class-scale fan-out (`dwellkit class`, `dwellkit status`) has been built and verified. For current status see `TODO.md`; for deployment see the README and `FANOUT-DESIGN.md`.
 
 Status: **build-out complete**. All phases run against real GitHub (`KitsWorkshop` org). One phase (3, push-protection format testing) is unresolved on paper rather than empirically — see below, that's a real gap, not a formality.
 

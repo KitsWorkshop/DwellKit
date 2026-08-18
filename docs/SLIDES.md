@@ -597,7 +597,6 @@ What's left is teaching materials and org setup — and the brief is the piece t
 |---|---|
 | `INSTRUCTOR-GUIDE.md` | Full guide, zero knowledge assumed |
 | `STUDENT-EXPERIENCE.md` | Walkthrough + model solution ⚠️ instructor-only |
-| `DEPLOY-RUNBOOK.md` | One-student deployment checklist |
 | `FANOUT-DESIGN.md` | Class-scale deployment + constraints |
 | `TECHNICAL-NOTES.md` | Technical report |
 | `TODO.md` | Remaining work |

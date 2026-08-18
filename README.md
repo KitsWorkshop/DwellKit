@@ -17,7 +17,6 @@ Students receive a private repository with a real, plausible commit history. Som
 | If you want to… | Read |
 |---|---|
 | Understand the kit from zero — concepts, design decisions, infrastructure | [INSTRUCTOR-GUIDE.md](docs/INSTRUCTOR-GUIDE.md) |
-| Deploy to one student | [DEPLOY-RUNBOOK.md](docs/DEPLOY-RUNBOOK.md) |
 | Deploy to a whole class | [Deploying to a class](#deploying-to-a-class), below |
 | Understand the class-scale constraints (billing, GitHub Classroom) | [FANOUT-DESIGN.md](docs/FANOUT-DESIGN.md) |
 | Trial it with colleagues before a real cohort | [PILOT-RUNBOOK.md](docs/PILOT-RUNBOOK.md) |
@@ -33,15 +32,7 @@ Students receive a private repository with a real, plausible commit history. Som
 
 Requires `git`, `gh` (authenticated), `python3`, and a token with `repo` + `workflow` scope on the target org.
 
-**One repository:**
-
-```bash
-export GH_TOKEN=...        # repo + workflow scope
-export GH_ORG=your-org
-./dwellkit build alice      # → your-org/hackathon-starter-alice
-```
-
-**A whole class:**
+Deploying to a cohort is the workflow — there is no separate single-student path.
 
 ```bash
 # 1. Environment. Keep KIT_SALT — it re-derives any student's credential later.
@@ -77,6 +68,23 @@ Two things this sequence assumes you have already dealt with — both covered in
   external lead time.
 - **The student brief.** It ships in `templates/student-README.md` and is installed into every
   student repo automatically — but read it once before a cohort does.
+
+<details>
+<summary><strong>Building a single repository</strong> — rarely needed, two cases</summary>
+
+```bash
+./dwellkit build alice     # → $GH_ORG/hackathon-starter-alice
+```
+
+`class` calls this once per roster row, so it is not a separate workflow. You would run it
+directly only to:
+
+- **test push protection in a new org** (step 2 of the quickstart), or
+- **rebuild for one student mid-session.** There is no reset path once a student has rotated and
+  rewritten, and re-running `class` will *not* help — it skips repositories that already exist.
+  Build a fresh one under a new id (`./dwellkit build alice-retry`) and invite them to it.
+
+</details>
 
 ---
 

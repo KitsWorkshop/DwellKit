@@ -2,7 +2,7 @@
 
 Operational checklist for putting this kit in front of **3–8 colleagues acting as students**, before it ever meets a real cohort.
 
-`DEPLOY-RUNBOOK.md` covers exactly one student. This covers a group, and adds the parts a pilot needs and a single build doesn't: what to watch for, what to capture, and how to tear it all down afterwards.
+The README covers deploying to a cohort. This covers running a *rehearsal* with colleagues, and adds the parts a real deployment doesn't need: what to watch for, what to capture, and how to tear it all down afterwards.
 
 ---
 
@@ -272,7 +272,7 @@ To run again with the same people, rebuild with fresh ids (`pilot2-amara`).
 
 ## Troubleshooting
 
-`DEPLOY-RUNBOOK.md` has the full table. The three that bite hardest in a group setting:
+`INSTRUCTOR-GUIDE.md` has the full table. The three that bite hardest in a group setting:
 
 | Symptom | Cause | Fix |
 |---|---|---|

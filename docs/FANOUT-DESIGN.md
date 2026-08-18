@@ -182,4 +182,4 @@ export KIT_SALT=<per-cohort secret string — keep it>
 
 - **A write-level collaborator rotating the secret and force-pushing.** The endpoint, parameters, and token permissions are confirmed, and GitHub's documentation confirms write access suffices for Actions secrets — but this has not been executed with a real second account. **Test it once before a real class.**
 - **Whether your target org permits outside collaborators.** Institutional orgs frequently restrict this. Check before committing to Option A.
-- **Push protection against the credential format** — see `DEPLOY-RUNBOOK.md` §0.3. Still the single highest-risk unknown, and it affects all 30 repos identically.
+- **Push protection against the credential format** — build one throwaway repo in the target org (`./dwellkit build pilot1`) before any fan-out. Still the single highest-risk unknown, and it affects all 30 repos identically.

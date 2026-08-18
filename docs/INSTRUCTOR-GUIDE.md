@@ -186,21 +186,23 @@ Everything in this kit is parameterised by `GH_ORG`; nothing is hardcoded to any
 
 ---
 
-## Part 4 — Building a repository
+## Part 4 — How a repository gets built
+
+**`dwellkit class` is the deployment workflow** — roster validation, per-student builds, invitations, and a results report. The commands are in the README; the surrounding work is in its "Deploying to a class" section.
+
+This part explains what `class` does per student, because `dwellkit build` is the thing it calls once per row:
 
 ```bash
-export GH_TOKEN=<your token>
-export GH_ORG=<your teaching org>
-export KIT_PREFIX=hackathon-starter-   # optional; this is also the default
-
-./dwellkit build alice
+./dwellkit build alice     # → $GH_ORG/hackathon-starter-alice
 ```
 
-This produces a private repository named `<KIT_PREFIX>alice`, and takes roughly 15–50 seconds (the variance is GitHub API latency, not local work — applying all 203 patches locally accounts for only about 5 seconds of it). It prints the credential value at the end — **note it down or redact it**, depending on what you're doing with the output.
+Roughly 15–50 seconds per repository. The variance is GitHub API latency, not local work — applying all 203 patches locally accounts for only about 5 seconds of it. It prints the credential value at the end.
 
 The script is deliberately plain, linear shell with a commented step for each phase. It is meant to be read.
 
-> **For a whole class, use `dwellkit class` instead** — it wraps this builder with roster validation, per-student invitations, concurrency, and a results report. See `FANOUT-DESIGN.md`. `dwellkit build` remains the right tool for one-off builds and for the push-protection pre-flight check.
+> **You will rarely run `build` directly.** Two cases where you do:
+> - **The push-protection check in a new organisation** — one throwaway repo, deleted afterwards. This is the only way to find out whether your org's scanning blocks the credential format, and it fails every student identically if it does.
+> - **Rebuilding for one student mid-session.** There is no reset path: once a student has rotated and rewritten, the repo cannot be returned to its starting state. Re-running `class` will *not* help, because it skips repositories that already exist. Build a fresh one under a new id (`./dwellkit build alice-retry`) and invite them to it.
 
 **What it does, in order:**
 
@@ -220,6 +222,17 @@ The script is deliberately plain, linear shell with a commented step for each ph
 - It never writes the credential to any file in this repo — the patches contain only the `__KIT_SECRET__` placeholder.
 
 **Failure behaviour to be aware of:** the script has no cleanup or resume logic. If it fails partway (a transient API error, say), it leaves a partially-built repository behind. You'll need to delete that repo manually and re-run. Note that deleting requires a `delete_repo` scope that the standard build token does not have.
+
+---
+
+### What students need installed
+
+Tell them in advance — neither is a default install, and discovering it at the start of a session costs you twenty minutes:
+
+- **`git-filter-repo`** — `pip install --user git-filter-repo`, or `brew install git-filter-repo`
+- **A GitHub account**, with the repository invitation already accepted
+
+> Do **not** explain *why* they need `git-filter-repo`. Listing it as course tooling is fine; saying "you will need this to rewrite history" gives away the second half of the exercise.
 
 ---
 
@@ -360,6 +373,25 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 
 ---
 
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `GH_TOKEN is not set` | Env var missing | `export GH_TOKEN=...` — the script refuses to guess |
+| `refusing: computed repo name ... does not start with KIT_PREFIX` | Prefix guard tripped | Check `KIT_PREFIX` and the suffix argument |
+| `Resource not accessible by integration` | Wrong token type (app token, not a PAT) | Use a classic/fine-grained PAT with `repo` + `workflow` |
+| Push rejected, mentions **push protection** / **GH013** | Org scanning recognises the credential format | **Stop.** Change the format in `dwellkit build`, re-test. Affects every student. |
+| `Name already exists on this account` | Repo suffix reused | Pick a new suffix. `dwellkit build` is not idempotent; `dwellkit class` is (it skips existing repos) |
+| Build fails partway, repo left half-made | ⚠️ `class` treats an existing repo as done and will **skip** it — see `TODO.md` §4 | Delete the partial repo manually, then re-run |
+| Student: `Repository not found` on clone | Invitation not accepted, or never sent | `./dwellkit status <results.csv> --remind` |
+| Student cannot rotate the secret | Granted `pull` instead of `push` | Re-run `./dwellkit class` — it invites at `push` |
+| CI green at handover | Secret doesn't match the planted value | Rebuild — the starting state is wrong |
+| CI never runs | Actions disabled at org level | Enable Actions for the org/repo |
+
+---
+
+---
+
 ## Appendix — Files in this repository
 
 | File | Purpose |
@@ -371,7 +403,6 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 | `INSTRUCTOR-GUIDE.md` | This document. |
 | `STUDENT-EXPERIENCE.md` | **Instructor-only.** Beat-by-beat walkthrough of what students experience, the model solution path, common wrong turns, and marking guidance. Contains all the answers — do not distribute. |
 | `SLIDES.md` | Marp-format deck covering the whole kit — pedagogy, student journey, delivery, architecture, findings, readiness. **Spoils the exercise**; for instructor briefings and stakeholder demos, not for a cohort. |
-| `DEPLOY-RUNBOOK.md` | Operational checklist for getting a repo into one student's hands: pre-flight, build, access, verification, troubleshooting. |
 | `PILOT-RUNBOOK.md` | Running the kit with 3–8 colleagues acting as students, before it meets a real cohort. Closes three of the four open unknowns in one sitting. |
 | `FANOUT-DESIGN.md` | Scaling to a class: access models, the GitHub Education/billing constraint, why Classroom's template flow can't deliver this kit, and what to build. |
 | `TODO.md` | Remaining work before classroom-ready, ordered by what blocks what. |
