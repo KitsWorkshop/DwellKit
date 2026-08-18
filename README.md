@@ -103,7 +103,11 @@ directly only to:
 
 ## Command reference
 
-Every command assumes `GH_TOKEN` and `GH_ORG` are exported. `class` additionally requires `KIT_SALT`.
+Every command assumes `GH_TOKEN` and `GH_ORG` are exported — there is no path that works without
+them, since even `--dry-run` calls the API to probe the org and check every username.
+
+`class` additionally requires `KIT_SALT`, **except** for `--dry-run`, which derives no credentials.
+A dry run without a salt warns and proceeds, so you can check a roster before deciding on one.
 
 ### Deploying
 
@@ -112,6 +116,7 @@ Every command assumes `GH_TOKEN` and `GH_ORG` are exported. `class` additionally
 ```
 Validates every GitHub username in the roster against the API and reports duplicates, missing
 usernames, and malformed rows. **Creates nothing.** Refuses the whole run if any row is bad.
+`KIT_SALT` is optional here — a dry run derives no credentials.
 
 ```bash
 ./dwellkit class roster.csv

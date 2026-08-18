@@ -9,7 +9,7 @@
 # Environment:
 #   GH_TOKEN    required   token with repo + workflow scope on GH_ORG
 #   GH_ORG      required   organisation to build into
-#   KIT_SALT    see below  per-cohort secret; required by `class`
+#   KIT_SALT    see below  per-cohort secret; required by `class` (not by `class --dry-run`)
 #   KIT_PREFIX  optional   repo name prefix (default: hackathon-starter-)
 #   CONCURRENCY optional   parallel builds during `class` (default: 5)
 #
@@ -263,7 +263,22 @@ cmd_class() {
   [ "${2:-}" = "--dry-run" ] && DRY_RUN=true
 
   require_env
-  : "${KIT_SALT:?KIT_SALT is not set. Pick a per-cohort secret string and keep it: it is what makes credentials reproducible.}"
+
+  # KIT_SALT is what makes credentials reproducible, so a real run cannot
+  # proceed without it. A dry run never derives a credential, though, and
+  # requiring one just to check a roster for typos is friction for no gain —
+  # so warn there instead of refusing, and still say the real run will fail.
+  if [ -z "${KIT_SALT:-}" ]; then
+    if [ "$DRY_RUN" = true ]; then
+      echo "    NOTE: KIT_SALT is not set. Fine for --dry-run, which derives no credentials."
+      echo "          The real run will refuse without it."
+      KIT_SALT=""
+    else
+      echo "KIT_SALT is not set. Pick a per-cohort secret string and keep it: it is what makes credentials reproducible." >&2
+      exit 1
+    fi
+  fi
+
   local CONCURRENCY="${CONCURRENCY:-5}"
   export GH_ORG KIT_PREFIX KIT_SALT SCRIPT_DIR
 
