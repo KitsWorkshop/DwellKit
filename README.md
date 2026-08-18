@@ -32,13 +32,13 @@ Students receive a private repository with a real, plausible commit history. Som
 
 Requires `git`, `gh` (authenticated), `python3`, and a token with `repo` + `workflow` scope on the target org.
 
-Deploying to a cohort is the workflow — there is no separate single-student path.
+Deploying to a class.
 
 ```bash
 # 1. Environment. Keep KIT_SALT — it re-derives any student's credential later.
 export GH_TOKEN=...        # repo + workflow scope on the target org
 export GH_ORG=your-org
-export KIT_SALT=...        # any secret string, one per cohort
+export KIT_SALT=...        # any secret string, one per class/cohort
 
 # 2. First time in this org? Build one throwaway repo and delete it.
 #    This is the only way to test push protection, which fails ALL students at once.
