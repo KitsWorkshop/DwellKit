@@ -24,7 +24,7 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
 - [x] ~~**Decide the access mechanism**~~ → **Option A: outside-collaborator invitations** at `permission=push`.
   **GitHub Classroom was ruled out on a hard technical constraint**, not preference: its assignment flow provisions repos from a *template*, and templates start with a single commit. That would erase the 3,059-commit history the exercise depends on. Classroom remains usable for roster/identity only.
 - [x] ~~**Build the roster mechanism**~~ → `roster.csv` + `dwellkit class`, with pre-flight validation that every username actually exists before anything is created.
-- [ ] **Confirm invited students can perform every required action** (~15 min, needs a second GitHub account to test properly)
+- [ ] **Confirm invited students can perform every required action** (~15 min, needs a second GitHub account to test properly — or run `PILOT-RUNBOOK.md`, which closes this plus two other unknowns in one sitting)
   Verified from documentation already: **write access is sufficient** to manage Actions secrets, so students can rotate. Still worth confirming live that a write-level collaborator can also force-push (branch protection is off, so this should hold).
 
 > **Note:** it is worth testing this end-to-end with a real second account rather than assuming. A student who cannot rotate the secret cannot complete the exercise's central action.

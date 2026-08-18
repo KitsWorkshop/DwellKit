@@ -19,6 +19,7 @@ Students receive a private repository with a real, plausible commit history. Som
 | Understand the kit from zero — concepts, design decisions, infrastructure | [INSTRUCTOR-GUIDE.md](INSTRUCTOR-GUIDE.md) |
 | Deploy to one student | [DEPLOY-RUNBOOK.md](DEPLOY-RUNBOOK.md) |
 | Deploy to a whole class | [FANOUT-DESIGN.md](FANOUT-DESIGN.md) |
+| Trial it with colleagues before a real cohort | [PILOT-RUNBOOK.md](PILOT-RUNBOOK.md) |
 | Know what students actually experience, and how to mark it | [STUDENT-EXPERIENCE.md](STUDENT-EXPERIENCE.md) |
 | Brief colleagues or stakeholders | [SLIDES.md](SLIDES.md) (Marp) |
 | Know what still needs building | [TODO.md](TODO.md) |
@@ -72,6 +73,7 @@ Total: 3,059 commits. The plant and scrub sit far enough back that `git log` wil
 | `roster.example.csv` | Roster format. |
 | `floor.bundle` | The authentic 2,855-commit history, serialised. |
 | `tail/*.patch` | The 203-patch series applied on top. |
+| `PILOT-RUNBOOK.md` | Running the kit with 3–8 colleagues as a dry run: setup, facilitation, what to capture, teardown. |
 | `agent-spec.md` | The original build spec, kept unedited for intent. Superseded in places by `TECHNICAL-NOTES.md`. |
 
 `roster.csv`, `dwellkit-results-*.csv`, and build logs are gitignored — they contain student identities and live credential values.

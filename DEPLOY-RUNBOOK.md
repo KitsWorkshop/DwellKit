@@ -4,7 +4,7 @@ Operational checklist for getting a working repository into one student's hands.
 
 For *why* any of this works the way it does, see `INSTRUCTOR-GUIDE.md`. This document assumes you have read it, or don't need to.
 
-**Scope:** one student. **For a whole class, use `dwellkit class`** — it wraps this same flow with roster validation, per-student invitations, concurrency, and a results report. See `FANOUT-DESIGN.md`. This runbook remains the right reference for a single build, for the push-protection pre-flight, and for understanding what `dwellkit class` does per student.
+**Scope:** one student. **To trial the kit with several colleagues acting as students, use `PILOT-RUNBOOK.md`.** **For a whole class, use `dwellkit class`** — it wraps this same flow with roster validation, per-student invitations, concurrency, and a results report. See `FANOUT-DESIGN.md`. This runbook remains the right reference for a single build, for the push-protection pre-flight, and for understanding what `dwellkit class` does per student.
 
 ---
 
