@@ -37,7 +37,7 @@ if [ "${1:-}" = "--deploy-one" ]; then
   if gh api "repos/${GH_ORG}/${REPO_NAME}" >/dev/null 2>&1; then
     NOTE="repo already existed; build skipped"
   else
-    if ! KIT_SALT="$KIT_SALT" "$SCRIPT_DIR/spike.sh" "$STUDENT_ID" >"$OUTDIR/$STUDENT_ID.build.log" 2>&1; then
+    if ! KIT_SALT="$KIT_SALT" "$SCRIPT_DIR/build-repo.sh" "$STUDENT_ID" >"$OUTDIR/$STUDENT_ID.build.log" 2>&1; then
       printf '%s,%s,%s,,build-failed,see %s\n' \
         "$STUDENT_ID" "$GH_USER" "$REPO_NAME" "$OUTDIR/$STUDENT_ID.build.log" > "$OUTDIR/$STUDENT_ID.row"
       exit 0
@@ -62,7 +62,7 @@ fi
 : "${GH_TOKEN:?GH_TOKEN is not set. Stop — do not fall back to a personal namespace.}"
 : "${GH_ORG:?GH_ORG is not set. Stop — do not fall back to a personal namespace.}"
 : "${KIT_SALT:?KIT_SALT is not set. Pick a per-cohort secret string and keep it: it is what makes credentials reproducible.}"
-KIT_PREFIX="${KIT_PREFIX:-secretkit-}"
+KIT_PREFIX="${KIT_PREFIX:-hackathon-starter-}"
 CONCURRENCY="${CONCURRENCY:-5}"
 
 export GH_TOKEN GH_ORG KIT_PREFIX KIT_SALT SCRIPT_DIR

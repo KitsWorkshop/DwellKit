@@ -1,5 +1,7 @@
 # Agent Spec — Secret Kit, Day-One Spike
 
+> **Historical note:** this is the original specification, kept unedited. Names have since changed: `spike.sh` is now `build-repo.sh`, `SPIKE-FINDINGS.md` is now `TECHNICAL-NOTES.md`, and the default `KIT_PREFIX` is now `hackathon-starter-`. Several assumptions here were also revised during the build; where they conflict, `TECHNICAL-NOTES.md` is authoritative.
+
 Hand this to Claude Code as the task. It assumes no prior context beyond what it can read on disk.
 
 ---

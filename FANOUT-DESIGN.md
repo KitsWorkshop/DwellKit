@@ -28,7 +28,7 @@ Each collaborator counts **once**, regardless of how many repos they touch. Org 
 
 **A class of 30 therefore needs 31 seats.** The `KitsWorkshop` org currently has `filled_seats: 1, seats: 1`.
 
-**The fix is not to pay for it.** Verified educators can apply for **free GitHub Team with unlimited users and unlimited private repositories** through GitHub Education. This single action removes the billing problem entirely, and it is the highest-leverage thing on this page.
+**The fix is not to pay for it, and not to change tier.** `KitsWorkshop` is *already* on Team — that is precisely what creates the per-seat cost, not something to upgrade away from. GitHub Education grants verified educators **the same Team plan, free, with unlimited users and unlimited private repositories**. What you need is the Education grant applied to this org, not a different plan.
 
 > **Do this first.** Verification is an external process with a lead time measured in days, so start it before writing any code.
 
@@ -53,7 +53,7 @@ Building the loop is trivial. These are not.
 Build each repo, then invite the student directly:
 
 ```bash
-gh api -X PUT "repos/$ORG/secretkit-$STUDENT/collaborators/$GH_USER" -f permission=push
+gh api -X PUT "repos/$ORG/hackathon-starter-$STUDENT/collaborators/$GH_USER" -f permission=push
 ```
 
 | | |
@@ -141,7 +141,7 @@ export KIT_SALT=<per-cohort secret string — keep it>
 
 ### Design decisions
 
-**Deterministic credentials.** `spike.sh` now derives the credential from `sha256(student_id + KIT_SALT)` when `KIT_SALT` is set, and stays random when it isn't (correct for one-off builds). This means a repo can be rebuilt identically after a failure, and any student's value can be re-derived for marking without having recorded thirty of them.
+**Deterministic credentials.** `build-repo.sh` now derives the credential from `sha256(student_id + KIT_SALT)` when `KIT_SALT` is set, and stays random when it isn't (correct for one-off builds). This means a repo can be rebuilt identically after a failure, and any student's value can be re-derived for marking without having recorded thirty of them.
 
 > **Keep `KIT_SALT` safe and unchanged for the cohort.** Losing it means losing the ability to re-derive credentials. Changing it mid-cohort means new repos get different values from existing ones.
 

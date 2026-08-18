@@ -140,11 +140,11 @@ Notably **not** required: PyNaCl or any cryptography library. An earlier version
 
 The token is an **instructor/CI-side credential**, used to create repositories and set secrets. Students authenticate as themselves with their own GitHub accounts and never touch it.
 
-For the spike a **classic Personal Access Token** with `repo` and `workflow` scopes was used. Be aware of what that means: **classic PATs are not scoped to an organisation.** A classic PAT with `repo` grants access to every repository the issuing account can reach, everywhere — not just your teaching org. The restriction to one org and one repo-name prefix is enforced by the *script's* logic, not by the token.
+During development a **classic Personal Access Token** with `repo` and `workflow` scopes was used. Be aware of what that means: **classic PATs are not scoped to an organisation.** A classic PAT with `repo` grants access to every repository the issuing account can reach, everywhere — not just your teaching org. The restriction to one org and one repo-name prefix is enforced by the *script's* logic, not by the token.
 
-**For anything beyond a one-off spike, use one of these instead:**
+**For anything beyond a one-off test build, use one of these instead:**
 
-- **A fine-grained PAT** restricted to the teaching organisation. Note it cannot be scoped to a name *pattern* (`secretkit-*`) because the repos don't exist when the token is created — you grant "all repositories in the org" plus Administration, Secrets, Contents, and Actions write. The benefit is that it cannot touch anything outside that org.
+- **A fine-grained PAT** restricted to the teaching organisation. Note it cannot be scoped to a name *pattern* (`hackathon-starter-*`) because the repos don't exist when the token is created — you grant "all repositories in the org" plus Administration, Secrets, Contents, and Actions write. The benefit is that it cannot touch anything outside that org.
 - **A GitHub App installation** — the best option for a real rollout. Org-scoped, not tied to any individual instructor's account, independently revocable, and auditable.
 
 ### The push protection consideration — read this before deploying
@@ -169,16 +169,16 @@ The kit uses an **invented vendor format**: `sk_staging_` followed by 40 hex cha
 ```bash
 export GH_TOKEN=<your token>
 export GH_ORG=<your teaching org>
-export KIT_PREFIX=secretkit-        # optional; defaults to secretkit-spike-
+export KIT_PREFIX=hackathon-starter-   # optional; this is also the default
 
-./spike.sh alice
+./build-repo.sh alice
 ```
 
 This produces a private repository named `<KIT_PREFIX>alice`, and takes roughly 15–50 seconds (the variance is GitHub API latency, not local work — applying all 203 patches locally accounts for only about 5 seconds of it). It prints the credential value at the end — **note it down or redact it**, depending on what you're doing with the output.
 
 The script is deliberately plain, linear shell with a commented step for each phase. It is meant to be read.
 
-> **For a whole class, use `fanout.sh` instead** — it wraps this builder with roster validation, per-student invitations, concurrency, and a results report. See `FANOUT-DESIGN.md`. `spike.sh` remains the right tool for one-off builds and for the push-protection pre-flight check.
+> **For a whole class, use `fanout.sh` instead** — it wraps this builder with roster validation, per-student invitations, concurrency, and a results report. See `FANOUT-DESIGN.md`. `build-repo.sh` remains the right tool for one-off builds and for the push-protection pre-flight check.
 
 **What it does, in order:**
 
@@ -262,7 +262,7 @@ Students who already know this tooling will finish in ten minutes. Have the exte
 
 ### A tuning note
 
-When the workflow fails, its log says: *"STAGING_API_KEY still matches the value that leaked into git history."* That is a fairly strong hint toward the answer. Depending on how much you want students to discover unaided, consider softening it to something like *"deployment credential validation failed"* before running the exercise. It's a one-line edit in `spike.sh`.
+When the workflow fails, its log says: *"STAGING_API_KEY still matches the value that leaked into git history."* That is a fairly strong hint toward the answer. Depending on how much you want students to discover unaided, consider softening it to something like *"deployment credential validation failed"* before running the exercise. It's a one-line edit in `build-repo.sh`.
 
 ### Marking
 
@@ -301,7 +301,7 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 |---|---|---|
 | ~~Students cannot access the repos~~ | ✅ **Done** | `fanout.sh` invites each student as a collaborator at `permission=push`. |
 | ~~No per-student fan-out~~ | ✅ **Done** | `fanout.sh` builds a repo per student from a roster, concurrently, with deterministic credentials and idempotent re-runs. |
-| **GitHub Education verification** | **Blocking for a real cohort** | Private-repo collaborators consume paid seats — 30 students needs 31, versus the 1 a bare Team org has. Education verification gives free Team with unlimited users. External lead time; start it early. See `FANOUT-DESIGN.md`. |
+| **GitHub Education verification** | **Blocking for a real cohort** | Private-repo collaborators consume paid seats — 30 students needs 31, versus the 1 a bare Team org has. Note the org is *already* on Team — that is the cause, not the cure. Education grants the same Team plan free with unlimited users. External lead time; start it early. See `FANOUT-DESIGN.md`. |
 | **Push protection format unvalidated** | **High risk** | See Part 3. Could cause every repo to fail to build in an org that enforces scanning. Cheapest mitigation: build one repo in your real target org and see if it pushes. |
 | **No student-facing brief** | Required | Was explicitly out of scope for the build. You need one, and it must state that marking is on ordering. |
 | **No prevention artifact** | Needed for the full lesson | Step 3 of the three-step lesson (rotate → rewrite → prevent) has no built component — no pre-commit hook, scanner config, or equivalent. Also the designated extension for fast finishers. |
@@ -318,7 +318,7 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 
 ### Housekeeping
 
-- Several throwaway repositories from development remain in the build org (`secretkit-spike-pushtest`, `-demo1`, `-demo2`, `-demo3`, `-demo5`, `-demo6`). They need manual deletion; the build token lacks the `delete_repo` scope. `-demo4` should also go — it was built with the earlier shallow tail and is superseded. **`secretkit-spike-demo7`** is the intentionally-preserved demo repo.
+- Several throwaway repositories from development remain in the build org (`secretkit-spike-pushtest`, `-demo1`, `-demo2`, `-demo3`, `-demo5`, `-demo6`). They need manual deletion; the build token lacks the `delete_repo` scope. `-demo4` should also go — it was built with the earlier shallow tail and is superseded. **`secretkit-spike-demo7`** is the intentionally-preserved demo repo. *(These repos keep their literal `secretkit-spike-*` names because that is what they are actually called on GitHub — they predate the rename to the `hackathon-starter-` prefix.)*
 - The classic PAT used during development was entered in plaintext into a chat transcript. It was never written to any file in this repository, but it should be revoked and reissued.
 
 ---
@@ -327,7 +327,7 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 
 | File | Purpose |
 |---|---|
-| `spike.sh` | The builder. Produces one complete student repo. Plain, linear, commented — meant to be read. |
+| `build-repo.sh` | The builder. Produces one complete student repo. Plain, linear, commented — meant to be read. |
 | `fanout.sh` | Class-scale deployment: roster validation → build → invite → report. Concurrent, idempotent. |
 | `check-invites.sh` | Reports who hasn't accepted their invitation; `--remind` re-sends. |
 | `roster.example.csv` | Roster format (`student_id,github_username`). |
@@ -339,8 +339,8 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 | `DEPLOY-RUNBOOK.md` | Operational checklist for getting a repo into one student's hands: pre-flight, build, access, verification, troubleshooting. |
 | `FANOUT-DESIGN.md` | Scaling to a class: access models, the GitHub Education/billing constraint, why Classroom's template flow can't deliver this kit, and what to build. |
 | `TODO.md` | Remaining work before classroom-ready, ordered by what blocks what. |
-| `SPIKE-FINDINGS.md` | Full technical report — what was tested, what broke, timings, open questions. |
+| `TECHNICAL-NOTES.md` | Full technical report — what was tested, what broke, timings, open questions. |
 | `PROGRESS.md` | Short status summary suitable for reporting. |
-| `agent-spec.md` | The original build specification. Useful for understanding intent; note that several of its assumptions were revised during the build, and where they conflict, the findings document is authoritative. |
+| `agent-spec.md` | The original build specification. Useful for understanding intent; note that several of its assumptions were revised during the build, and where they conflict, `TECHNICAL-NOTES.md` is authoritative. |
 
 A built student repository contains **3,059 commits**: 2,855 floor + 203 tail + 1 workflow commit added at build time.

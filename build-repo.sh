@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 #
-# spike.sh — build one student repo for "The Secret You Can't Delete".
+# build-repo.sh — build ONE student repo for "The Secret You Can't Delete".
 #
-# This is a day-one spike script: plain, linear shell. Every numbered step
-# below is a stand-in for a future kitscript task/microtask; the comment on
-# each step says what that eventual task would be called.
+# For a whole class, use fanout.sh, which drives this script once per student.
+#
+# Plain, linear shell by design. Every numbered step below is a stand-in for a
+# future kitscript task/microtask; the comment on each step says what that
+# eventual task would be called.
 #
 # Usage:
-#   GH_TOKEN=... GH_ORG=... [KIT_PREFIX=secretkit-spike-] ./spike.sh <suffix>
+#   GH_TOKEN=... GH_ORG=... [KIT_PREFIX=hackathon-starter-] ./build-repo.sh <suffix>
 #
 # Re-runnable: a different <suffix> produces a fully independent repo.
 
@@ -19,9 +21,9 @@ set -euo pipefail
 
 : "${GH_TOKEN:?GH_TOKEN is not set. Stop — do not fall back to a personal namespace.}"
 : "${GH_ORG:?GH_ORG is not set. Stop — do not fall back to a personal namespace.}"
-KIT_PREFIX="${KIT_PREFIX:-secretkit-spike-}"
+KIT_PREFIX="${KIT_PREFIX:-hackathon-starter-}"
 
-SUFFIX="${1:?Usage: spike.sh <repo-suffix>}"
+SUFFIX="${1:?Usage: build-repo.sh <repo-suffix>}"
 REPO_NAME="${KIT_PREFIX}${SUFFIX}"
 
 case "$REPO_NAME" in
@@ -33,14 +35,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKDIR="$(mktemp -d)"
 trap 'rm -rf "$WORKDIR"' EXIT
 
-# The one hardcoded credential value for this spike. Per-student seeding via
-# sha256(student_id + salt) is explicitly out of scope — see agent-spec.md
-# Non-goals.
-#
-# WARNING: this format is UNVALIDATED against GitHub push protection. No
-# format testing was possible (the build org has no secret scanning — see
-# SPIKE-FINDINGS.md Phase 3). If you deploy to an org that HAS push
-# protection enabled, verify this format is not blocked before running a
+# WARNING: this credential format is UNVALIDATED against GitHub push
+# protection. No format testing was possible (the build org has no secret
+# scanning — see TECHNICAL-NOTES.md Phase 3). If you deploy to an org that HAS
+# push protection enabled, verify this format is not blocked before running a
 # fan-out, or every student repo will fail to push at once.
 # If KIT_SALT is set, the credential is derived deterministically from
 # sha256(suffix + salt). This means a repo can be rebuilt identically after a
@@ -60,8 +58,8 @@ export GH_TOKEN
 # ---------------------------------------------------------------------------
 # Step 1 — floor: unpack the authentic history bundle.
 # Eventual kitscript task: git-bundle-checkout
-# (does not exist yet as of this spike; this is plain `git clone` against a
-# bundle file, which is exactly what that task needs to wrap.)
+# (does not exist yet; this is plain `git clone` against a bundle file,
+# which is exactly what that task needs to wrap.)
 # ---------------------------------------------------------------------------
 echo "==> [1/7] Unpacking floor bundle"
 git clone --quiet "$SCRIPT_DIR/floor.bundle" "$WORKDIR/repo"
@@ -71,8 +69,8 @@ git remote remove origin
 
 # ---------------------------------------------------------------------------
 # Step 2 — tail: apply the scripted patch series on top of the floor.
-# Eventual kitscript task: git-tail-apply (explicitly a non-goal to build as
-# a reusable image for this spike — inline is correct here).
+# Eventual kitscript task: git-tail-apply (out of scope to build as a
+# reusable image for now — inline is correct here).
 # Substitutes the __KIT_SECRET__ placeholder for the real credential value
 # as each patch is applied.
 # ---------------------------------------------------------------------------
@@ -93,7 +91,7 @@ echo "    tail applied: $(ls "$SCRIPT_DIR"/tail/*.patch | wc -l | tr -d ' ') com
 # Eventual kitscript task: github-repo-create (with: services: github)
 # ---------------------------------------------------------------------------
 echo "==> [3/7] Creating private repo $GH_ORG/$REPO_NAME"
-gh repo create "$GH_ORG/$REPO_NAME" --private --description "Secret Kit spike repo" >/dev/null
+gh repo create "$GH_ORG/$REPO_NAME" --private --description "Hackathon starter application" >/dev/null
 
 # ---------------------------------------------------------------------------
 # Step 4 — push floor + tail.

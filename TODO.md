@@ -9,7 +9,7 @@ Ordered by what blocks what. Effort estimates assume familiarity with the codeba
 ## 0. Do this first — highest information per unit effort
 
 - [ ] **Build one repo in the real target organisation** (~10 min)
-  Run `./spike.sh pilot1` against the organisation you will actually teach from, not the development sandbox.
+  Run `./build-repo.sh pilot1` against the organisation you will actually teach from, not the development sandbox.
   **This single action validates three separate unknowns at once:** whether push protection blocks the credential format, whether your token has sufficient permissions, and whether org policy (default branch protection, Actions restrictions, required workflows) interferes.
   *Acceptance: repo builds, push succeeds, workflow runs and reports red.*
 
@@ -40,7 +40,7 @@ Implemented in `fanout.sh`: per-repo outside-collaborator invitations at `permis
 **Still open in this area:**
 - [ ] **Teardown script** (~15 min) — bulk delete after the exercise. Needs `delete_repo` scope, which the build token lacks.
 - [ ] **Retry with backoff** (~30 min) — failures are reported and retryable by re-running, but there is no automatic backoff on secondary rate limits.
-- [ ] **⚠️ GitHub Education verification** (external, days) — private-repo collaborators consume paid seats; 30 students needs 31. Education gives free Team with unlimited users. **Now the main blocker for a real cohort.** See `FANOUT-DESIGN.md`.
+- [ ] **⚠️ GitHub Education verification** (external, days) — private-repo collaborators consume paid seats; 30 students needs 31. The org is already on Team — that is what creates the cost. Education grants the same Team plan free with unlimited users. **Now the main blocker for a real cohort.** See `FANOUT-DESIGN.md`.
 
 ---
 
@@ -86,7 +86,7 @@ Implemented in `fanout.sh`: per-repo outside-collaborator invitations at `permis
 ## 5. Tuning and polish
 
 - [ ] **Consider softening the workflow failure message** (~2 min)
-  It currently reads *"STAGING_API_KEY still matches the value that leaked into git history"* — a strong hint delivered by CI at the exact moment the student should be working it out unaided. Something like *"deployment credential validation failed"* preserves the red/green signal without spoiling the reveal. One-line edit in `spike.sh`.
+  It currently reads *"STAGING_API_KEY still matches the value that leaked into git history"* — a strong hint delivered by CI at the exact moment the student should be working it out unaided. Something like *"deployment credential validation failed"* preserves the red/green signal without spoiling the reveal. One-line edit in `build-repo.sh`.
 - [ ] **Consider the pre-red CI state** (~15 min of thought)
   Students clone a repository whose CI is *already* failing, before they have done anything. This may read as "the exercise is broken" rather than "there is a problem to solve." Worth either addressing in the brief or reconsidering whether the workflow should only start failing after the student's first push.
 - [ ] **Review tail commit dates** (~10 min)
@@ -96,12 +96,12 @@ Implemented in `fanout.sh`: per-repo outside-collaborator invitations at `permis
 
 ## 6. Housekeeping
 
-- [ ] **Revoke the development PAT**
-  The classic PAT used during the build was entered in plaintext into a chat transcript. It was never written to any file in this repository, but it should be considered exposed. Revoke and reissue.
+- [ ] **Revoke the development PATs — both of them**
+  **Two** classic PATs were entered in plaintext into a chat transcript: the original build token, and a second one used to rename the repository. Neither was written to any file in this repository, but both must be considered exposed. Revoke both and reissue.
 - [ ] **Delete leftover development repositories**
   `secretkit-spike-pushtest`, `-demo1`, `-demo2`, `-demo3`, `-demo5`, `-demo6` in the build org. Requires manual deletion — the build token lacks `delete_repo` scope.
   Also delete **`-demo4`** — it was built with the earlier shallow tail and is superseded.
-  **Keep `secretkit-spike-demo7`** — it is the preserved, correctly-staged demo repo, built with the current buried tail.
+  **Keep `secretkit-spike-demo7`** — it is the preserved, correctly-staged demo repo, built with the current buried tail. *(These repos keep their literal `secretkit-spike-*` names because that is what they are actually called on GitHub — they predate the rename to the `hackathon-starter-` prefix.)*
 - [ ] **Move to an org-scoped credential for real rollout**
   Classic PATs are not org-scoped; they grant access to everything the issuing account can reach. Replace with a fine-grained PAT restricted to the teaching org, or preferably a GitHub App installation (not tied to any individual instructor, independently revocable, auditable). See `INSTRUCTOR-GUIDE.md` Part 3.
 

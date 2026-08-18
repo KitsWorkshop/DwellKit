@@ -13,7 +13,7 @@ activity. Safe for: instructor briefings, curriculum review, stakeholder demos.
 
 # The Secret You Can't Delete
 
-### A teaching kit for credential-leak response
+### DwellKit — a teaching kit for credential-leak response
 
 **Status:** working prototype, verified end to end
 **Build effort:** very low · **Time box:** 45–60 min, in class
@@ -104,6 +104,24 @@ Transfers directly to:
 - Leaked tokens in logs
 - Exposed database backups
 - Any accidental publication
+
+---
+
+## Why it's called DwellKit
+
+**Dwell time** — the interval between a compromise happening and anyone noticing.
+
+Students reliably find the credential they deleted a minute ago.
+The one that has been sitting in the history since **March** is the one they walk past.
+
+| | |
+|---|---|
+| What students measure | "Did I remove it?" |
+| What actually matters | "How long has it been out, and who had it?" |
+
+**The exercise is a dwell-time problem wearing a git costume.**
+
+It's also a term they will meet again in incident response — worth planting early.
 
 ---
 
@@ -418,7 +436,7 @@ The workflow compares a **SHA-256 hash** — it never contains the credential.
 ```bash
 export GH_TOKEN=<token>
 export GH_ORG=<your teaching org>
-./spike.sh alice
+./build-repo.sh alice
 ```
 
 ⏱ **15–50 seconds** per repo — dominated by GitHub API latency, not local work.
@@ -441,7 +459,7 @@ The build org had no secret scanning available to test against.
 
 ---
 
-# Part 6 — What the spike proved
+# Part 6 — What was proved
 
 ---
 
@@ -572,7 +590,7 @@ What's left is teaching materials and org setup — and the brief is the piece t
 
 # Questions?
 
-**Repo:** `KitsWorkshop/ScrubKit`
+**Repo:** `KitsWorkshop/DwellKit`
 **Demo:** `secretkit-spike-demo7` (private)
 
 | Document | Purpose |
@@ -581,7 +599,7 @@ What's left is teaching materials and org setup — and the brief is the piece t
 | `STUDENT-EXPERIENCE.md` | Walkthrough + model solution ⚠️ instructor-only |
 | `DEPLOY-RUNBOOK.md` | One-student deployment checklist |
 | `FANOUT-DESIGN.md` | Class-scale deployment + constraints |
-| `SPIKE-FINDINGS.md` | Technical report |
+| `TECHNICAL-NOTES.md` | Technical report |
 | `TODO.md` | Remaining work |
 
-**Scripts:** `spike.sh` (one repo) · `fanout.sh` (a class) · `check-invites.sh`
+**Scripts:** `build-repo.sh` (one repo) · `fanout.sh` (a class) · `check-invites.sh`

@@ -42,7 +42,7 @@ pip install --user git-filter-repo
 ```bash
 export GH_TOKEN=<classic PAT with repo + workflow scopes>
 export GH_ORG=<your teaching org>
-export KIT_PREFIX=secretkit-
+export KIT_PREFIX=hackathon-starter-   # optional; this is also the default
 ```
 
 Confirm the token works and has the right scopes:
@@ -65,11 +65,11 @@ gh api "orgs/$GH_ORG" --jq '.login'
 **This can invalidate the whole approach, so do it before anything else.**
 
 ```bash
-./spike.sh pushcheck
+./build-repo.sh pushcheck
 ```
 
 - **Succeeds** → the credential format gets through your org's scanning. Proceed.
-- **Fails with a push-protection / GH013 error** → **stop.** The planted credential format is being blocked. Every student repo will fail identically. You will need to change the credential format in `spike.sh` and re-test before going further.
+- **Fails with a push-protection / GH013 error** → **stop.** The planted credential format is being blocked. Every student repo will fail identically. You will need to change the credential format in `build-repo.sh` and re-test before going further.
 
 This single command also validates your token permissions and org policy at the same time.
 
@@ -79,7 +79,7 @@ This single command also validates your token permissions and org policy at the 
 
 ```bash
 STUDENT=alice          # your label for the repo; not necessarily their username
-./spike.sh "$STUDENT"
+./build-repo.sh "$STUDENT"
 ```
 
 Expected output ends with:
@@ -87,7 +87,7 @@ Expected output ends with:
 ```
 ==> [7/7] Confirming branch protection is off
     OK: no branch protection on main
-==> Done: https://github.com/<org>/secretkit-alice
+==> Done: https://github.com/<org>/hackathon-starter-alice
     credential value (redact before sharing notes): sk_staging_...
 ```
 
@@ -102,7 +102,7 @@ Save the printed value against the student's name. You will want it to confirm t
 **If you lose it**, recover it from the repo:
 
 ```bash
-gh repo clone "$GH_ORG/secretkit-$STUDENT" /tmp/recover
+gh repo clone "$GH_ORG/hackathon-starter-$STUDENT" /tmp/recover
 cd /tmp/recover
 git log --all -p -S'sk_staging_' -- config/staging.env | grep STAGING_API_KEY | head -1
 ```
@@ -111,14 +111,14 @@ git log --all -p -S'sk_staging_' -- config/staging.env | grep STAGING_API_KEY | 
 
 ## §3 — Grant the student access
 
-> ⚠️ **Not performed by `spike.sh`.** This is a manual step; a built repo is private and unreachable until you do it.
+> ⚠️ **Not performed by `build-repo.sh`.** This is a manual step; a built repo is private and unreachable until you do it.
 
 You need their **GitHub username** — not an email, not a student ID.
 
 ```bash
 GH_USER=<their-github-username>
 
-gh api -X PUT "repos/$GH_ORG/secretkit-$STUDENT/collaborators/$GH_USER" \
+gh api -X PUT "repos/$GH_ORG/hackathon-starter-$STUDENT/collaborators/$GH_USER" \
   -f permission=push
 ```
 
@@ -139,11 +139,11 @@ gh api -X PUT "repos/$GH_ORG/secretkit-$STUDENT/collaborators/$GH_USER" \
 
 ```bash
 # Outstanding (unaccepted) invitations:
-gh api "repos/$GH_ORG/secretkit-$STUDENT/invitations" \
+gh api "repos/$GH_ORG/hackathon-starter-$STUDENT/invitations" \
   --jq '.[] | "PENDING: \(.invitee.login)"'
 
 # Actual collaborators (accepted):
-gh api "repos/$GH_ORG/secretkit-$STUDENT/collaborators" \
+gh api "repos/$GH_ORG/hackathon-starter-$STUDENT/collaborators" \
   --jq '.[] | "\(.login)  \(.role_name)"'
 ```
 
@@ -153,23 +153,23 @@ A student showing under **PENDING** cannot clone yet. Chase them.
 
 ```bash
 # CI should be RED — this is correct, not a fault
-gh api "repos/$GH_ORG/secretkit-$STUDENT/actions/runs" \
+gh api "repos/$GH_ORG/hackathon-starter-$STUDENT/actions/runs" \
   --jq '.workflow_runs[0].conclusion'
 # expect: failure
 
 # The secret should exist
-gh secret list --repo "$GH_ORG/secretkit-$STUDENT"
+gh secret list --repo "$GH_ORG/hackathon-starter-$STUDENT"
 # expect: STAGING_API_KEY
 
 # Branch protection must be OFF (students need to force-push)
-gh api "repos/$GH_ORG/secretkit-$STUDENT/branches/main/protection" 2>&1 | grep -q "Branch not protected" \
+gh api "repos/$GH_ORG/hackathon-starter-$STUDENT/branches/main/protection" 2>&1 | grep -q "Branch not protected" \
   && echo "OK: unprotected" || echo "CHECK THIS"
 ```
 
 ### 4.3 Optional — confirm the exercise itself is intact
 
 ```bash
-gh repo clone "$GH_ORG/secretkit-$STUDENT" /tmp/verify && cd /tmp/verify
+gh repo clone "$GH_ORG/hackathon-starter-$STUDENT" /tmp/verify && cd /tmp/verify
 
 grep -rln "sk_staging_" . --exclude-dir=.git    # expect exactly: config/staging.env
 git log --all --oneline -S'sk_staging_' | wc -l # expect: 3
@@ -182,7 +182,7 @@ git log --oneline -20 | grep -c "staging config" # expect: 1 (only the live copy
 
 Give the student:
 
-1. **The repository URL** — `https://github.com/<org>/secretkit-<student>`
+1. **The repository URL** — `https://github.com/<org>/hackathon-starter-<student>`
 2. **The brief** — ⚠️ **does not exist yet.** See `TODO.md` §3.1. It must state that marking is on *order of operations*, not on whether the history rewrite succeeded.
 3. **A prerequisite note** — they need `git-filter-repo` installed, and a GitHub account with access accepted.
 
@@ -193,7 +193,7 @@ Give the student:
 The student's repository is now rotated and rewritten. **There is no reset path.** To run the exercise again, build a fresh repo with a new suffix:
 
 ```bash
-./spike.sh alice-retry
+./build-repo.sh alice-retry
 ```
 
 ### Cleanup
@@ -201,7 +201,7 @@ The student's repository is now rotated and rewritten. **There is no reset path.
 Deleting repositories requires a token with `delete_repo` scope, which the build token does **not** have by default. Either add that scope, or delete via the web UI:
 
 ```bash
-gh repo delete "$GH_ORG/secretkit-$STUDENT" --yes   # needs delete_repo scope
+gh repo delete "$GH_ORG/hackathon-starter-$STUDENT" --yes   # needs delete_repo scope
 ```
 
 ---
@@ -213,8 +213,8 @@ gh repo delete "$GH_ORG/secretkit-$STUDENT" --yes   # needs delete_repo scope
 | `GH_TOKEN is not set` | Env var missing | `export GH_TOKEN=...` — the script refuses to guess |
 | `refusing: computed repo name ... does not start with KIT_PREFIX` | Prefix guard tripped | Check `KIT_PREFIX` and the suffix argument |
 | `Resource not accessible by integration` | Wrong token type (app token, not a PAT) | Use a classic/fine-grained PAT with `repo` + `workflow` |
-| Push rejected, mentions **push protection** / **GH013** | Org scanning recognises the credential format | **Stop.** Change the format in `spike.sh`, re-test. Affects every student. |
-| `Name already exists on this account` | Repo suffix reused | Pick a new suffix. `spike.sh` is not idempotent; `fanout.sh` is (it skips existing repos) |
+| Push rejected, mentions **push protection** / **GH013** | Org scanning recognises the credential format | **Stop.** Change the format in `build-repo.sh`, re-test. Affects every student. |
+| `Name already exists on this account` | Repo suffix reused | Pick a new suffix. `build-repo.sh` is not idempotent; `fanout.sh` is (it skips existing repos) |
 | Build fails partway, repo left half-made | No cleanup/resume logic | Delete the partial repo manually, re-run |
 | Student: `Repository not found` on clone | Invitation not accepted, or never sent | Check §4.1 |
 | Student cannot rotate the secret | Granted `pull` instead of `push` | Re-run §3 with `-f permission=push` |
