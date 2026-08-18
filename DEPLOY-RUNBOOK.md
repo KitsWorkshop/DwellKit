@@ -99,7 +99,13 @@ Expected output ends with:
 
 Save the printed value against the student's name. You will want it to confirm they rotated.
 
-**If you lose it**, recover it from the repo:
+**If you lose it and you built with `KIT_SALT` set**, re-derive it — no clone needed:
+
+```bash
+printf 'sk_staging_%s\n' "$(printf '%s' "${STUDENT}${KIT_SALT}" | sha256sum | cut -c1-40)"
+```
+
+**If you built without a salt** (random credential), recover it from the repo:
 
 ```bash
 gh repo clone "$GH_ORG/hackathon-starter-$STUDENT" /tmp/recover

@@ -19,7 +19,7 @@ Status as of 2026-08-18: **working; deployment machinery complete.** The exercis
 3. Recover the deleted copy → one command.
 4. Recover the *older* planted-and-scrubbed copy → one command, searches full history.
 5. Rotate the secret, push → workflow turns **green**.
-6. Rewrite history + force-push → credential no longer recoverable from the remote.
+6. Rewrite history + force-push → fresh clones are clean, but GitHub **still serves the orphaned commit by SHA**. Purging it requires GitHub Support.
 
 That full loop is the exercise's entire premise, and it works exactly as designed.
 
@@ -32,11 +32,11 @@ First version of the workflow file accidentally hardcoded the leaked credential 
 - **Push-protection format not empirically validated.** The credential format (`sk_staging_` + 40 hex) is untested against a live GitHub secret scanner — this sandbox org's plan doesn't include that feature. Biggest open risk before running this on a different GitHub environment.
 - **No "prevention" step.** The full lesson (rotate → rewrite → prevent) needs a third artifact that hasn't been built — explicitly deferred.
 - **GitHub Education verification not yet applied for.** Private-repo collaborators consume paid seats — a class of 30 needs 31, versus the 1 a bare Team org has. Education verification gives free Team with unlimited users. External lead time, so start it early.
-- **A few throwaway repos in the org need manual deletion** (`secretkit-spike-pushtest`, `-demo1`, `-demo2`, `-demo3`) — the token used doesn't have delete permission.
+- **A few throwaway repos in the org need manual deletion** (`secretkit-spike-pushtest`, `-demo1` through `-demo6`; keep `-demo7`) — the build token lacks `delete_repo` scope.
 
 ## Recommended next steps
 
 1. Decide how to validate the credential format against a real push-protection-enabled environment (public-repo test, paid GHAS, or a low-stakes pilot).
 2. Design the "prevention" extension artifact for fast finishers.
 3. Apply for GitHub Education verification (external lead time; removes the per-seat cost of a class).
-4. Revoke the PAT used for today's build once you're done with it.
+4. Revoke both development PATs (the build token and the one used to rename the repo) — see `TODO.md` §6.

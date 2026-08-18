@@ -291,7 +291,7 @@ The full loop has been executed end to end against real GitHub, not simulated:
 3. Deleted copy recovered in one command ✓
 4. Older planted-and-scrubbed copy recovered by searching all history ✓
 5. Secret rotated → workflow turns **green** ✓
-6. History rewritten + force-pushed → credential no longer recoverable from the remote ✓
+6. History rewritten + force-pushed → **fresh clones are clean**, but GitHub still serves the orphaned commit by SHA ✓ (see the box in Part 2)
 
 A working demo repository exists and is in the correct pre-exercise state: **[`KitsWorkshop/secretkit-spike-demo7`](https://github.com/KitsWorkshop/secretkit-spike-demo7)** — cloned fresh it has one credential in the tree, the plant and scrub invisible to `git log -50`, and CI red.
 
