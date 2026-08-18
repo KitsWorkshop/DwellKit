@@ -1,0 +1,80 @@
+From 688c0b0a5cb25bfcaed2a3cfd5c063f04dac704c Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Thu, 26 Mar 2026 13:27:32 +0000
+Subject: [PATCH 051/200] chore(deps): bump stripe in the major-updates group
+ (#1593)
+
+Bumps the major-updates group with 1 update: [stripe](https://github.com/stripe/stripe-node).
+
+
+Updates `stripe` from 20.4.1 to 21.0.0
+- [Release notes](https://github.com/stripe/stripe-node/releases)
+- [Changelog](https://github.com/stripe/stripe-node/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/stripe/stripe-node/compare/v20.4.1...v21.0.0)
+
+---
+updated-dependencies:
+- dependency-name: stripe
+  dependency-version: 21.0.0
+  dependency-type: direct:production
+  update-type: version-update:semver-major
+  dependency-group: major-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 12 ++++++------
+ package.json      |  2 +-
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 4d449e0..b4c32fe 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -67,7 +67,7 @@
+         "pug": "^3.0.4",
+         "qr": "^0.5.5",
+         "sass": "^1.98.0",
+-        "stripe": "^20.4.1",
++        "stripe": "^21.0.0",
+         "twilio": "^5.13.1",
+         "twitch-passport": "^1.0.6",
+         "validator": "^13.15.26"
+@@ -8801,15 +8801,15 @@
+       }
+     },
+     "node_modules/stripe": {
+-      "version": "20.4.1",
+-      "resolved": "https://registry.npmjs.org/stripe/-/stripe-20.4.1.tgz",
+-      "integrity": "sha512-axCguHItc8Sxt0HC6aSkdVRPffjYPV7EQqZRb2GkIa8FzWDycE7nHJM19C6xAIynH1Qp1/BHiopSi96jGBxT0w==",
++      "version": "21.0.0",
++      "resolved": "https://registry.npmjs.org/stripe/-/stripe-21.0.0.tgz",
++      "integrity": "sha512-VlQ1QhjQAhmCgY3g3BgfZFLo8AkJw1r9zTrG4hdjSDX2AcwS5sPz4eHJG0zfzCO8zO/md0Xe+zrkxRqg604ZWA==",
+       "license": "MIT",
+       "engines": {
+-        "node": ">=16"
++        "node": ">=18"
+       },
+       "peerDependencies": {
+-        "@types/node": ">=16"
++        "@types/node": ">=18"
+       },
+       "peerDependenciesMeta": {
+         "@types/node": {
+diff --git a/package.json b/package.json
+index b5e57de..2541a73 100644
+--- a/package.json
++++ b/package.json
+@@ -86,7 +86,7 @@
+     "pug": "^3.0.4",
+     "qr": "^0.5.5",
+     "sass": "^1.98.0",
+-    "stripe": "^20.4.1",
++    "stripe": "^21.0.0",
+     "twilio": "^5.13.1",
+     "twitch-passport": "^1.0.6",
+     "validator": "^13.15.26"
+-- 
+2.53.0
+

@@ -1,0 +1,71 @@
+From 3b5299dcd04ec80319d387a17da86e6450c55566 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Mon, 13 Apr 2026 14:34:47 +0000
+Subject: [PATCH 068/200] chore(deps-dev): bump globals in the minor-updates
+ group (#1613)
+
+Bumps the minor-updates group with 1 update: [globals](https://github.com/sindresorhus/globals).
+
+
+Updates `globals` from 17.4.0 to 17.5.0
+- [Release notes](https://github.com/sindresorhus/globals/releases)
+- [Commits](https://github.com/sindresorhus/globals/compare/v17.4.0...v17.5.0)
+
+---
+updated-dependencies:
+- dependency-name: globals
+  dependency-version: 17.5.0
+  dependency-type: direct:development
+  update-type: version-update:semver-minor
+  dependency-group: minor-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 8 ++++----
+ package.json      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 57484ca..8ae4f01 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -81,7 +81,7 @@
+         "eslint": "^10.2.0",
+         "eslint-config-prettier": "^10.1.8",
+         "eslint-plugin-chai-friendly": "^1.2.0",
+-        "globals": "^17.4.0",
++        "globals": "^17.5.0",
+         "husky": "^9.1.7",
+         "mocha": "*",
+         "mongodb-memory-server": "^11.0.1",
+@@ -5464,9 +5464,9 @@
+       }
+     },
+     "node_modules/globals": {
+-      "version": "17.4.0",
+-      "resolved": "https://registry.npmjs.org/globals/-/globals-17.4.0.tgz",
+-      "integrity": "sha512-hjrNztw/VajQwOLsMNT1cbJiH2muO3OROCHnbehc8eY5JyD2gqz4AcMHPqgaOR59DjgUjYAYLeH699g/eWi2jw==",
++      "version": "17.5.0",
++      "resolved": "https://registry.npmjs.org/globals/-/globals-17.5.0.tgz",
++      "integrity": "sha512-qoV+HK2yFl/366t2/Cb3+xxPUo5BuMynomoDmiaZBIdbs+0pYbjfZU+twLhGKp4uCZ/+NbtpVepH5bGCxRyy2g==",
+       "dev": true,
+       "license": "MIT",
+       "engines": {
+diff --git a/package.json b/package.json
+index 8b25beb..10df6f8 100644
+--- a/package.json
++++ b/package.json
+@@ -100,7 +100,7 @@
+     "eslint": "^10.2.0",
+     "eslint-config-prettier": "^10.1.8",
+     "eslint-plugin-chai-friendly": "^1.2.0",
+-    "globals": "^17.4.0",
++    "globals": "^17.5.0",
+     "husky": "^9.1.7",
+     "mocha": "next",
+     "mongodb-memory-server": "^11.0.1",
+-- 
+2.53.0
+

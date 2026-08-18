@@ -1,0 +1,167 @@
+From 4e459c9581d62462f83d1eb393a80f38c046d342 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Mon, 23 Mar 2026 17:00:45 +0000
+Subject: [PATCH 044/200] chore(deps): bump the patch-updates group with 3
+ updates (#1587)
+
+Bumps the patch-updates group with 3 updates: [@langchain/core](https://github.com/langchain-ai/langchainjs), [@langchain/langgraph](https://github.com/langchain-ai/langgraphjs/tree/HEAD/libs/langgraph-core) and [langchain](https://github.com/langchain-ai/langchainjs).
+
+
+Updates `@langchain/core` from 1.1.34 to 1.1.35
+- [Release notes](https://github.com/langchain-ai/langchainjs/releases)
+- [Commits](https://github.com/langchain-ai/langchainjs/compare/@langchain/core@1.1.34...@langchain/core@1.1.35)
+
+Updates `@langchain/langgraph` from 1.2.4 to 1.2.5
+- [Release notes](https://github.com/langchain-ai/langgraphjs/releases)
+- [Changelog](https://github.com/langchain-ai/langgraphjs/blob/main/libs/langgraph-core/CHANGELOG.md)
+- [Commits](https://github.com/langchain-ai/langgraphjs/commits/@langchain/langgraph@1.2.5/libs/langgraph-core)
+
+Updates `langchain` from 1.2.35 to 1.2.36
+- [Release notes](https://github.com/langchain-ai/langchainjs/releases)
+- [Commits](https://github.com/langchain-ai/langchainjs/compare/langchain@1.2.35...langchain@1.2.36)
+
+---
+updated-dependencies:
+- dependency-name: "@langchain/core"
+  dependency-version: 1.1.35
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: "@langchain/langgraph"
+  dependency-version: 1.2.5
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: langchain
+  dependency-version: 1.2.36
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 34 +++++++++++++++++-----------------
+ package.json      |  6 +++---
+ 2 files changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 4d2a0d6..137ce9c 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16,9 +16,9 @@
+         "@huggingface/inference": "^4.13.15",
+         "@keyv/mongo": "^3.1.0",
+         "@langchain/community": "^1.1.24",
+-        "@langchain/core": "^1.1.34",
++        "@langchain/core": "^1.1.35",
+         "@langchain/groq": "^1.1.5",
+-        "@langchain/langgraph": "^1.2.4",
++        "@langchain/langgraph": "^1.2.5",
+         "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+         "@langchain/mongodb": "^1.1.0",
+         "@langchain/textsplitters": "^1.0.1",
+@@ -42,7 +42,7 @@
+         "express-session": "^1.19.0",
+         "jquery": "^4.0.0",
+         "keyv": "^5.6.0",
+-        "langchain": "^1.2.35",
++        "langchain": "^1.2.36",
+         "lastfm": "^0.9.4",
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.20",
+@@ -1147,9 +1147,9 @@
+       }
+     },
+     "node_modules/@langchain/core": {
+-      "version": "1.1.34",
+-      "resolved": "https://registry.npmjs.org/@langchain/core/-/core-1.1.34.tgz",
+-      "integrity": "sha512-IDlZES5Vexo5meLQRCGkAU7NM0tPGPfPP5wcUzBd7Ot+JoFBmSXutC4gGzvZod5AKRVn3I0Qy5k8vkTraY21jA==",
++      "version": "1.1.35",
++      "resolved": "https://registry.npmjs.org/@langchain/core/-/core-1.1.35.tgz",
++      "integrity": "sha512-TM0idLSAx17IEMqEIN7F8MDdXpN53p4A4vhhjZxf7LedwShB/8Zx1F5D5Nq1Bbn0zh9QDzSHpWyfCrTtggKf7g==",
+       "license": "MIT",
+       "dependencies": {
+         "@cfworker/json-schema": "^4.0.2",
+@@ -1197,13 +1197,13 @@
+       }
+     },
+     "node_modules/@langchain/langgraph": {
+-      "version": "1.2.4",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.2.4.tgz",
+-      "integrity": "sha512-opUmulmIkQFwFP/JpsXl8K7vqfzeNjuZObeQ1ASu4ZjUcQdyaY1Vm11g9fxH/pXJFeIWy+6BLVJcLUxQ1DRhcA==",
++      "version": "1.2.5",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.2.5.tgz",
++      "integrity": "sha512-O/ROF1oaXN7VK6+WTpXsDvJp7L+YyTOHa9rt3L85jrvwxBqQQRIlRLOWT8ehB/ywE3M1K7WAWOAXbmorCYzviQ==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph-checkpoint": "^1.0.1",
+-        "@langchain/langgraph-sdk": "~1.7.5",
++        "@langchain/langgraph-sdk": "~1.8.0",
+         "@standard-schema/spec": "1.1.0",
+         "uuid": "^10.0.0"
+       },
+@@ -1327,9 +1327,9 @@
+       }
+     },
+     "node_modules/@langchain/langgraph-sdk": {
+-      "version": "1.7.5",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph-sdk/-/langgraph-sdk-1.7.5.tgz",
+-      "integrity": "sha512-j6MjD5btOfVSj2nVKVTu28YPHA9vzBuDbOFnzzfa5q4F6Tbt2Dwg+EiGhJptUz/3XKmU0OKp/3gCWk0ZTHHD1Q==",
++      "version": "1.8.0",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph-sdk/-/langgraph-sdk-1.8.0.tgz",
++      "integrity": "sha512-TPowjgfLjRll4zUDiOUVgd8qLgSOhy5uHt0sWhpvxgQd+dcUs4x/3nKjrepSvmp24KQKbF6GJy6MaHBDj3Ubtw==",
+       "license": "MIT",
+       "dependencies": {
+         "@types/json-schema": "^7.0.15",
+@@ -6310,9 +6310,9 @@
+       }
+     },
+     "node_modules/langchain": {
+-      "version": "1.2.35",
+-      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.2.35.tgz",
+-      "integrity": "sha512-uMK/YZu8i4mCfGarB3EJ/efd7CKidtphw7M5qcgTxWvXMXxHCG8KMLMq70hnJ63GQa1TpgreOzePrK4bvdE2ig==",
++      "version": "1.2.36",
++      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.2.36.tgz",
++      "integrity": "sha512-DGMBGbmpdpC5BJDi89XxdOfFg8FOkW7/xDclecUVUDVzPyWm4kiHKKKsBJZbxqJ08/SAziIlFV8PefRM2omV+A==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph": "^1.1.2",
+@@ -6325,7 +6325,7 @@
+         "node": ">=20"
+       },
+       "peerDependencies": {
+-        "@langchain/core": "^1.1.34"
++        "@langchain/core": "^1.1.35"
+       }
+     },
+     "node_modules/langchain/node_modules/uuid": {
+diff --git a/package.json b/package.json
+index 3dd7111..4af323e 100644
+--- a/package.json
++++ b/package.json
+@@ -35,9 +35,9 @@
+     "@huggingface/inference": "^4.13.15",
+     "@keyv/mongo": "^3.1.0",
+     "@langchain/community": "^1.1.24",
+-    "@langchain/core": "^1.1.34",
++    "@langchain/core": "^1.1.35",
+     "@langchain/groq": "^1.1.5",
+-    "@langchain/langgraph": "^1.2.4",
++    "@langchain/langgraph": "^1.2.5",
+     "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+     "@langchain/mongodb": "^1.1.0",
+     "@langchain/textsplitters": "^1.0.1",
+@@ -61,7 +61,7 @@
+     "express-session": "^1.19.0",
+     "jquery": "^4.0.0",
+     "keyv": "^5.6.0",
+-    "langchain": "^1.2.35",
++    "langchain": "^1.2.36",
+     "lastfm": "^0.9.4",
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.20",
+-- 
+2.53.0
+

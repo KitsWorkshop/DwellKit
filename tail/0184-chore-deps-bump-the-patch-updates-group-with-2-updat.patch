@@ -1,0 +1,112 @@
+From 2b4663b86318568ee920c1670a8c930673c0bfaa Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Mon, 27 Jul 2026 13:33:46 +0000
+Subject: [PATCH 182/200] chore(deps): bump the patch-updates group with 2
+ updates (#1727)
+
+Bumps the patch-updates group with 2 updates: [express-rate-limit](https://github.com/express-rate-limit/express-rate-limit) and [langchain](https://github.com/langchain-ai/langchainjs).
+
+
+Updates `express-rate-limit` from 8.6.0 to 8.6.1
+- [Release notes](https://github.com/express-rate-limit/express-rate-limit/releases)
+- [Commits](https://github.com/express-rate-limit/express-rate-limit/compare/v8.6.0...v8.6.1)
+
+Updates `langchain` from 1.5.3 to 1.5.4
+- [Release notes](https://github.com/langchain-ai/langchainjs/releases)
+- [Commits](https://github.com/langchain-ai/langchainjs/compare/langchain@1.5.3...langchain@1.5.4)
+
+---
+updated-dependencies:
+- dependency-name: express-rate-limit
+  dependency-version: 8.6.1
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: langchain
+  dependency-version: 1.5.4
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 18 +++++++++---------
+ package.json      |  4 ++--
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index df42e97..e09c81e 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -38,11 +38,11 @@
+         "connect-mongo": "^6.0.0",
+         "errorhandler": "^1.5.2",
+         "express": "^5.2.1",
+-        "express-rate-limit": "^8.6.0",
++        "express-rate-limit": "^8.6.1",
+         "express-session": "^1.19.0",
+         "jquery": "^4.0.0",
+         "keyv": "^5.6.0",
+-        "langchain": "^1.5.3",
++        "langchain": "^1.5.4",
+         "lastfm": "^0.9.4",
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.21",
+@@ -4141,9 +4141,9 @@
+       }
+     },
+     "node_modules/express-rate-limit": {
+-      "version": "8.6.0",
+-      "resolved": "https://registry.npmjs.org/express-rate-limit/-/express-rate-limit-8.6.0.tgz",
+-      "integrity": "sha512-XKJXDsASUOo0LLtFwW5hCcQGH0N4WQc/Rn8/Pvoia+TJFOkkFPvrtW9lZOeeNcxQJspvOIERMwiRLsVFlhHEkA==",
++      "version": "8.6.1",
++      "resolved": "https://registry.npmjs.org/express-rate-limit/-/express-rate-limit-8.6.1.tgz",
++      "integrity": "sha512-0D493aP61w0TJ2A0wy27riRsO7FMQ7FK+KUHOKCSfPvYo0R55aiC6emCVgFUeShH0fq0ICPVzNcgoS+BsbXQCA==",
+       "license": "MIT",
+       "dependencies": {
+         "debug": "^4.4.3",
+@@ -5649,9 +5649,9 @@
+       }
+     },
+     "node_modules/langchain": {
+-      "version": "1.5.3",
+-      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.5.3.tgz",
+-      "integrity": "sha512-YRYPy1xPq4CgKe0NdPoscYHnKBW5cViEyWiZsUKQfN3xL1X5DpGlIpaBQg1A/t6o9ePKE7J5b7nqrfLz8t7/Rw==",
++      "version": "1.5.4",
++      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.5.4.tgz",
++      "integrity": "sha512-9Rq6Ih77UOy3+7bCbxMJS16MRUJwfxuljU0yW2KOXDgEKWE8cmaZJE6ONEy4HdWGMsbj3qyv3vD5UvV7fvNksg==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph": "^1.4.7",
+@@ -5663,7 +5663,7 @@
+         "node": ">=20"
+       },
+       "peerDependencies": {
+-        "@langchain/core": "^1.2.1"
++        "@langchain/core": "^1.2.3"
+       }
+     },
+     "node_modules/langsmith": {
+diff --git a/package.json b/package.json
+index 3740486..0f681df 100644
+--- a/package.json
++++ b/package.json
+@@ -57,11 +57,11 @@
+     "connect-mongo": "^6.0.0",
+     "errorhandler": "^1.5.2",
+     "express": "^5.2.1",
+-    "express-rate-limit": "^8.6.0",
++    "express-rate-limit": "^8.6.1",
+     "express-session": "^1.19.0",
+     "jquery": "^4.0.0",
+     "keyv": "^5.6.0",
+-    "langchain": "^1.5.3",
++    "langchain": "^1.5.4",
+     "lastfm": "^0.9.4",
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.21",
+-- 
+2.53.0
+

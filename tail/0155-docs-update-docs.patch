@@ -1,0 +1,701 @@
+From 2654bd049c2c5dab34a012263ed99e0ba2420b3d Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <YasharF.Git1@ydftech.com>
+Date: Wed, 1 Jul 2026 19:32:41 -0700
+Subject: [PATCH 153/200] docs: update docs
+
+---
+ AGENTS.md         | 189 ++++++++++++++++++++++++++++++++++++++++++++++
+ CLAUDE.md         |   5 ++
+ PROD_CHECKLIST.md |  25 +++---
+ README.md         | 181 +++++++++++++++++++++++++++-----------------
+ test/TESTING.md   |  24 +++++-
+ 5 files changed, 343 insertions(+), 81 deletions(-)
+ create mode 100644 AGENTS.md
+ create mode 100644 CLAUDE.md
+
+diff --git a/AGENTS.md b/AGENTS.md
+new file mode 100644
+index 0000000..2774caa
+--- /dev/null
++++ b/AGENTS.md
+@@ -0,0 +1,189 @@
++# AGENTS.md
++
++This file is for coding agents (and anyone doing a quick pass with one). It is a
++**dependency map**, not a tutorial — for narrative setup instructions, API key
++registration links, and "how it works" walkthroughs, see [README.md](README.md)
++and [test/TESTING.md](test/TESTING.md).
++
++Hackathon Starter is boilerplate. Most people who clone it will delete large
++parts of it — most `/api/*` and `/ai/*` examples, and most OAuth providers —
++and keep only what their project needs. That deletion is the single most
++common task an agent will be asked to do in this repo, and it's easy to do
++incompletely: routes, views, config blocks, env vars, npm packages, and tests
++are declared in five different files per feature, and nothing enforces that
++they're removed together. The tables below exist so an agent (or a human)
++doesn't have to reverse-engineer those relationships from scratch, feature by
++feature, and doesn't leave orphaned code behind.
++
++**If you can't verify a claim below against the current code, don't trust it
++— re-derive it.** This file can drift out of date; the code is ground truth.
++
++## Core vs. optional, in one paragraph
++
++Core = auth, account management, session/security middleware, the base
++layout. Removing or breaking this makes the app not work. Optional = every
++individual OAuth provider and every `/api/*` and `/ai/*` example — each one
++is a self-contained demo of integrating some third-party service, included so
++you can copy the pattern, then delete the ones you don't need. A few
++providers are **cross-cutting** (used for both login and an API example) —
++those are flagged explicitly below because deleting them breaks more than one
++feature.
++
++## Core system (edit carefully, don't delete)
++
++| Area                                                               | Files                                                                                                                                                 |
++| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
++| Entry point / route table                                          | `app.js` — every route in the app is registered here, in one file, on purpose (see README "Why do you have all routes defined in app.js?")            |
++| Session, CSRF, rate limiting, redirect-back-after-login            | `app.js` middleware stack (top of file)                                                                                                               |
++| Local auth + session + 2FA + account CRUD                          | `controllers/user.js`, `models/User.js`, `models/Session.js`                                                                                          |
++| Passport strategy registration, OAuth linking logic, token refresh | `config/passport.js`                                                                                                                                  |
++| OAuth token revocation on unlink/delete                            | `config/token-revocation.js`                                                                                                                          |
++| Passkey / WebAuthn login and registration                          | `controllers/webauthn.js`                                                                                                                             |
++| Flash messages                                                     | `config/flash.js`, `views/partials/flash.pug`                                                                                                         |
++| Request logging                                                    | `config/morgan.js`                                                                                                                                    |
++| Email sending                                                      | `config/nodemailer.js`                                                                                                                                |
++| Cache-busted static asset URLs                                     | `config/cacheBust.js`, used via `app.locals.getFileHash` in `views/layout.pug`                                                                        |
++| Base layout, nav, footer                                           | `views/layout.pug`, `views/partials/header.pug`, `views/partials/footer.pug`                                                                          |
++| Auth views                                                         | `views/account/login.pug`, `signup.pug`, `forgot.pug`, `reset.pug`, `two-factor.pug`, `totp-setup.pug`, `webauthn-login.pug`, `webauthn-register.pug` |
++| Account management view                                            | `views/account/profile.pug` — **also lists every OAuth provider's link/unlink block**; see OAuth table below                                          |
++| Contact form                                                       | `controllers/contact.js`, `views/contact.pug` — technically optional (SMTP-dependent), but small/self-contained enough that most projects keep it     |
++
++`views/account/login.pug` and `views/account/profile.pug` are **shared,
++hand-edited files**, not generated from a list — each OAuth provider has a
++hardcoded button/link block in one or both of these templates. Removing a
++provider means deleting its specific block, not deleting the file.
++
++## OAuth providers
++
++Every provider follows the same shape in `config/passport.js`: a
++`passport.use(...)` call under a `/** Sign in with X */`-style comment,
++registered under a **provider key** (the string passed to `passport.use` /
++`passport.authorize`, and the field name stored on `User.tokens[].kind` and
++`User[providerKey]`). That provider key is what to grep for across the repo
++when removing a provider — it appears in `app.js` routes, `passport.js`,
++`config/token-revocation.js`, and both account views.
++
++| Provider key  | Env vars                                           | Sign-in button (`login.pug`)                | Link/unlink block (`profile.pug`) | Revocation configured | Also used for an API example?                                                                                                                                                                                                                                       |
++| ------------- | -------------------------------------------------- | ------------------------------------------- | --------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
++| `google`      | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`         | yes                                         | yes                               | yes                   | **Yes — Drive (`/api/google/drive`) and Sheets (`/api/google/sheets`) reuse the same Google OAuth token/scopes.** Removing Google login breaks those two API examples too; removing just those two examples doesn't affect login.                                   |
++| `facebook`    | `FACEBOOK_ID`, `FACEBOOK_SECRET`                   | yes                                         | yes                               | yes                   | **Yes — `/api/facebook`** reuses the Facebook login token. Don't confuse `FACEBOOK_ID`/`FACEBOOK_SECRET` (OAuth) with `FACEBOOK_PIXEL_ID` (analytics, unrelated, keep — see below).                                                                                 |
++| `twitch`      | `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET`         | yes                                         | yes                               | yes                   | **Yes — `/api/twitch`** reuses the Twitch login token.                                                                                                                                                                                                              |
++| `github`      | `GITHUB_ID`, `GITHUB_SECRET`                       | yes                                         | yes                               | yes                   | No — `/api/github` (GitHub search example) is unauthenticated and uses `@octokit/rest` independently; it is a _different feature_ that happens to share a name. Removing "Sign in with GitHub" does not require removing the `/api/github` example, and vice versa. |
++| `microsoft`   | `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`   | yes                                         | yes                               | no                    | No                                                                                                                                                                                                                                                                  |
++| `linkedin`    | `LINKEDIN_ID`, `LINKEDIN_SECRET`                   | yes                                         | yes                               | yes                   | No                                                                                                                                                                                                                                                                  |
++| `x` (Twitter) | `X_KEY`, `X_SECRET`                                | yes                                         | yes                               | yes                   | No                                                                                                                                                                                                                                                                  |
++| `discord`     | `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`       | yes                                         | yes                               | yes                   | No                                                                                                                                                                                                                                                                  |
++| `tumblr`      | `TUMBLR_KEY`, `TUMBLR_SECRET`                      | no (link-only, from `/api/tumblr` view)     | yes                               | no                    | This _is_ the API example — `/api/tumblr` (`apiController.getTumblr`) is the only reason this provider exists.                                                                                                                                                      |
++| `steam`       | `STEAM_KEY`                                        | no (link-only, from `/api/steam` view)      | yes                               | no                    | Same pattern — `/api/steam` is the feature.                                                                                                                                                                                                                         |
++| `trakt`       | `TRAKT_ID`, `TRAKT_SECRET`                         | no (link-only, from `/api/trakt` view)      | yes                               | yes                   | Same pattern — `/api/trakt` is the feature.                                                                                                                                                                                                                         |
++| `quickbooks`  | `QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET` | no (link-only, from `/api/quickbooks` view) | yes                               | yes                   | Same pattern — `/api/quickbooks` is the feature.                                                                                                                                                                                                                    |
++
++Notes:
++
++- "Link/unlink block" for all twelve providers lives in `views/account/profile.pug`; only eight of them (the ones marked "yes" in the sign-in column) also get a button in `views/account/login.pug`.
++- `passport-oauth2-refresh` (`refresh.use(...)` calls in `passport.js`) is only wired up for providers with a refresh token: `google`, `linkedin`, `microsoft`, `twitch`, `quickbooks`, `trakt`, `discord`. Removing one of those providers means removing its `refresh.use(...)` call too, not just `passport.use(...)`.
++- `config/token-revocation.js` is driven entirely by `passport.js`'s exported `providerRevocationConfig` object — removing a provider's entry there is enough; there's no separate per-provider file.
++- `/auth/failure` (`app.js`) is a single shared failure-redirect route for _all_ providers — never remove it while any provider remains.
++
++## API examples (`/api/*`)
++
++Every route below is registered in `app.js` under `/** API examples routes. */`,
++implemented in `controllers/api.js`, and rendered from `views/api/<name>.pug`
++unless noted. Feature tokens match the e2e test/fixture naming convention
++(`test/e2e/<token>.e2e.test.js`, `test/fixtures/*<token>*` — fixtures are
++named after the sanitized outbound request URL, so the token match is
++substring, not exact).
++
++| Feature                          | Route(s)                                                   | Controller export                                     | Env vars                                           | npm package(s)                       | e2e test                                                                                                     |
++| -------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
++| API browser index                | `/api`                                                     | `getApi`                                              | —                                                  | —                                    | —                                                                                                            |
++| Last.fm                          | `/api/lastfm`                                              | `getLastfm`                                           | `LASTFM_KEY`, `LASTFM_SECRET`                      | `lastfm`                             | `test/e2e-nokey/lastfm.e2e.test.js`                                                                          |
++| New York Times                   | `/api/nyt`                                                 | `getNewYorkTimes`                                     | `NYT_KEY`                                          | —                                    | `test/e2e/nyt.e2e.test.js`                                                                                   |
++| Stripe                           | `/api/stripe` (GET/POST)                                   | `getStripe`, `postStripe`                             | `STRIPE_SKEY`, `STRIPE_PKEY`                       | `stripe`                             | none                                                                                                         |
++| Web scraping                     | `/api/scraping`                                            | `getScraping`                                         | —                                                  | `cheerio`                            | `test/e2e-nokey/scraping.e2e.test.js`                                                                        |
++| Twilio                           | `/api/twilio` (GET/POST)                                   | `getTwilio`, `postTwilio`                             | `TWILIO_SID`, `TWILIO_TOKEN`, `TWILIO_FROM_NUMBER` | `twilio`                             | `test/e2e/twilio.e2e.test.js`                                                                                |
++| Foursquare                       | `/api/foursquare`                                          | `getFoursquare`                                       | `FOURSQUARE_APIKEY`                                | —                                    | `test/e2e/foursquare.e2e.test.js`                                                                            |
++| PayPal                           | `/api/paypal`, `/api/paypal/success`, `/api/paypal/cancel` | `getPayPal`, `getPayPalSuccess`, `getPayPalCancel`    | `PAYPAL_ID`, `PAYPAL_SECRET`                       | —                                    | none                                                                                                         |
++| File upload                      | `/api/upload` (GET/POST)                                   | `getFileUpload`, `postFileUpload`, `uploadMiddleware` | —                                                  | `multer`                             | `test/e2e-nokey/upload.e2e.test.js`                                                                          |
++| HERE Maps                        | `/api/here-maps`                                           | `getHereMaps`                                         | `HERE_API_KEY`                                     | —                                    | `test/e2e/here-maps.e2e.test.js`                                                                             |
++| Google Maps                      | `/api/google-maps`                                         | `getGoogleMaps`                                       | `GOOGLE_MAP_API_KEY`                               | —                                    | `test/e2e/google-maps.e2e.test.js`                                                                           |
++| Chart (Alpha Vantage + Chart.js) | `/api/chart`                                               | `getChart`                                            | `ALPHA_VANTAGE_KEY`                                | `chart.js`                           | `test/e2e/chart.e2e.test.js` — also remove the `/js/lib/chart.umd.min.js` entry in `app.js`'s `libFiles` map |
++| Lob                              | `/api/lob`                                                 | `getLob`                                              | `LOB_KEY`                                          | `@lob/lob-typescript-sdk`            | `test/e2e/lob.e2e.test.js`                                                                                   |
++| Trakt                            | `/api/trakt`                                               | `getTrakt`                                            | see OAuth table (`trakt`)                          | —                                    | `test/e2e/trakt.e2e.test.js`                                                                                 |
++| PubChem                          | `/api/pubchem`                                             | `getPubChem`                                          | —                                                  | —                                    | `test/e2e-nokey/pubchem.e2e.test.js`                                                                         |
++| Wikipedia                        | `/api/wikipedia`                                           | `getWikipedia`                                        | —                                                  | —                                    | `test/e2e-nokey/wikipedia.e2e.test.js`                                                                       |
++| GIPHY                            | `/api/giphy`                                               | `getGiphy`                                            | `GIPHY_API_KEY`                                    | —                                    | `test/e2e/giphy.e2e.test.js`                                                                                 |
++| GitHub search                    | `/api/github`                                              | `getGithub`                                           | `GITHUB_ID`, `GITHUB_SECRET`*                      | `@octokit/rest`                      | `test/e2e-nokey/github-api.e2e.test.js`                                                                      |
++| Google Drive                     | `/api/google/drive`                                        | `getGoogleDrive`                                      | see OAuth table (`google`)                         | `@googleapis/drive`                  | none (needs live user OAuth session)                                                                         |
++| Google Sheets                    | `/api/google/sheets`                                       | `getGoogleSheets`                                     | see OAuth table (`google`)                         | `@googleapis/sheets`                 | none                                                                                                         |
++| Tumblr                           | `/api/tumblr`                                              | `getTumblr`                                           | see OAuth table (`tumblr`)                         | —                                    | none                                                                                                         |
++| Facebook                         | `/api/facebook`                                            | `getFacebook`                                         | see OAuth table (`facebook`)                       | —                                    | none                                                                                                         |
++| Twitch                           | `/api/twitch`                                              | `getTwitch`                                           | see OAuth table (`twitch`)                         | `twitch-passport` (also OAuth)       | none                                                                                                         |
++| Steam                            | `/api/steam`                                               | `getSteam`                                            | see OAuth table (`steam`)                          | `passport-steam-openid` (also OAuth) | none                                                                                                         |
++| QuickBooks                       | `/api/quickbooks`                                          | `getQuickbooks`                                       | see OAuth table (`quickbooks`)                     | —                                    | none                                                                                                         |
++
++\* `/api/github` (unauthenticated search) and "Sign in with GitHub" both read
++`GITHUB_ID`/`GITHUB_SECRET` from env, but for different purposes — verify
++which one(s) a given project still needs before removing these vars.
++
++## AI examples (`/ai/*`)
++
++Registered in `app.js` under `/** AI Integrations and Boilerplate example
++routes. */`, implemented across `controllers/ai.js` and
++`controllers/ai-agent.js`, views under `views/ai/`.
++
++| Feature                                    | Route(s)                                                  | Controller                                                       | Env vars                                                                                               | npm package(s)                                                                                                  | e2e test                                                         |
++| ------------------------------------------ | --------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
++| AI examples index                          | `/ai`                                                     | `ai.js: getAi`                                                   | —                                                                                                      | —                                                                                                               | —                                                                |
++| LLM text classifier                        | `/ai/llm-classifier` (GET/POST)                           | `ai.js: getLLMClassifier`, `postLLMClassifier`                   | `GROQ_API_KEY`, `GROQ_MODEL_PROMPT_GUARD`                                                              | `@langchain/groq`, `langchain`                                                                                  | `test/e2e/llm-classifier.e2e.test.js`                            |
++| LLM camera / image                         | `/ai/llm-camera` (GET/POST)                               | `ai.js: getLLMCamera`, `postLLMCamera`, `imageUploadMiddleware`  | `GROQ_API_KEY`, `GROQ_VISION`                                                                          | `@langchain/groq`, `multer`                                                                                     | none                                                             |
++| RAG (retrieval-augmented generation)       | `/ai/rag`, `/ai/rag/ingest`, `/ai/rag/ask`                | `ai.js: getRag`, `postRagIngest`, `postRagAsk`                   | `HUGGINGFACE_KEY`, `HUGGINGFACE_EMBEDDING_MODEL`, `HUGGINGFACE_PROVIDER`, `GROQ_API_KEY`, `GROQ_MODEL` | `@langchain/textsplitters`, `@langchain/mongodb`, `@huggingface/inference`, `pdfjs-dist`, `keyv`, `@keyv/mongo` | `test/e2e/rag.e2e.test.js`                                       |
++| AI Agent (ReAct, tool calling, guardrails) | `/ai/ai-agent`, `/ai/ai-agent/chat`, `/ai/ai-agent/reset` | `ai-agent.js: getAIAgent`, `postAIAgentChat`, `postAIAgentReset` | `GROQ_API_KEY`, `GROQ_MODEL`                                                                           | `@langchain/groq`, `@langchain/core`, `langchain`, `@langchain/langgraph-checkpoint-mongodb`, `zod`             | none (see `test/*.test.js` for unit coverage of session cleanup) |
++
++Notes:
++
++- `ai-agent.js` also exports `cleanupOrphanedTempSessions`, called once from
++  `app.js` on Mongo connection open, and `deleteUserAIAgentData`, called from
++  `controllers/user.js` on account deletion — **both are cross-links from
++  core account code into this "optional" feature.** If you remove the AI
++  Agent, remove those two call sites too, not just the routes/controller.
++- `OPENAI_API_KEY` is present in `.env.example` but **not referenced by any
++  current code path** — don't assume it maps to a feature; verify with grep
++  before acting on it either way.
++- `MongoDBAtlasVectorSearch`/`MongoDBAtlasSemanticCache` (RAG) and
++  `MongoDBSaver` (AI Agent) both write to MongoDB collections beyond the
++  `User`/`Session` models — check `controllers/ai.js` / `controllers/ai-agent.js`
++  for the exact collection names if you need to also drop data, not just code.
++
++## Removing a feature: checklist
++
++For any feature (an OAuth provider, an `/api/*` example, an `/ai/*` example):
++
++1. Route(s) in `app.js`.
++2. Controller export(s) in `controllers/*.js` (delete the function; delete the file only if nothing else in it is still used).
++3. View(s) in `views/`.
++4. Any hardcoded block in a _shared_ view — check `views/account/login.pug`, `views/account/profile.pug`, `views/partials/header.pug` by grepping the provider key or feature name; don't assume there's a clean per-feature file to delete.
++5. `config/passport.js` — `passport.use(...)`, matching `refresh.use(...)` if present, and its entry in `providerRevocationConfig` at the bottom of the file.
++6. Env vars in `.env.example` and `test/.env.test` — **verify with grep that nothing else references the var before removing it** (see the `GITHUB_ID`/`OPENAI_API_KEY` notes above for why this matters).
++7. npm packages — remove with `npm uninstall <package>` (don't hand-edit `package.json`/`package-lock.json`), and only after confirming via grep that no other retained feature imports the same package (several packages, e.g. `passport-steam-openid`, `twitch-passport`, do double duty as both the OAuth strategy and the API example).
++8. Static lib mapping in `app.js`'s `libFiles` map, if the feature has a dedicated client-side library entry (currently only `chart.js`, for the Chart/Alpha Vantage example).
++9. Tests: unit test file if one exists (`test/*.test.js`), the whole `test/e2e/<feature>.e2e.test.js` or `test/e2e-nokey/<feature>.e2e.test.js` file, and its fixtures — fixtures are named after the _outbound request URL_, so match by substring (e.g. everything containing `trakt.tv`), not by an exact feature-name filename.
++10. Run the checks in the next section before considering the removal done — an incomplete removal usually shows up as a lint error (unused import), a failing test (missing fixture / removed route still referenced), or a broken view (undefined local).
++
++## Commands
++
++- `npm run lint` — ESLint + Prettier, should pass with zero warnings.
++- `npm test` — Mocha unit/integration tests (`test/*.test.js`), runs against an in-memory MongoDB.
++- `npm run test:e2e:replay` — Playwright e2e tests against recorded fixtures (no live API keys needed).
++- `npm run test:e2e:custom -- --project=chromium-nokey-live` — Playwright e2e tests that hit live APIs not requiring keys.
++- `npm run test:e2e:live` — full Playwright e2e suite against live third-party APIs (needs real keys in `.env`/`test/.env.test`).
++- `npm start` — builds SCSS then runs the app.
++
++## Testing conventions
++
++See [test/TESTING.md](test/TESTING.md) for the full picture. Short version:
++`test/*.test.js` are **core** tests (auth, security, session) and must always
++pass — they're what protects you from breaking the framework while
++customizing it. `test/e2e/` and `test/e2e-nokey/` are **per-integration**
++tests; each one only matters if you're keeping that integration, and should
++be deleted alongside it.
+diff --git a/CLAUDE.md b/CLAUDE.md
+new file mode 100644
+index 0000000..190bbd3
+--- /dev/null
++++ b/CLAUDE.md
+@@ -0,0 +1,5 @@
++# CLAUDE.md
++
++See [AGENTS.md](AGENTS.md) for project instructions. This file exists only so
++that tools which don't yet read `AGENTS.md` natively pick up the same
++guidance.
+diff --git a/PROD_CHECKLIST.md b/PROD_CHECKLIST.md
+index dd973e5..e782b71 100644
+--- a/PROD_CHECKLIST.md
++++ b/PROD_CHECKLIST.md
+@@ -4,7 +4,7 @@ If you are done with your hackathon and thinking about launching your project in
+ - Add a proxy such as Cloudflare in front of your production deployment. Adjust the numberOfProxies logic in app.js if needed
+ - Update the session cookie configs with sameSite attribute, domain, and path
+ - Add Terms of Service and Privacy Policy
+-- Update `LICENSE.md` and the relevant license field in package.json if applicable - See [npm's doc](https://docs.npmjs.com/files/package.json#license).
++- Update `LICENSE` and the relevant license field in package.json if applicable - See [npm's doc](https://docs.npmjs.com/files/package.json#license).
+ - Add [sitemap.xml](https://en.wikipedia.org/wiki/Sitemaps) and [robots.txt](https://moz.com/learn/seo/robotstxt)
+ - Update Google Analytics ID
+ - Add Facebook App/Pixel ID
+@@ -29,19 +29,22 @@ The following is a list of various code that you may not potentially be using an
+   - All API example routes
+   - OAuth routes for authentications that you are not using (i.e. GitHub, LinkedIn, etc. based on your app)
+   - All OAuth authorization routes
+-- passport.js all references and functions related to:
+-  - Github, LinkedIn, OpenID, OAuth, OAuth2
+-- model/User.js
+-  - key pairs for Github, LinkedIn, Steam
++- passport.js
++  - `passport.use(...)` (and the matching `refresh.use(...)`, where present) for each OAuth provider you're not using
++- config/token-revocation.js
++  - the matching entry in `providerRevocationConfig` for each removed provider
++- models/User.js
++  - the provider key field(s) for each removed provider
+ - package.json
+-  - @octokit/rest, lastfm, lob, multer, node-linkedin, passport-github2, passport-linkedin-oauth2, passport-oauth, paypal-rest-sdk, stripe, twilio
+-- /test
+-  - Replace E2E and API example tests with new tests for your application
++  - the npm package(s) tied to each removed OAuth provider or API/AI example (remove with `npm uninstall`, don't hand-edit) — some packages (e.g. `passport-steam-openid`, `twitch-passport`) serve both an OAuth strategy and an API example, so confirm nothing else still needs it first
+ - views/account/login.pug
+-  - Some or all of the last form-group set, which are the social login choices
++  - the sign-in button block for each removed OAuth provider
+ - views/account/profile.pug
+-  - Link/unlink buttons for GitHub, LinkedIn, Steam
+-- Remove README, changelog and this guide if not using them
++  - the link/unlink block for each removed OAuth provider
++- /test
++  - the unit test, e2e test, and fixtures for each removed OAuth provider or API/AI example
++- [AGENTS.md](AGENTS.md) has the full per-provider/per-feature breakdown (which files, env vars, and packages go together, and which OAuth providers double as an API example — Google, Facebook, and Twitch each do) plus a step-by-step removal checklist; use it as the reference for the bullets above instead of re-deriving the mapping from scratch
++- Remove README, AGENTS.md, CLAUDE.md, changelog and this guide if not using them
+ - Create a domain whitelist for your app in Here's developer portal if you are using the HERE Maps API.
+ - Add unit tests so you can test and incorporate dependency and upstream updates with less effort. GPT tools may create some good unit tests with very low effort.
+ 
+diff --git a/README.md b/README.md
+index e5b2797..90b7186 100644
+--- a/README.md
++++ b/README.md
+@@ -119,9 +119,9 @@ I also tried to make it as **generic** and **reusable** as possible to cover mos
+ - Command Line Tools
+ - <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Apple_logo_grey.svg" height="17">&nbsp;**Mac OS X:** [Xcode](https://itunes.apple.com/us/app/xcode/id497799835?mt=12) (or **OS X 10.9+**: `xcode-select --install`)
+ - <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Windows_logo_-_2021.svg" height="17">&nbsp;**Windows:** [Visual Studio Code](https://code.visualstudio.com) + [Windows Subsystem for Linux - Ubuntu](https://learn.microsoft.com/en-us/windows/wsl/install) OR [Visual Studio](https://www.visualstudio.com/products/visual-studio-community-vs)
+-- <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/UbuntuCoF.svg/512px-UbuntuCoF.svg.png?20120210072525" height="17">&nbsp;**Ubuntu** / <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Linux_Mint_logo_without_wordmark.svg" height="17">&nbsp;**Linux Mint:** `sudo apt-get install build-essential`
++- <img src="https://i.imgur.com/SxtiAZc.png" height="17">&nbsp;**Ubuntu** / <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Linux_Mint_logo_without_wordmark.svg" height="17">&nbsp;**Linux Mint:** `sudo apt-get install build-essential`
+ - <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Fedora_logo.svg" height="17">&nbsp;**Fedora**: `sudo dnf groupinstall "Development Tools"`
+-- <img src="https://en.opensuse.org/images/b/be/Logo-geeko_head.png" height="17">&nbsp;**OpenSUSE:** `sudo zypper install --type pattern devel_basis`
++- <img src="https://i.imgur.com/SJtKAkL.png" height="17">&nbsp;**OpenSUSE:** `sudo zypper install --type pattern devel_basis`
+ 
+ **Note:** If you are new to Node or Express, you may find [Node.js & Express From Scratch series](https://www.youtube.com/watch?v=Ad2ngx6CT0M&list=PLillGF-RfqbYRpji8t4SxUkMxfowG4Kqp&index=3) helpful for learning the basics of Node and Express. Alternatively, here is another great tutorial for complete beginners - [Getting Started With Node.js, Express, MongoDB](https://www.freecodecamp.org/news/build-a-restful-api-using-node-express-and-mongodb/).
+ 
+@@ -160,7 +160,7 @@ _What to get and configure:_
+ - reCAPTCHA
+   - For contact form submission, but you can skip it during your development
+ - OAuth for social logins (Sign in with / Login with)
+-  - Depending on your application need, obtain keys from Google, Facebook, X (Twitter), LinkedIn, Twitch, GitHub. You don't have to obtain valid keys for any provider that you don't need. Just remove the buttons and links in the login and account pug views before your demo.
++  - Depending on your application need, obtain keys from Google, Facebook, X (Twitter), LinkedIn, Twitch, GitHub, Discord, Microsoft. You don't have to obtain valid keys for any provider that you don't need. Just remove the buttons and links in the login and account pug views before your demo.
+ - API keys for service providers that you need in the API Examples if you are planning to use them.
+ 
+ - MongoDB Atlas
+@@ -183,7 +183,7 @@ See
+ See:
+ 
+ - [Deployment](#deployment)
+-- [prod-checklist.md](https://github.com/sahat/hackathon-starter/blob/master/prod-checklist.md)
++- [PROD_CHECKLIST.md](https://github.com/sahat/hackathon-starter/blob/master/PROD_CHECKLIST.md)
+ 
+ ## HTTPS Proxy:
+ 
+@@ -248,6 +248,8 @@ Obtain SMTP credentials from a provider for transactional emails. Set the SMTP_U
+ 
+ <img src="https://i.imgur.com/jULUCKF.png" height="75">
+ 
++**Facebook**
++
+ - Visit <a href="https://developers.facebook.com/" target="_blank">Facebook Developers</a>
+ - Click **My Apps**, then select \*_Add a New App_ from the dropdown menu
+ - Enter a new name for your app
+@@ -269,6 +271,8 @@ Obtain SMTP credentials from a provider for transactional emails. Set the SMTP_U
+ 
+ <img src="https://imgur.com/2P4UMvC.png" height="75">
+ 
++**Foursquare**
++
+ - Go to <a href="https://foursquare.com/developers" target="_blank">Foursquare for Developers</a> and log in
+ 
+ - Click on **Create a new project** button
+@@ -283,6 +287,8 @@ Obtain SMTP credentials from a provider for transactional emails. Set the SMTP_U
+ 
+ <img src="https://i.imgur.com/oUob1wG.png" height="75">
+ 
++**GitHub**
++
+ - Go to <a href="https://github.com/settings/profile" target="_blank">Account Settings</a>
+ - Select **Developer settings** from the sidebar
+ - Then click on **OAuth Apps** and then on **Register new application**
+@@ -295,6 +301,8 @@ Obtain SMTP credentials from a provider for transactional emails. Set the SMTP_U
+ 
+ <img src="https://i.imgur.com/ddl2VjR.png" height="75">
+ 
++**GIPHY**
++
+ - Go to <a href="https://developers.giphy.com/" target="_blank">GIPHY Developers website</a>
+ - Login or create a new account and login.
+ - Select **Dashboard** from the navigation bar
+@@ -304,7 +312,9 @@ Obtain SMTP credentials from a provider for transactional emails. Set the SMTP_U
+ 
+ <hr>
+ 
+-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1000px-Google_2015_logo.svg.png" height="50">
++<img src="https://i.imgur.com/uqiaSg6.png" height="50">
++
++**Google**
+ 
+ - Visit <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>
+ - Click on the **Create Project** button
+@@ -338,6 +348,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://cdn.worldvectorlogo.com/logos/discord-6.svg" height="50">
+ 
++**Discord**
++
+ - Go to <a href="https://discord.com/developers/teams" target="_blank">Teams tab</a> in the Discord Developer Portal and create a new team. This allows you to manage your Discord applications under a team name instead of your personal account.
+ - After creating a team, switch to the <a href="https://discord.com/developers/applications" target="_blank">Applications tab</a> in the Discord Developer Portal.
+ - Click on **New Application** and give your app a name. When prompted, select your team as the owner.
+@@ -352,6 +364,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/HERE_logo.svg" height="75">
+ 
++**HERE Maps**
++
+ - Go to <a href="https://developer.here.com" target="_blank">https://developer.here.com</a>
+ - Sign up for the Base plan. The Base plan require a credit card to start, but you get 30,000 map renders for free each month.
+ - Create JAVASCRIPT/REST credentials. Copy and paste the API key into the `.env` file as HERE_API_KEY, or set it up as an environment variable.
+@@ -361,6 +375,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://i.imgur.com/OEVF7HK.png" height="75">
+ 
++**Hugging Face**
++
+ - Go to <a href="https://huggingface.co" target="_blank">https://huggingface.co</a> and create an account.
+ - Go to your Account Settings and create a new Access Token. Make sure you have granted the **"Make calls to Inference Provider"** permission to your token.
+ - Add your token as `HUGGINGFACE_KEY` to your `.env` file or as an environment variable.
+@@ -369,6 +385,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://i.imgur.com/Lw5Jb7A.png" height="50">
+ 
++**QuickBooks**
++
+ - Go to <a href="https://developer.intuit.com/app/developer/qbo/docs/get-started" target="_blank">https://developer.intuit.com/app/developer/qbo/docs/get-started</a>
+ - Use the Sign Up option in the upper right corner of the screen (navbar) to get a free developer account and a sandbox company.
+ - Create a new app by going to your Dashboard using the My Apps option in the top nav bar or by going to <a href="https://developer.intuit.com/app/developer/myapps" target="_blank">https://developer.intuit.com/app/developer/myapps</a>
+@@ -378,6 +396,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Logo.svg.original.svg" height="50">
+ 
++**LinkedIn**
++
+ - Sign in at <a href="https://developer.linkedin.com/" target="_blank">LinkedIn Developer Network</a>
+ - From the account name dropdown menu select **API Keys**
+ - _It may ask you to sign in once again_
+@@ -396,6 +416,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" height="50">
+ 
++**Microsoft**
++
+ - Go to <a href="https://entra.microsoft.com/" target="_blank">Microsoft Entra admin center</a> and sign in
+ - Click **App registrations** > **+ New registration**
+ - Enter an application name (e.g., "Hackathon Starter App") and select **Accounts in any organizational directory and personal Microsoft accounts**
+@@ -408,6 +430,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://s3-us-west-2.amazonaws.com/public.lob.com/dashboard/navbar/lob-logo.svg" height="50">
+ 
++**Lob**
++
+ - Visit <a href="https://dashboard.lob.com/register" target="_blank">Lob Dashboard</a>
+ - Create an account
+ - Once logged into the dashboard, go to Settings in the bottom left corner of the page. (If there is a bottom pop-up, you may need to close it to see the Settings option.)
+@@ -417,6 +441,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://imgur.com/VpWnjp1.png" height="75">
+ 
++**PayPal**
++
+ - Visit <a href="https://developer.paypal.com" target="_blank">PayPal Developer</a>
+ - Log in to your PayPal account
+ - Click **Applications > Create App** in the navigation bar
+@@ -429,6 +455,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://upload.wikimedia.org/wikipedia/commons/a/ae/Steam_logo.svg" height="75">
+ 
++**Steam**
++
+ - Go to <a href="http://steamcommunity.com/dev/apikey" target="_blank">http://steamcommunity.com/dev/apikey</a>
+ - Sign in with your existing Steam account
+ - Enter your _Domain Name_ based on your BASE_URL, then and click **Register**
+@@ -438,6 +466,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://stripe.com/img/about/logos/logos/black@2x.png" height="75">
+ 
++**Stripe**
++
+ - <a href="https://stripe.com/" target="_blank">Sign up</a> or log into your <a href="https://manage.stripe.com" target="_blank">dashboard</a>
+ - Click on your profile and click on Account Settings
+ - Then click on **API Keys**
+@@ -447,6 +477,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://i.imgur.com/dSwblOk.png" height="50">
+ 
++**Groq**
++
+ - Visit <a href="https://groq.com" target="_blank">Groq</a>
+ - Sign in or create a Groq account.
+ - Click on **Create API Key** to generate a new key. You will also be able to access your API key under your account settings in the API Keys tab.
+@@ -456,6 +488,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://i.imgur.com/Adtl9qg.png" height="75">
+ 
++**Trakt**
++
+ - Sign up or sign in to your trakt.tv account and go to <a href="https://trakt.tv/oauth/applications" target="_blank">Trakt.tv Applications</a>.
+ - Create a new application and fill in the required fields:
+   - **Name**: Your app name.
+@@ -468,6 +502,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://i.imgur.com/gUngyyW.png" height="50">
+ 
++**Tumblr**
++
+ - Go to <a href="http://www.tumblr.com/oauth/apps" target="_blank">http://www.tumblr.com/oauth/apps</a>
+ - Once signed in, click **+Register application**
+ - Fill in all the details
+@@ -479,6 +515,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://www.freepnglogos.com/uploads/twitch-logo-image-hd-31.png" height="75">
+ 
++**Twitch**
++
+ - Visit the <a href="https://dev.twitch.tv/console" target="_blank">Twitch developer console</a>
+ - If prompted, authorize the dashboard to access your twitch account
+ - In the Console, click on Register Your Application
+@@ -493,6 +531,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://s3.amazonaws.com/ahoy-assets.twilio.com/global/images/wordmark.svg" height="75">
+ 
++**Twilio**
++
+ - Go to <a href="https://www.twilio.com/try-twilio" target="_blank">https://www.twilio.com/try-twilio</a>
+ - Sign up for an account.
+ - Once logged into the dashboard, expand the link 'show api credentials'
+@@ -503,6 +543,8 @@ Next, create API keys for the services you enabled:
+ 
+ <img src="https://i.imgur.com/QMjwCk6.png" height="50">
+ 
++**X (Twitter)**
++
+ - Sign in at <a href="https://developer.x.com/" target="_blank">https://developer.x.com/</a>
+ - Start with the Free tier
+ - Click **Create a new application**
+@@ -550,6 +592,7 @@ The metadata for Open Graph is only set up for the home page (`home.pug`). Updat
+ | **config**/passport.js           | Passport Local and OAuth strategies, plus login middleware.          |
+ | **config**/token-revocation.js   | Helper for revoking OAuth tokens.                                    |
+ | **controllers**/ai.js            | Controller for /ai route and all ai examples and boilerplates.       |
++| **controllers**/ai-agent.js      | Controller for /ai/ai-agent route (ReAct AI Agent boilerplate).      |
+ | **controllers**/api.js           | Controller for /api route and all api examples.                      |
+ | **controllers**/contact.js       | Controller for contact form.                                         |
+ | **controllers**/home.js          | Controller for home page (index).                                    |
+@@ -589,67 +632,70 @@ Just don't forget to update `extends ../layout` and corresponding
+ 
+ Required to run the project before your modifications
+ 
+-| Package                       | Description                                                           |
+-| ----------------------------- | --------------------------------------------------------------------- |
+-| @fortawesome/fontawesome-free | Symbol and Icon library.                                              |
+-| @googleapis/drive             | Google Drive API integration library.                                 |
+-| @googleapis/sheets            | Google Sheets API integration library.                                |
+-| @huggingface/inference        | Client library for Hugging Face Inference providers                   |
+-| @keyv/mongo                   | MongoDB storage adapter for Keyv                                      |
+-| @langchain/core               | Base LangChain abstractions and Expression Language                   |
+-| @langchain/mongodb            | MongoDB integrations for LangChain                                    |
+-| @langchain/textsplitters      | LangChain text splitters for RAG pipelines                            |
+-| @lob/lob-typescript-sdk       | Lob (USPS mailing / physical mailing service) library.                |
+-| @node-rs/bcrypt               | Library for hashing and salting user passwords.                       |
+-| @octokit/rest                 | GitHub API library.                                                   |
+-| @passport-js/passport-twitter | X (Twitter) login support (OAuth 2).                                  |
+-| @popperjs/core                | Frontend js library for poppers and tooltips.                         |
+-| @simplewebauthn/browser       | WebAuthn frontend library (passkey / biometrics authentication)       |
+-| @simplewebauthn/server        | WebAuthn backend library (passkey / biometrics authentication)        |
+-| @zapier/secret-scrubber       | For redacting sensitive/secret values in objects                      |
+-| bootstrap                     | CSS Framework.                                                        |
+-| bootstrap-social              | Social buttons library.                                               |
+-| bowser                        | User agent parser                                                     |
+-| chart.js                      | Front-end js library for creating charts.                             |
+-| cheerio                       | Scrape web pages using jQuery-style syntax.                           |
+-| compression                   | Node.js compression middleware.                                       |
+-| connect-mongo                 | MongoDB session store for Express.                                    |
+-| errorhandler                  | Development-only error handler middleware.                            |
+-| express                       | Node.js web framework.                                                |
+-| express-rate-limit            | Rate limiting middleware for abuse protection.                        |
+-| express-session               | Simple session middleware for Express.                                |
+-| jquery                        | Front-end JS library to interact with HTML elements.                  |
+-| keyv                          | key-value storage with support for multiple backends                  |
+-| langchain                     | Framework for developing LLM applications                             |
+-| lastfm                        | Last.fm API library.                                                  |
+-| lusca                         | CSRF middleware.                                                      |
+-| mailchecker                   | Verifies that an email address is valid and not a disposable address. |
+-| mongodb                       | MongoDB driver                                                        |
+-| mongoose                      | MongoDB ODM.                                                          |
+-| morgan                        | HTTP request logger middleware for node.js.                           |
+-| multer                        | Node.js middleware for handling `multipart/form-data`.                |
+-| nodemailer                    | Node.js library for sending emails.                                   |
+-| oauth                         | OAuth API library without middleware constraints.                     |
+-| otpauth                       | One-Time Password (TOTP/HOTP) library for 2FA authenticator apps.     |
+-| passport                      | Simple and elegant authentication library for node.js.                |
+-| passport-facebook             | Sign-in with Facebook plugin.                                         |
+-| passport-github2              | Sign-in with GitHub plugin.                                           |
+-| passport-google-oauth         | Sign-in with Google plugin.                                           |
+-| passport-local                | Sign-in with Username and Password plugin.                            |
+-| passport-oauth1               | Allows you to set up your own OAuth 1.0a strategy.                    |
+-| passport-oauth2               | Allows you to set up your own OAuth 2.0 strategy.                     |
+-| passport-oauth2-refresh       | A library to refresh OAuth 2.0 access tokens using refresh tokens.    |
+-| passport-steam-openid         | OpenID 2.0 Steam plugin.                                              |
+-| patch-package                 | Fix broken node modules ahead of fixes by maintainers.                |
+-| pdfjs-dist                    | PDF parser                                                            |
+-| pug                           | Template engine for Express.                                          |
+-| qr                            | Generate and decode QR codes                                          |
+-| sass                          | Sass compiler to generate CSS with superpowers.                       |
+-| stripe                        | Official Stripe API library.                                          |
+-| twilio                        | Twilio API library.                                                   |
+-| twitch-passport               | Sign-in with Twitch plugin.                                           |
+-| validator                     | A library of string validators and sanitizers.                        |
+-| vanilla-cookieconsent         | GDPR/CCPA-compliant cookie consent banner                             |
++| Package                                 | Description                                                           |
++| --------------------------------------- | --------------------------------------------------------------------- |
++| @fortawesome/fontawesome-free           | Symbol and Icon library.                                              |
++| @googleapis/drive                       | Google Drive API integration library.                                 |
++| @googleapis/sheets                      | Google Sheets API integration library.                                |
++| @huggingface/inference                  | Client library for Hugging Face Inference providers                   |
++| @keyv/mongo                             | MongoDB storage adapter for Keyv                                      |
++| @langchain/core                         | Base LangChain abstractions and Expression Language                   |
++| @langchain/groq                         | Groq chat model integration for LangChain                             |
++| @langchain/langgraph                    | Graph-based agent orchestration used by the AI Agent example          |
++| @langchain/langgraph-checkpoint-mongodb | MongoDB-backed session/checkpoint persistence for the AI Agent        |
++| @langchain/mongodb                      | MongoDB integrations for LangChain                                    |
++| @langchain/textsplitters                | LangChain text splitters for RAG pipelines                            |
++| @lob/lob-typescript-sdk                 | Lob (USPS mailing / physical mailing service) library.                |
++| @node-rs/bcrypt                         | Library for hashing and salting user passwords.                       |
++| @octokit/rest                           | GitHub API library.                                                   |
++| @passport-js/passport-twitter           | X (Twitter) login support (OAuth 2).                                  |
++| @popperjs/core                          | Frontend js library for poppers and tooltips.                         |
++| @simplewebauthn/browser                 | WebAuthn frontend library (passkey / biometrics authentication)       |
++| @simplewebauthn/server                  | WebAuthn backend library (passkey / biometrics authentication)        |
++| @zapier/secret-scrubber                 | For redacting sensitive/secret values in objects                      |
++| bootstrap                               | CSS Framework.                                                        |
++| bootstrap-social                        | Social buttons library.                                               |
++| bowser                                  | User agent parser                                                     |
++| chart.js                                | Front-end js library for creating charts.                             |
++| cheerio                                 | Scrape web pages using jQuery-style syntax.                           |
++| compression                             | Node.js compression middleware.                                       |
++| connect-mongo                           | MongoDB session store for Express.                                    |
++| errorhandler                            | Development-only error handler middleware.                            |
++| express                                 | Node.js web framework.                                                |
++| express-rate-limit                      | Rate limiting middleware for abuse protection.                        |
++| express-session                         | Simple session middleware for Express.                                |
++| jquery                                  | Front-end JS library to interact with HTML elements.                  |
++| keyv                                    | key-value storage with support for multiple backends                  |
++| langchain                               | Framework for developing LLM applications                             |
++| lastfm                                  | Last.fm API library.                                                  |
++| lusca                                   | CSRF middleware.                                                      |
++| mailchecker                             | Verifies that an email address is valid and not a disposable address. |
++| mongodb                                 | MongoDB driver                                                        |
++| mongoose                                | MongoDB ODM.                                                          |
++| morgan                                  | HTTP request logger middleware for node.js.                           |
++| multer                                  | Node.js middleware for handling `multipart/form-data`.                |
++| nodemailer                              | Node.js library for sending emails.                                   |
++| oauth                                   | OAuth API library without middleware constraints.                     |
++| otpauth                                 | One-Time Password (TOTP/HOTP) library for 2FA authenticator apps.     |
++| passport                                | Simple and elegant authentication library for node.js.                |
++| passport-facebook                       | Sign-in with Facebook plugin.                                         |
++| passport-github2                        | Sign-in with GitHub plugin.                                           |
++| passport-google-oauth                   | Sign-in with Google plugin.                                           |
++| passport-local                          | Sign-in with Username and Password plugin.                            |
++| passport-oauth1                         | Allows you to set up your own OAuth 1.0a strategy.                    |
++| passport-oauth2                         | Allows you to set up your own OAuth 2.0 strategy.                     |
++| passport-oauth2-refresh                 | A library to refresh OAuth 2.0 access tokens using refresh tokens.    |
++| passport-steam-openid                   | OpenID 2.0 Steam plugin.                                              |
++| patch-package                           | Fix broken node modules ahead of fixes by maintainers.                |
++| pdfjs-dist                              | PDF parser                                                            |
++| pug                                     | Template engine for Express.                                          |
++| qr                                      | Generate and decode QR codes                                          |
++| sass                                    | Sass compiler to generate CSS with superpowers.                       |
++| stripe                                  | Official Stripe API library.                                          |
++| twilio                                  | Twilio API library.                                                   |
++| twitch-passport                         | Sign-in with Twitch plugin.                                           |
++| validator                               | A library of string validators and sanitizers.                        |
++| vanilla-cookieconsent                   | GDPR/CCPA-compliant cookie consent banner                             |
+ 
+ **Dev Dependencies**
+ 
+@@ -665,7 +711,6 @@ Required during code development for testing, Hygiene, code styling, etc.
+ | eslint-config-prettier      | Make ESLint and Prettier play nice with each other.                         |
+ | eslint                      | Linter JavaScript.                                                          |
+ | eslint-plugin-chai-friendly | Makes eslint friendly towards Chai.js 'expect' and 'should' statements.     |
+-| eslint-plugin-import-x      | ESLint plugin with rules that help validate proper imports.                 |
+ | globals                     | ESLint global identifiers from different JavaScript environments.           |
+ | husky                       | Git hook manager to automate tasks with git.                                |
+ | mocha                       | Test framework.                                                             |
+@@ -1506,7 +1551,7 @@ Using a local instance on your laptop with ngrok is a good solution for your dem
+ 
+ ## Production
+ 
+-If you are starting with this boilerplate to build an application for prod deployment, or if after your hackathon you would like to get your project hardened for production use, see [prod-checklist.md](https://github.com/sahat/hackathon-starter/blob/master/prod-checklist.md).
++If you are starting with this boilerplate to build an application for prod deployment, or if after your hackathon you would like to get your project hardened for production use, see [PROD_CHECKLIST.md](https://github.com/sahat/hackathon-starter/blob/master/PROD_CHECKLIST.md).
+ 
+ ## Testing
+ 
+diff --git a/test/TESTING.md b/test/TESTING.md
+index 249b891..576f6de 100644
+--- a/test/TESTING.md
++++ b/test/TESTING.md
+@@ -7,7 +7,8 @@ This document describes the test organization, fixture system, and how to create
+ - [Overview](#overview)
+ - [Test Organization](#test-organization)
+ - [Fixture System](#fixture-system)
+-- [Running Tests](#running-tests)
++- [Running E2E Tests](#running-e2e-tests)
++- [Link Checking](#link-checking)
+ - [Creating New Tests](#creating-new-tests)
+ - [Troubleshooting](#troubleshooting)
+ 
+@@ -54,7 +55,8 @@ test/
+ │   ├── upload.e2e.test.js
+ │   └── wikipedia.e2e.test.js
+ ├── app.test.js                  # Basic app structure tests - core unit test
+-├── app-links.test.js            # Link validation tests
++├── app-links.test.js            # Link/image validation for views (views/ai, views/api, etc.)
++├── docs-links.test.js           # Link validation for README.md and PROD_CHECKLIST.md
+ ├── cacheBust.test.js            # Cache-busting tests
+ ├── contact.test.js              # Contact form tests
+ ├── flash.test.js                # Flash message tests
+@@ -143,6 +145,24 @@ npx playwright test test/e2e/.../testfile.e2e.test.js --config=test/playwright.c
+ npx playwright test test/e2e/.../testfile.e2e.test.js --config=test/playwright.config.js --project=chromium-record
+ ```
+ 
++## Link Checking
++
++`app-links.test.js` and `docs-links.test.js` (matched together by the `test/*links.test.js`
++glob) make a live HTTP request for every link/image found in the Pug views and in
++README.md/PROD_CHECKLIST.md, respectively (see `test/tools/simple-link-image-check.js`).
++They are excluded from `npm test` and are not run in CI, since a run this size hitting
++live third-party URLs is slow and prone to transient failures. Run them manually after
++changing links in those files:
++
++```bash
++npm run test:image-link
++```
++
++`SKIP_KEYWORDS` in `simple-link-image-check.js` skips certain URLs (including any
++containing `hackathon-starter`), so links back into this repo's own GitHub pages are not
++checked by this script — verify those by hand, including case, since GitHub blob URLs are
++case-sensitive.
++
+ ## Creating New Tests
+ 
+ 1. Create the test file in `test/e2e/` or `test/e2e-nokey/`.
+-- 
+2.53.0
+

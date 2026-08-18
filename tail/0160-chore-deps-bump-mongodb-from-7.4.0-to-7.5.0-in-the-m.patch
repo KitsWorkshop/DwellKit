@@ -1,0 +1,88 @@
+From f3f0b5acf1113cb367194c20541447e327e0537d Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Wed, 8 Jul 2026 13:28:39 +0000
+Subject: [PATCH 158/200] chore(deps): bump mongodb from 7.4.0 to 7.5.0 in the
+ minor-updates group (#1710)
+
+Bumps the minor-updates group with 1 update: [mongodb](https://github.com/mongodb/node-mongodb-native).
+
+
+Updates `mongodb` from 7.4.0 to 7.5.0
+- [Release notes](https://github.com/mongodb/node-mongodb-native/releases)
+- [Changelog](https://github.com/mongodb/node-mongodb-native/blob/main/HISTORY.md)
+- [Commits](https://github.com/mongodb/node-mongodb-native/compare/v7.4.0...v7.5.0)
+
+---
+updated-dependencies:
+- dependency-name: mongodb
+  dependency-version: 7.5.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: minor-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 14 +++++++-------
+ package.json      |  2 +-
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 26323f8..b2808df 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -46,7 +46,7 @@
+         "lastfm": "^0.9.4",
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.20",
+-        "mongodb": "^7.4.0",
++        "mongodb": "^7.5.0",
+         "mongoose": "^9.7.4",
+         "morgan": "^1.11.0",
+         "multer": "^2.2.0",
+@@ -6131,14 +6131,14 @@
+       }
+     },
+     "node_modules/mongodb": {
+-      "version": "7.4.0",
+-      "resolved": "https://registry.npmjs.org/mongodb/-/mongodb-7.4.0.tgz",
+-      "integrity": "sha512-giySkkdYiwoBFo/oCc8nzov3xOYZ/sB8OpAYk5GINRLEjVw0LDsm8xgQL0XMTyU4extQlDZjhdUr1ZEwKFaazw==",
++      "version": "7.5.0",
++      "resolved": "https://registry.npmjs.org/mongodb/-/mongodb-7.5.0.tgz",
++      "integrity": "sha512-5FnrEDLnvp6ycUOGLNLLU33BfCx2qmp2mJjGPDwKLruYsVzXVSK5fsGpoDXvsXJwBfBsD7ebMRdawbDxC2814g==",
+       "license": "Apache-2.0",
+       "dependencies": {
+-        "@mongodb-js/saslprep": "^1.3.0",
++        "@mongodb-js/saslprep": "^1.4.11",
+         "bson": "^7.2.0",
+-        "mongodb-connection-string-url": "^7.0.0"
++        "mongodb-connection-string-url": "^7.0.1"
+       },
+       "engines": {
+         "node": ">=20.19.0"
+@@ -6148,7 +6148,7 @@
+         "@mongodb-js/zstd": "^7.0.0",
+         "gcp-metadata": "^7.0.1",
+         "kerberos": "^7.0.0",
+-        "mongodb-client-encryption": ">=7.0.0 <7.1.0",
++        "mongodb-client-encryption": "^7.2.0",
+         "snappy": "^7.3.2",
+         "socks": "^2.8.6"
+       },
+diff --git a/package.json b/package.json
+index cae2339..0ee27ca 100644
+--- a/package.json
++++ b/package.json
+@@ -65,7 +65,7 @@
+     "lastfm": "^0.9.4",
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.20",
+-    "mongodb": "^7.4.0",
++    "mongodb": "^7.5.0",
+     "mongoose": "^9.7.4",
+     "morgan": "^1.11.0",
+     "multer": "^2.2.0",
+-- 
+2.53.0
+

@@ -1,0 +1,113 @@
+From b9b1f33fc9a701d873a9555c033011868e165866 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Mon, 3 Aug 2026 13:28:37 +0000
+Subject: [PATCH 187/200] chore(deps): bump the minor-updates group with 2
+ updates (#1732)
+
+Bumps the minor-updates group with 2 updates: [mongoose](https://github.com/Automattic/mongoose) and [lint-staged](https://github.com/lint-staged/lint-staged).
+
+
+Updates `mongoose` from 9.8.1 to 9.9.0
+- [Release notes](https://github.com/Automattic/mongoose/releases)
+- [Changelog](https://github.com/Automattic/mongoose/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/Automattic/mongoose/compare/9.8.1...9.9.0)
+
+Updates `lint-staged` from 17.2.0 to 17.3.0
+- [Release notes](https://github.com/lint-staged/lint-staged/releases)
+- [Changelog](https://github.com/lint-staged/lint-staged/blob/main/CHANGELOG.md)
+- [Commits](https://github.com/lint-staged/lint-staged/compare/v17.2.0...v17.3.0)
+
+---
+updated-dependencies:
+- dependency-name: mongoose
+  dependency-version: 9.9.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: minor-updates
+- dependency-name: lint-staged
+  dependency-version: 17.3.0
+  dependency-type: direct:development
+  update-type: version-update:semver-minor
+  dependency-group: minor-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 16 ++++++++--------
+ package.json      |  4 ++--
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index fab3b26..74ce809 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -47,7 +47,7 @@
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.21",
+         "mongodb": "^7.5.0",
+-        "mongoose": "^9.8.1",
++        "mongoose": "^9.9.0",
+         "morgan": "^1.11.0",
+         "multer": "^2.2.0",
+         "nodemailer": "^9.0.3",
+@@ -84,7 +84,7 @@
+         "eslint-plugin-chai-friendly": "^1.2.1",
+         "globals": "^17.8.0",
+         "husky": "^9.1.7",
+-        "lint-staged": "^17.2.0",
++        "lint-staged": "^17.3.0",
+         "mocha": "^12.0.0-rc.5",
+         "mongodb-memory-server": "^11.2.0",
+         "nock": "15.0.0-beta.12",
+@@ -5723,9 +5723,9 @@
+       }
+     },
+     "node_modules/lint-staged": {
+-      "version": "17.2.0",
+-      "resolved": "https://registry.npmjs.org/lint-staged/-/lint-staged-17.2.0.tgz",
+-      "integrity": "sha512-FchGnFe4i4B1C/a35SPU9bNGPEHSC1+1iV0plLjzBmKVe9klZrlRfSgK6Cw4VeHyqOXbJUXP0vON61uRftNQ0A==",
++      "version": "17.3.0",
++      "resolved": "https://registry.npmjs.org/lint-staged/-/lint-staged-17.3.0.tgz",
++      "integrity": "sha512-woZS3vNe3UKqBaLPvbLOtKRY4tLANpWQhom12MGWqC8Mh1lCOO+WgSwmX2amjJAqTY9BkXYW87fCUH5H9Ph6xw==",
+       "dev": true,
+       "license": "MIT",
+       "dependencies": {
+@@ -6235,9 +6235,9 @@
+       "license": "MIT"
+     },
+     "node_modules/mongoose": {
+-      "version": "9.8.1",
+-      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-9.8.1.tgz",
+-      "integrity": "sha512-1ncioLSBWeFSXIiKw6aR4YYFAhpvS7uSbPpkzq5ELSP9PEScGkbzFg6Q0mNuHighosmgZPYPsY4sSIXqkY3/hw==",
++      "version": "9.9.0",
++      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-9.9.0.tgz",
++      "integrity": "sha512-xtBH8CU5oRK16F14rC8/KlRHeuPGP+w/URjDdwHV0oyN7otVuqglLje1FePX9+SaSBGj0/QiM65Tg86R7iNbPg==",
+       "license": "MIT",
+       "dependencies": {
+         "@standard-schema/spec": "^1.1.0",
+diff --git a/package.json b/package.json
+index c6fd56b..8ad3b80 100644
+--- a/package.json
++++ b/package.json
+@@ -66,7 +66,7 @@
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.21",
+     "mongodb": "^7.5.0",
+-    "mongoose": "^9.8.1",
++    "mongoose": "^9.9.0",
+     "morgan": "^1.11.0",
+     "multer": "^2.2.0",
+     "nodemailer": "^9.0.3",
+@@ -103,7 +103,7 @@
+     "eslint-plugin-chai-friendly": "^1.2.1",
+     "globals": "^17.8.0",
+     "husky": "^9.1.7",
+-    "lint-staged": "^17.2.0",
++    "lint-staged": "^17.3.0",
+     "mocha": "^12.0.0-rc.5",
+     "mongodb-memory-server": "^11.2.0",
+     "nock": "15.0.0-beta.12",
+-- 
+2.53.0
+

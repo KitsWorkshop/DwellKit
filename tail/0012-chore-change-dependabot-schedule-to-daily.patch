@@ -1,0 +1,27 @@
+From c194e84a23a55fe9b2a1eb5d66b1f7cdc66f8d88 Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <YasharF.Git1@ydftech.com>
+Date: Sun, 1 Mar 2026 10:44:22 -0800
+Subject: [PATCH 012/200] chore: change dependabot schedule to daily
+
+---
+ .github/dependabot.yml | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/.github/dependabot.yml b/.github/dependabot.yml
+index b85ab12..ab4d14d 100644
+--- a/.github/dependabot.yml
++++ b/.github/dependabot.yml
+@@ -3,9 +3,7 @@ updates:
+   - package-ecosystem: npm
+     directory: '/'
+     schedule:
+-      interval: 'weekly'
+-      day: 'thursday'
+-      time: '11:00'
++      interval: 'daily'
+     target-branch: 'master'
+     open-pull-requests-limit: 10
+     versioning-strategy: increase
+-- 
+2.53.0
+

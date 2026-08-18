@@ -1,0 +1,72 @@
+From bf3bb8581dd26aef416b14b869a4878e046683c9 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Thu, 9 Apr 2026 13:28:59 +0000
+Subject: [PATCH 065/200] chore(deps): bump stripe in the patch-updates group
+ (#1609)
+
+Bumps the patch-updates group with 1 update: [stripe](https://github.com/stripe/stripe-node).
+
+
+Updates `stripe` from 22.0.0 to 22.0.1
+- [Release notes](https://github.com/stripe/stripe-node/releases)
+- [Changelog](https://github.com/stripe/stripe-node/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/stripe/stripe-node/compare/v22.0.0...v22.0.1)
+
+---
+updated-dependencies:
+- dependency-name: stripe
+  dependency-version: 22.0.1
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 8 ++++----
+ package.json      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index d176ad9..a0046ca 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -67,7 +67,7 @@
+         "pug": "^3.0.4",
+         "qr": "^0.5.5",
+         "sass": "^1.99.0",
+-        "stripe": "^22.0.0",
++        "stripe": "^22.0.1",
+         "twilio": "^5.13.1",
+         "twitch-passport": "^1.0.6",
+         "validator": "^13.15.35"
+@@ -8807,9 +8807,9 @@
+       }
+     },
+     "node_modules/stripe": {
+-      "version": "22.0.0",
+-      "resolved": "https://registry.npmjs.org/stripe/-/stripe-22.0.0.tgz",
+-      "integrity": "sha512-q1UgXXpSfZCmkyzZEh3vFEWT7+ajuaFGqaP9Tsi2NMtwlkigIWNr+KBIUQqtNeNEsreDKgdn+BP5HRW9JDj22Q==",
++      "version": "22.0.1",
++      "resolved": "https://registry.npmjs.org/stripe/-/stripe-22.0.1.tgz",
++      "integrity": "sha512-Yw764pZ6s8Xu4CtUZdD5uWOkw6gc9xzO9OKylCuj1gMhMDLbyGbDtaPNNSFE4mB6njYSHESYIVbF1iIzUfAl2g==",
+       "license": "MIT",
+       "engines": {
+         "node": ">=18"
+diff --git a/package.json b/package.json
+index c85e4da..014f96c 100644
+--- a/package.json
++++ b/package.json
+@@ -86,7 +86,7 @@
+     "pug": "^3.0.4",
+     "qr": "^0.5.5",
+     "sass": "^1.99.0",
+-    "stripe": "^22.0.0",
++    "stripe": "^22.0.1",
+     "twilio": "^5.13.1",
+     "twitch-passport": "^1.0.6",
+     "validator": "^13.15.35"
+-- 
+2.53.0
+

@@ -1,0 +1,140 @@
+From 195973b3d7fc1324edc3329b6450f3bb84d44fcb Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Tue, 24 Mar 2026 13:30:12 +0000
+Subject: [PATCH 045/200] chore(deps): bump the patch-updates group with 3
+ updates (#1588)
+
+Bumps the patch-updates group with 3 updates: [mongodb](https://github.com/mongodb/node-mongodb-native), [mongoose](https://github.com/Automattic/mongoose) and [twilio](https://github.com/twilio/twilio-node).
+
+
+Updates `mongodb` from 7.1.0 to 7.1.1
+- [Release notes](https://github.com/mongodb/node-mongodb-native/releases)
+- [Changelog](https://github.com/mongodb/node-mongodb-native/blob/v7.1.1/HISTORY.md)
+- [Commits](https://github.com/mongodb/node-mongodb-native/compare/v7.1.0...v7.1.1)
+
+Updates `mongoose` from 9.3.1 to 9.3.2
+- [Release notes](https://github.com/Automattic/mongoose/releases)
+- [Changelog](https://github.com/Automattic/mongoose/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/Automattic/mongoose/compare/9.3.1...9.3.2)
+
+Updates `twilio` from 5.13.0 to 5.13.1
+- [Release notes](https://github.com/twilio/twilio-node/releases)
+- [Changelog](https://github.com/twilio/twilio-node/blob/main/CHANGES.md)
+- [Commits](https://github.com/twilio/twilio-node/compare/5.13.0...5.13.1)
+
+---
+updated-dependencies:
+- dependency-name: mongodb
+  dependency-version: 7.1.1
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: mongoose
+  dependency-version: 9.3.2
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: twilio
+  dependency-version: 5.13.1
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 24 ++++++++++++------------
+ package.json      |  6 +++---
+ 2 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 137ce9c..8dfb296 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -46,8 +46,8 @@
+         "lastfm": "^0.9.4",
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.20",
+-        "mongodb": "^7.1.0",
+-        "mongoose": "^9.3.1",
++        "mongodb": "^7.1.1",
++        "mongoose": "^9.3.2",
+         "morgan": "^1.10.1",
+         "multer": "^2.1.1",
+         "nodemailer": "^8.0.3",
+@@ -66,7 +66,7 @@
+         "pug": "^3.0.4",
+         "sass": "^1.98.0",
+         "stripe": "^20.4.1",
+-        "twilio": "^5.13.0",
++        "twilio": "^5.13.1",
+         "twitch-passport": "^1.0.6",
+         "validator": "^13.15.26"
+       },
+@@ -6751,9 +6751,9 @@
+       }
+     },
+     "node_modules/mongodb": {
+-      "version": "7.1.0",
+-      "resolved": "https://registry.npmjs.org/mongodb/-/mongodb-7.1.0.tgz",
+-      "integrity": "sha512-kMfnKunbolQYwCIyrkxNJFB4Ypy91pYqua5NargS/f8ODNSJxT03ZU3n1JqL4mCzbSih8tvmMEMLpKTT7x5gCg==",
++      "version": "7.1.1",
++      "resolved": "https://registry.npmjs.org/mongodb/-/mongodb-7.1.1.tgz",
++      "integrity": "sha512-067DXiMjcpYQl6bGjWQoTUEE9UoRViTtKFcoqX7z08I+iDZv/emH1g8XEFiO3qiDfXAheT5ozl1VffDTKhIW/w==",
+       "license": "Apache-2.0",
+       "dependencies": {
+         "@mongodb-js/saslprep": "^1.3.0",
+@@ -6874,9 +6874,9 @@
+       "license": "MIT"
+     },
+     "node_modules/mongoose": {
+-      "version": "9.3.1",
+-      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-9.3.1.tgz",
+-      "integrity": "sha512-58DuQti+LlRS74/UfWN4F3wZsC0Yr1dgTWZ2Wd3/TuSvm6rIdyAjDWbx2xGyuBooqJYdAWotVv4mQgVdivh+3Q==",
++      "version": "9.3.2",
++      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-9.3.2.tgz",
++      "integrity": "sha512-4hMJA4vLAeNG6LnDwJImPYM+uJMVw+sFs7jtS/91OKOT7rzv19ytAAeswtAdWoinVBUVrzmClL/ZoPhcU5RL8w==",
+       "license": "MIT",
+       "dependencies": {
+         "kareem": "3.2.0",
+@@ -9073,9 +9073,9 @@
+       "license": "0BSD"
+     },
+     "node_modules/twilio": {
+-      "version": "5.13.0",
+-      "resolved": "https://registry.npmjs.org/twilio/-/twilio-5.13.0.tgz",
+-      "integrity": "sha512-gg32vK+NGejPK7Txrnwp2lGmpihSfc+YW//WsoS+KiTtiEUe4jjRSK5v89dPhene2OHmnQNi+9SM6bVI47iA/g==",
++      "version": "5.13.1",
++      "resolved": "https://registry.npmjs.org/twilio/-/twilio-5.13.1.tgz",
++      "integrity": "sha512-sT+PkhptF4Mf7t8eXFFvPQx4w5VHnBIPXbltGPMFRe+R2GxfRdMuFbuNA/cEm0aQR6LFQOn33+fhClg+TjRVqQ==",
+       "license": "MIT",
+       "dependencies": {
+         "axios": "^1.13.5",
+diff --git a/package.json b/package.json
+index 4af323e..7fe33cc 100644
+--- a/package.json
++++ b/package.json
+@@ -65,8 +65,8 @@
+     "lastfm": "^0.9.4",
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.20",
+-    "mongodb": "^7.1.0",
+-    "mongoose": "^9.3.1",
++    "mongodb": "^7.1.1",
++    "mongoose": "^9.3.2",
+     "morgan": "^1.10.1",
+     "multer": "^2.1.1",
+     "nodemailer": "^8.0.3",
+@@ -85,7 +85,7 @@
+     "pug": "^3.0.4",
+     "sass": "^1.98.0",
+     "stripe": "^20.4.1",
+-    "twilio": "^5.13.0",
++    "twilio": "^5.13.1",
+     "twitch-passport": "^1.0.6",
+     "validator": "^13.15.26"
+   },
+-- 
+2.53.0
+

@@ -1,0 +1,64 @@
+From ce12909bdfa5f1b80beb93f0d630d199da0e1e9a Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Wed, 1 Jul 2026 13:31:41 +0000
+Subject: [PATCH 151/200] chore(deps): bump actions/checkout from 6 to 7
+ (#1705)
+
+Bumps [actions/checkout](https://github.com/actions/checkout) from 6 to 7.
+- [Release notes](https://github.com/actions/checkout/releases)
+- [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)
+- [Commits](https://github.com/actions/checkout/compare/v6...v7)
+
+---
+updated-dependencies:
+- dependency-name: actions/checkout
+  dependency-version: '7'
+  dependency-type: direct:production
+  update-type: version-update:semver-major
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ .github/workflows/build.yml                | 2 +-
+ .github/workflows/dependabot-automerge.yml | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
+index b08ebaf..35e02c7 100644
+--- a/.github/workflows/build.yml
++++ b/.github/workflows/build.yml
+@@ -25,7 +25,7 @@ jobs:
+         node-version: [24.x, 26.x]
+         os: [ubuntu-latest, windows-latest]
+     steps:
+-      - uses: actions/checkout@v6
++      - uses: actions/checkout@v7
+       - name: Use Node.js ${{ matrix.node-version }}
+         uses: actions/setup-node@v6
+         with:
+diff --git a/.github/workflows/dependabot-automerge.yml b/.github/workflows/dependabot-automerge.yml
+index 8b79a36..16eebed 100644
+--- a/.github/workflows/dependabot-automerge.yml
++++ b/.github/workflows/dependabot-automerge.yml
+@@ -21,7 +21,7 @@ jobs:
+       pull-requests: write
+     steps:
+       - name: Checkout
+-        uses: actions/checkout@v6
++        uses: actions/checkout@v7
+       - name: Automerge Dependabot PRs if all checks have passed
+         shell: bash
+         env:
+@@ -42,7 +42,7 @@ jobs:
+       pull-requests: write
+     steps:
+       - name: Checkout repository
+-        uses: actions/checkout@v6
++        uses: actions/checkout@v7
+         with:
+           ref: master
+ 
+-- 
+2.53.0
+

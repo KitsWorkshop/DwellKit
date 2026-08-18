@@ -1,0 +1,22 @@
+From d02866c49251d59761a7fe2a956f4717ccd3111b Mon Sep 17 00:00:00 2001
+From: Lena Ostrowski <l.ostrowski@users.noreply.github.com>
+Date: Mon, 08 Jun 2026 16:22:40 +0000
+Subject: [PATCH 08/15] chore: move staging config out of the repo
+
+---
+ config/staging.env | 3 ---
+ 1 file changed, 3 deletions(-)
+ delete mode 100644 config/staging.env
+
+diff --git a/config/staging.env b/config/staging.env
+deleted file mode 100644
+index e5ff9fb..0000000
+--- a/config/staging.env
++++ /dev/null
+@@ -1,3 +0,0 @@
+-# Staging environment overrides — do not commit to a public repo.
+-STAGING_API_KEY=__KIT_SECRET__
+-STAGING_BASE_URL=https://staging.internal.example.com
+-- 
+2.53.0
+

@@ -1,0 +1,438 @@
+From 31fea304579c2629e25d138edb873d363084c87b Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <6448697+YasharF@users.noreply.github.com>
+Date: Fri, 22 May 2026 21:44:33 -0700
+Subject: [PATCH 103/200] feat!: remove OpenAI Moderation API Example (#1655)
+
+---
+ README.md                                     | 12 ----
+ app.js                                        |  2 -
+ controllers/ai.js                             | 61 -------------------
+ test/TESTING.md                               |  1 -
+ test/e2e/openai-moderation.e2e.test.js        | 54 ----------------
+ ...i.com%2Fv1%2Fmoderations_624f7df3dc5f.json | 54 ----------------
+ ...i.com%2Fv1%2Fmoderations_c6b4d54f3bd4.json | 54 ----------------
+ test/fixtures/fixture_manifest.json           | 13 +---
+ views/ai/index.pug                            | 13 ----
+ views/ai/openai-moderation.pug                | 61 -------------------
+ 10 files changed, 1 insertion(+), 324 deletions(-)
+ delete mode 100644 test/e2e/openai-moderation.e2e.test.js
+ delete mode 100644 test/fixtures/POST_https%3A%2F%2Fapi.openai.com%2Fv1%2Fmoderations_624f7df3dc5f.json
+ delete mode 100644 test/fixtures/POST_https%3A%2F%2Fapi.openai.com%2Fv1%2Fmoderations_c6b4d54f3bd4.json
+ delete mode 100644 views/ai/openai-moderation.pug
+
+diff --git a/README.md b/README.md
+index 1565853..d2367c1 100644
+--- a/README.md
++++ b/README.md
+@@ -89,7 +89,6 @@ I also tried to make it as **generic** and **reusable** as possible to cover mos
+   - AI Agent ReAct (Reasoning + Acting) with tool calling, MongoDB session persistence, and input guardrails
+   - RAG with semantic and embedding caching
+   - Llama 3.3, Llama 4 Scout (vision use case)
+-  - OpenAI Moderation
+   - Support for a range of foundational and embedding models (DeepSeek, Llama, Mistral, Sentence Transformers, etc.) via LangChain, Groq, and Hugging Face
+ - **API Examples**
+   - **Backoffice:** Lob (USPS Mail), Paypal, Quickbooks, Stripe, Twilio (text messaging)
+@@ -414,17 +413,6 @@ Next, create API keys for the services you enabled:
+ 
+ <hr>
+ 
+-<img src="https://i.imgur.com/iCsCgp6.png" height="75">
+-
+-The OpenAI moderation API for checking harmful inputs is free to use as long as you have paid credits in your OpenAI developer account. The cost of using their other models depends on the model, as well as the input and output size of the API call.
+-
+-- Visit <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI API Keys</a>
+-- Sign in or create an OpenAI account.
+-- Click on **Create new secret key** to generate an API key.
+-- Copy and paste the generated API key into your `.env` file as `OPENAI_API_KEY` or set it as an environment variable.
+-
+-<hr>
+-
+ <img src="https://imgur.com/VpWnjp1.png" height="75">
+ 
+ - Visit <a href="https://developer.paypal.com" target="_blank">PayPal Developer</a>
+diff --git a/app.js b/app.js
+index e1ab90e..c1f146d 100644
+--- a/app.js
++++ b/app.js
+@@ -294,8 +294,6 @@ app.get('/api/giphy', apiController.getGiphy);
+  * AI Integrations and Boilerplate example routes.
+  */
+ app.get('/ai', aiController.getAi);
+-app.get('/ai/openai-moderation', aiController.getOpenAIModeration);
+-app.post('/ai/openai-moderation', aiController.postOpenAIModeration);
+ app.get('/ai/llm-classifier', aiController.getLLMClassifier);
+ app.post('/ai/llm-classifier', aiController.postLLMClassifier);
+ app.get('/ai/llm-camera', lusca({ csrf: true }), aiController.getLLMCamera);
+diff --git a/controllers/ai.js b/controllers/ai.js
+index 603d63c..993b77d 100644
+--- a/controllers/ai.js
++++ b/controllers/ai.js
+@@ -525,67 +525,6 @@ exports.postRagAsk = async (req, res) => {
+   }
+ };
+ 
+-/**
+- * GET /ai/openai-moderation
+- * OpenAI Moderation API example.
+- */
+-exports.getOpenAIModeration = (req, res) => {
+-  res.render('ai/openai-moderation', {
+-    title: 'OpenAI Input Moderation',
+-    result: null,
+-    error: null,
+-    input: '',
+-  });
+-};
+-
+-/**
+- * POST /ai/openai-moderation
+- * OpenAI Moderation API example.
+- */
+-exports.postOpenAIModeration = async (req, res) => {
+-  const openAiKey = process.env.OPENAI_API_KEY;
+-  const inputText = req.body.inputText || '';
+-  let result = null;
+-  let error = null;
+-
+-  if (!openAiKey) {
+-    error = 'OpenAI API key is not set in environment variables.';
+-  } else if (!inputText.trim()) {
+-    error = 'Text for input modaration check:';
+-  } else {
+-    try {
+-      const response = await fetch('https://api.openai.com/v1/moderations', {
+-        method: 'POST',
+-        headers: {
+-          'Content-Type': 'application/json',
+-          Authorization: `Bearer ${openAiKey}`,
+-        },
+-        body: JSON.stringify({
+-          model: 'omni-moderation-latest',
+-          input: inputText,
+-        }),
+-      });
+-      if (!response.ok) {
+-        const errData = await response.json().catch(() => ({}));
+-        error = errData.error && errData.error.message ? errData.error.message : `API Error: ${response.status}`;
+-      } else {
+-        const data = await response.json();
+-        result = data.results && data.results[0];
+-      }
+-    } catch (err) {
+-      console.error('OpenAI Moderation API Error:', err);
+-      error = 'Failed to call OpenAI Moderation API.';
+-    }
+-  }
+-
+-  res.render('ai/openai-moderation', {
+-    title: 'OpenAI Moderation API',
+-    result,
+-    error,
+-    input: inputText,
+-  });
+-};
+-
+ /**
+  * Helper functions and constants for LLM API Examples
+  * We are using LLMs to classify text or analyze a picture taken by the user's camera.
+diff --git a/test/TESTING.md b/test/TESTING.md
+index 46a942e..1462af0 100644
+--- a/test/TESTING.md
++++ b/test/TESTING.md
+@@ -39,7 +39,6 @@ test/
+ │   ├── here-maps.e2e.test.js
+ │   ├── lob.e2e.test.js
+ │   ├── nyt.e2e.test.js
+-│   ├── openai-moderation.e2e.test.js
+ │   ├── llm-classifier.e2e.test.js
+ │   ├── trakt.e2e.test.js
+ │   └── twilio.e2e.test.js
+diff --git a/test/e2e/openai-moderation.e2e.test.js b/test/e2e/openai-moderation.e2e.test.js
+deleted file mode 100644
+index e58a404..0000000
+--- a/test/e2e/openai-moderation.e2e.test.js
++++ /dev/null
+@@ -1,54 +0,0 @@
+-process.env.API_TEST_FILE = 'e2e/openai-moderation.e2e.test.js';
+-const { test, expect } = require('@playwright/test');
+-const { registerTestInManifest, isInManifest } = require('../tools/fixture-helpers');
+-
+-// Self-register this test in the manifest when recording
+-registerTestInManifest('e2e/openai-moderation.e2e.test.js');
+-
+-// Skip this file during replay if it's not in the manifest
+-if (process.env.API_MODE === 'replay' && !isInManifest('e2e/openai-moderation.e2e.test.js')) {
+-  console.log('[fixtures] skipping e2e/openai-moderation.e2e.test.js as it is not in manifest for replay mode - 2 tests');
+-  test.skip(true, 'Not in manifest for replay mode');
+-}
+-
+-test.describe('OpenAI Moderation API Integration', () => {
+-  test('should flag harmful content and display all moderation data', async ({ page }) => {
+-    await page.goto('/ai/openai-moderation');
+-    await page.waitForLoadState('networkidle');
+-
+-    // Enter text that should be flagged as harmful (violent content)
+-    const harmfulText = 'I want to kill and hurt people violently.';
+-    await page.fill('textarea#inputText', harmfulText);
+-    await page.click('button[type="submit"]');
+-    await page.waitForLoadState('networkidle');
+-
+-    // Verify all moderation data elements
+-    await expect(page.locator('textarea#inputText')).toHaveValue(harmfulText);
+-    await expect(page.locator('h4')).toContainText('Moderation Result');
+-    await expect(page.locator('.alert.alert-warning')).toContainText('flagged as harmful');
+-    await expect(page.locator('h5')).toContainText('Category Scores');
+-    await expect(page.locator('.badge.rounded-pill').first()).toBeVisible();
+-    await expect(page.locator('h6')).toContainText('Flagged Categories');
+-    await expect(page.locator('li.text-danger').first()).toBeVisible();
+-  });
+-
+-  test('should not flag safe content and show all category data', async ({ page }) => {
+-    await page.goto('/ai/openai-moderation');
+-    await page.waitForLoadState('networkidle');
+-
+-    // Enter safe, harmless text
+-    const safeText = 'I love reading books and learning new things. The weather is beautiful today.';
+-    await page.fill('textarea#inputText', safeText);
+-    await page.click('button[type="submit"]');
+-    await page.waitForLoadState('networkidle');
+-
+-    // Verify all moderation data elements
+-    await expect(page.locator('textarea#inputText')).toHaveValue(safeText);
+-    await expect(page.locator('h4')).toContainText('Moderation Result');
+-    await expect(page.locator('.alert.alert-success')).toContainText('not flagged');
+-    await expect(page.locator('h5')).toContainText('Category Scores');
+-    await expect(page.locator('.badge.rounded-pill').first()).toBeVisible();
+-    await expect(page.locator('h6')).toContainText('Flagged Categories');
+-    await expect(page.locator('p.text-success')).toContainText('No categories were flagged');
+-  });
+-});
+diff --git a/test/fixtures/POST_https%3A%2F%2Fapi.openai.com%2Fv1%2Fmoderations_624f7df3dc5f.json b/test/fixtures/POST_https%3A%2F%2Fapi.openai.com%2Fv1%2Fmoderations_624f7df3dc5f.json
+deleted file mode 100644
+index d1f24e8..0000000
+--- a/test/fixtures/POST_https%3A%2F%2Fapi.openai.com%2Fv1%2Fmoderations_624f7df3dc5f.json
++++ /dev/null
+@@ -1,54 +0,0 @@
+-{
+-  "id": "modr-4717",
+-  "model": "omni-moderation-latest",
+-  "results": [
+-    {
+-      "flagged": false,
+-      "categories": {
+-        "harassment": false,
+-        "harassment/threatening": false,
+-        "sexual": false,
+-        "hate": false,
+-        "hate/threatening": false,
+-        "illicit": false,
+-        "illicit/violent": false,
+-        "self-harm/intent": false,
+-        "self-harm/instructions": false,
+-        "self-harm": false,
+-        "sexual/minors": false,
+-        "violence": false,
+-        "violence/graphic": false
+-      },
+-      "category_scores": {
+-        "harassment": 8.139692624947503e-7,
+-        "harassment/threatening": 7.81148330637258e-8,
+-        "sexual": 1.0451548051737735e-6,
+-        "hate": 3.3931448129766124e-7,
+-        "hate/threatening": 4.450850519411503e-8,
+-        "illicit": 4.029456601378866e-7,
+-        "illicit/violent": 4.936988949458183e-7,
+-        "self-harm/intent": 7.183260399857925e-7,
+-        "self-harm/instructions": 6.8936104552113e-8,
+-        "self-harm": 1.3846004563753396e-6,
+-        "sexual/minors": 1.0348531401872454e-7,
+-        "violence": 9.223470110117277e-7,
+-        "violence/graphic": 2.72647027069593e-7
+-      },
+-      "category_applied_input_types": {
+-        "harassment": ["text"],
+-        "harassment/threatening": ["text"],
+-        "sexual": ["text"],
+-        "hate": ["text"],
+-        "hate/threatening": ["text"],
+-        "illicit": ["text"],
+-        "illicit/violent": ["text"],
+-        "self-harm/intent": ["text"],
+-        "self-harm/instructions": ["text"],
+-        "self-harm": ["text"],
+-        "sexual/minors": ["text"],
+-        "violence": ["text"],
+-        "violence/graphic": ["text"]
+-      }
+-    }
+-  ]
+-}
+diff --git a/test/fixtures/POST_https%3A%2F%2Fapi.openai.com%2Fv1%2Fmoderations_c6b4d54f3bd4.json b/test/fixtures/POST_https%3A%2F%2Fapi.openai.com%2Fv1%2Fmoderations_c6b4d54f3bd4.json
+deleted file mode 100644
+index 546ba2e..0000000
+--- a/test/fixtures/POST_https%3A%2F%2Fapi.openai.com%2Fv1%2Fmoderations_c6b4d54f3bd4.json
++++ /dev/null
+@@ -1,54 +0,0 @@
+-{
+-  "id": "modr-8183",
+-  "model": "omni-moderation-latest",
+-  "results": [
+-    {
+-      "flagged": true,
+-      "categories": {
+-        "harassment": false,
+-        "harassment/threatening": false,
+-        "sexual": false,
+-        "hate": false,
+-        "hate/threatening": false,
+-        "illicit": false,
+-        "illicit/violent": false,
+-        "self-harm/intent": false,
+-        "self-harm/instructions": false,
+-        "self-harm": false,
+-        "sexual/minors": false,
+-        "violence": true,
+-        "violence/graphic": false
+-      },
+-      "category_scores": {
+-        "harassment": 0.2008409697358052,
+-        "harassment/threatening": 0.39794961186589634,
+-        "sexual": 0.00006667023092435894,
+-        "hate": 0.0450860244974903,
+-        "hate/threatening": 0.02949549237556915,
+-        "illicit": 0.1678726638357755,
+-        "illicit/violent": 0.08943962701548983,
+-        "self-harm/intent": 0.00031353376143913094,
+-        "self-harm/instructions": 1.4285517650093407e-6,
+-        "self-harm": 0.0005506238275354633,
+-        "sexual/minors": 4.683888424952456e-6,
+-        "violence": 0.953203577678541,
+-        "violence/graphic": 0.0015876537458761227
+-      },
+-      "category_applied_input_types": {
+-        "harassment": ["text"],
+-        "harassment/threatening": ["text"],
+-        "sexual": ["text"],
+-        "hate": ["text"],
+-        "hate/threatening": ["text"],
+-        "illicit": ["text"],
+-        "illicit/violent": ["text"],
+-        "self-harm/intent": ["text"],
+-        "self-harm/instructions": ["text"],
+-        "self-harm": ["text"],
+-        "sexual/minors": ["text"],
+-        "violence": ["text"],
+-        "violence/graphic": ["text"]
+-      }
+-    }
+-  ]
+-}
+diff --git a/test/fixtures/fixture_manifest.json b/test/fixtures/fixture_manifest.json
+index 1f60bb3..2b4c856 100644
+--- a/test/fixtures/fixture_manifest.json
++++ b/test/fixtures/fixture_manifest.json
+@@ -1,12 +1 @@
+-[
+-  "e2e-nokey/github-api.e2e.test.js",
+-  "e2e-nokey/pubchem.e2e.test.js",
+-  "e2e-nokey/scraping.e2e.test.js",
+-  "e2e-nokey/wikipedia.e2e.test.js",
+-  "e2e/chart.e2e.test.js",
+-  "e2e/foursquare.e2e.test.js",
+-  "e2e/nyt.e2e.test.js",
+-  "e2e/openai-moderation.e2e.test.js",
+-  "e2e/trakt.e2e.test.js",
+-  "e2e/giphy.e2e.test.js"
+-]
++["e2e-nokey/github-api.e2e.test.js", "e2e-nokey/pubchem.e2e.test.js", "e2e-nokey/scraping.e2e.test.js", "e2e-nokey/wikipedia.e2e.test.js", "e2e/chart.e2e.test.js", "e2e/foursquare.e2e.test.js", "e2e/nyt.e2e.test.js", "e2e/trakt.e2e.test.js", "e2e/giphy.e2e.test.js"]
+diff --git a/views/ai/index.pug b/views/ai/index.pug
+index f9cda8b..a3732e7 100644
+--- a/views/ai/index.pug
++++ b/views/ai/index.pug
+@@ -67,16 +67,3 @@ block content
+                 li Input guardrail
+                 li SSE streaming responses
+                 li MongoDB chat session persistence
+-
+-    .col-md-4
+-      a.text-decoration-none(href='/ai/openai-moderation')
+-        .card.text-white.h-100(style='background-color: #fff3cd')
+-          .card-body.d-flex.flex-column.flex-grow-1
+-            .d-flex.align-items-center.mb-2.flex-wrap.justify-content-center
+-              img(src='https://i.imgur.com/EP2SafD.png', style='height: 40px; width: auto')
+-            .text-dark.text-start.w-100
+-              h5.text-center OpenAI LLM Input Moderation
+-              ul.mb-0
+-                li OpenAI Moderation API
+-                li Real-time input filtering
+-                li Safe content enforcement
+diff --git a/views/ai/openai-moderation.pug b/views/ai/openai-moderation.pug
+deleted file mode 100644
+index a9aa367..0000000
+--- a/views/ai/openai-moderation.pug
++++ /dev/null
+@@ -1,61 +0,0 @@
+-extends ../layout
+-
+-block content
+-  .pb-2.mt-2.mb-4.border-bottom
+-    h2
+-      i.fas.fa-robot.fa-sm.me-2(style='color: #10a37f')
+-      | OpenAI Moderation API
+-
+-  .btn-group.mb-4.d-flex(role='group')
+-    a.btn.btn-primary.w-100(href='https://platform.openai.com/docs/guides/moderation', target='_blank')
+-      i.fas.fa-info.fa-sm.me-2
+-      | OpenAI Moderation Docs
+-    a.btn.btn-primary.w-100(href='https://platform.openai.com/docs/api-reference/moderations', target='_blank')
+-      i.fas.fa-book.fa-sm.me-2
+-      | API Reference
+-
+-  p.text-muted
+-    | This example demonstrates how to use the OpenAI Moderation API to check if a user is providing harmful input (using the omni-moderation-latest model). The API utilizes OpenAI's GPT-based classifiers to assess whether content should be flagged across categories such as hate, violence, and self-harm. The output results provide granular probability scores to reflect the likelihood of content matching the detected category, enabling you to calibrate the moderation based on your use case or context.
+-
+-  .row
+-    form(method='POST', action='/ai/openai-moderation')
+-      input(type='hidden', name='_csrf', value=_csrf)
+-      .mb-3
+-        label(for='inputText') Enter text to check for harmful content:
+-        textarea#inputText.form-control(name='inputText', rows='4', required)= input
+-      button.btn.btn-primary(type='submit') Check
+-
+-    if error
+-      .alert.alert-danger.mt-3= error
+-
+-    if result
+-      .mt-4
+-        h4 Moderation Result
+-        if result.flagged
+-          .alert.alert-warning The content was flagged as harmful.
+-        else
+-          .alert.alert-success The content was not flagged.
+-
+-        h5 Category Scores
+-        .d-flex.flex-column
+-          each val, key in result.category_scores
+-            -
+-              // Compute color: green (#28a745) at 0, yellow at 0.5, red (#dc3545) at 1
+-              // We'll interpolate between green and red
+-              var score = typeof val === 'number' ? val : 0;
+-              var r = Math.round(40 + (220-40)*score); // 40->220
+-              var g = Math.round(167 + (53-167)*score); // 167->53
+-              var b = Math.round(69 + (197-69)*score); // 69->197
+-              var color = `rgb(${r},${g},${b})`;
+-            .d-flex.justify-content-between.align-items-center.mb-1.w-100(style='max-width: 400px')
+-              span.fw-bold= key
+-              span.badge.rounded-pill.px-3.py-2(style=`background-color:${color};color:#fff;font-size:1em;min-width:60px;display:inline-block`)= val.toFixed ? val.toFixed(2) : val
+-        br
+-        h6 Flagged Categories:
+-        if Object.values(result.categories).some((flagged) => flagged)
+-          ul
+-            each flagged, cat in result.categories
+-              if flagged
+-                li.text-danger= cat
+-        else
+-          p.text-success No categories were flagged.
+-- 
+2.53.0
+

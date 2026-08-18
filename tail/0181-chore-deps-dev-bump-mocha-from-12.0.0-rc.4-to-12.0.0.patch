@@ -1,0 +1,68 @@
+From d4296f21ce270885ae6da5b6055412865969d3c4 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Fri, 24 Jul 2026 13:29:22 +0000
+Subject: [PATCH 179/200] chore(deps-dev): bump mocha from 12.0.0-rc.4 to
+ 12.0.0-rc.5 (#1725)
+
+Bumps [mocha](https://github.com/mochajs/mocha) from 12.0.0-rc.4 to 12.0.0-rc.5.
+- [Release notes](https://github.com/mochajs/mocha/releases)
+- [Changelog](https://github.com/mochajs/mocha/blob/main/CHANGELOG.md)
+- [Commits](https://github.com/mochajs/mocha/compare/v12.0.0-rc.4...v12.0.0-rc.5)
+
+---
+updated-dependencies:
+- dependency-name: mocha
+  dependency-version: 12.0.0-rc.5
+  dependency-type: direct:development
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 8 ++++----
+ package.json      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 124c455..66bfa67 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -85,7 +85,7 @@
+         "globals": "^17.7.0",
+         "husky": "^9.1.7",
+         "lint-staged": "^17.2.0",
+-        "mocha": "^12.0.0-rc.4",
++        "mocha": "^12.0.0-rc.5",
+         "mongodb-memory-server": "^11.2.0",
+         "nock": "15.0.0-beta.12",
+         "prettier": "^3.9.6",
+@@ -6016,9 +6016,9 @@
+       }
+     },
+     "node_modules/mocha": {
+-      "version": "12.0.0-rc.4",
+-      "resolved": "https://registry.npmjs.org/mocha/-/mocha-12.0.0-rc.4.tgz",
+-      "integrity": "sha512-P/YUkiNOdeRgB4Biv47Qhn6zNrn6tebA8PHsVIDmVILETsSVEQafEVZMyPGjZRfuIou/llKSmBADv8KXInvWEg==",
++      "version": "12.0.0-rc.5",
++      "resolved": "https://registry.npmjs.org/mocha/-/mocha-12.0.0-rc.5.tgz",
++      "integrity": "sha512-K6Ai6a1kSfZezibYKkgM7PVQP9mrtk0dcZqwbEv9gHScNj7eJzH33ACsN/JuxVXf1HCV6hw035z8zDDG/SLpmg==",
+       "dev": true,
+       "license": "MIT",
+       "dependencies": {
+diff --git a/package.json b/package.json
+index 6fd5cd7..8a0b8ce 100644
+--- a/package.json
++++ b/package.json
+@@ -104,7 +104,7 @@
+     "globals": "^17.7.0",
+     "husky": "^9.1.7",
+     "lint-staged": "^17.2.0",
+-    "mocha": "^12.0.0-rc.4",
++    "mocha": "^12.0.0-rc.5",
+     "mongodb-memory-server": "^11.2.0",
+     "nock": "15.0.0-beta.12",
+     "prettier": "^3.9.6",
+-- 
+2.53.0
+

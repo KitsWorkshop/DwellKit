@@ -1,0 +1,1033 @@
+From 28003a5a02cc187aa781fd6e1cd6fa3962d78b21 Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <6448697+YasharF@users.noreply.github.com>
+Date: Fri, 5 Jun 2026 14:08:11 -0700
+Subject: [PATCH 118/200] feat: add dark mode (#1671)
+
+---
+ README.md                             |   4 +-
+ public/css/main.scss                  |  59 +++++++++++++
+ public/js/theme.js                    |  93 ++++++++++++++++++++
+ test/e2e-nokey/github-api.e2e.test.js |   2 +-
+ test/e2e-nokey/theme.e2e.test.js      | 117 +++++++++++++++++++++++++
+ views/account/login.pug               |   2 +-
+ views/account/profile.pug             |  10 +--
+ views/ai/rag.pug                      |  12 +--
+ views/api/foursquare.pug              |   2 +-
+ views/api/giphy.pug                   |   4 +-
+ views/api/github.pug                  |   4 +-
+ views/api/here-maps.pug               |  31 +++++--
+ views/api/index.pug                   | 120 +++++++++++++-------------
+ views/api/pubchem.pug                 |   8 +-
+ views/api/stripe.pug                  |   2 +-
+ views/api/trakt.pug                   |   8 +-
+ views/api/tumblr.pug                  |   4 +-
+ views/api/twitch.pug                  |   6 +-
+ views/api/wikipedia.pug               |   4 +-
+ views/layout.pug                      |  26 ++++++
+ views/partials/header.pug             |   4 +
+ 21 files changed, 419 insertions(+), 103 deletions(-)
+ create mode 100644 public/js/theme.js
+ create mode 100644 test/e2e-nokey/theme.e2e.test.js
+
+diff --git a/README.md b/README.md
+index ec69828..091f34b 100644
+--- a/README.md
++++ b/README.md
+@@ -97,13 +97,14 @@ I also tried to make it as **generic** and **reusable** as possible to cover mos
+   - **Productivity:** Google Drive, Google Sheets
+ 
+ - Flash notifications
++- Dark mode toggle (defaults to OS-preference)
+ - reCAPTCHA and rate limit protection
+ - CSRF protection
+ - MVC Project Structure
+ - Node.js clusters support
+ - HTTPS Proxy support (via ngrok, Cloudflare, etc.)
+ - Sass stylesheets
+-- Bootstrap 5
++- Bootstrap 5.3
+ - "Go to production" checklist
+ 
+ ## Prerequisites
+@@ -557,6 +558,7 @@ The metadata for Open Graph is only set up for the home page (`home.pug`). Updat
+ | **public**/                      | Static assets (fonts, css, js, img).                                 |
+ | **public**/**js**/application.js | Specify client-side JavaScript dependencies.                         |
+ | **public**/**js**/app.js         | Place your client-side JavaScript here.                              |
++| **public**/**js**/theme.js       | Client-side dark mode toggle (localStorage persistence)              |
+ | **public**/**css**/main.scss     | Main stylesheet for your app.                                        |
+ | **test**/\*.js                   | Tests, related configs and helpers.                                  |
+ | **views/account**/               | Templates for _login, password reset, signup, profile, webauthn_     |
+diff --git a/public/css/main.scss b/public/css/main.scss
+index b5f7fb6..156746d 100755
+--- a/public/css/main.scss
++++ b/public/css/main.scss
+@@ -1,3 +1,13 @@
++// Use Bootstrap 5.3's `data` color mode: dark mode is applied by setting
++// `data-bs-theme="dark"` on <html>, which flips the global --bs-* CSS
++// variables. The preference is stored entirely in the browser —
++// localStorage for an explicit user choice, prefers-color-scheme as the
++// first-visit fallback. The inline <script> in <head> stamps the
++// attribute from those sources before the stylesheets load, so the first
++// paint is already in the right theme. The runtime toggle, persistence,
++// and cross-tab sync live in /js/theme.js.
++$color-mode-type: data;
++
+ @import 'node_modules/bootstrap/scss/bootstrap';
+ @import 'node_modules/bootstrap-social/bootstrap-social.scss';
+ @import 'node_modules/@fortawesome/fontawesome-free/scss/fontawesome';
+@@ -88,3 +98,52 @@
+     border: solid #000000;
+   }
+ }
++
++// Dark-mode overrides for the hardcoded `bg-light` utility used in a few
++// views (footer, pre.card in stripe.pug, ai-agent status panes, profile
++// picture-tile). The plain `bg-light` is not theme-aware, so we remap it.
++// Cookieconsent is themed separately via the `cc--darkmode` class on
++// <html>, which the inline <script> in <head> toggles alongside
++// `data-bs-theme`.
++@mixin dark-mode-fixes {
++  .bg-light,
++  pre.bg-light {
++    background-color: var(--bs-tertiary-bg) !important;
++  }
++
++  // The footer uses a hardcoded `bg-light` — give it a subtle dark equivalent
++  // without changing the markup.
++  footer.bg-light {
++    background-color: var(--bs-tertiary-bg) !important;
++  }
++
++  // /ai/rag.pug defines a .response-box with a hardcoded light background
++  // (#f8f9fa) inline; in dark mode the body text inside it would be light on
++  // a light box. Flip the box to the dark body bg so the text stays legible.
++  .response-box {
++    background-color: var(--bs-body-bg) !important;
++  }
++}
++
++[data-bs-theme='dark'] {
++  @include dark-mode-fixes;
++}
++
++// Dark-mode toggle icons: both glyphs are always present in the DOM, and SCSS
++// shows the one that matches the effective theme. Default is moon (page is
++// light); flip to sun whenever the page is in dark mode. `data-bs-theme` is
++// always set — by the inline <script> in <head> on first paint, and by
++// /js/theme.js on every subsequent toggle.
++.theme-icon-sun {
++  display: none;
++}
++.theme-icon-moon {
++  display: inline;
++}
++
++[data-bs-theme='dark'] .theme-icon-sun {
++  display: inline;
++}
++[data-bs-theme='dark'] .theme-icon-moon {
++  display: none;
++}
+diff --git a/public/js/theme.js b/public/js/theme.js
+new file mode 100644
+index 0000000..bf2cfa8
+--- /dev/null
++++ b/public/js/theme.js
+@@ -0,0 +1,93 @@
++/* global document, window */
++/**
++ * Client-side dark mode toggle.
++ *
++ * The theme is a UI preference stored in localStorage and applied to <html> as
++ * the `data-bs-theme` attribute (Bootstrap 5.3's data color mode). The
++ * attribute is also kept in sync with the `cc--darkmode` class that
++ * vanilla-cookieconsent uses for its dark stylesheet.
++ *
++ * The inline <script> in views/layout.pug stamps the attribute on first
++ * paint from localStorage (falling back to prefers-color-scheme). This
++ * file is the runtime half: it handles clicks, persists the choice, and
++ * syncs across tabs via the `storage` event.
++ *
++ * Storage key and attribute values must match the inline head script.
++ */
++(function () {
++  const STORAGE_KEY = 'theme';
++  const VALID = ['light', 'dark'];
++
++  const html = document.documentElement;
++
++  function readStored() {
++    try {
++      const v = window.localStorage.getItem(STORAGE_KEY);
++      return VALID.includes(v) ? v : null;
++    } catch {
++      // localStorage can throw in privacy modes / sandboxed iframes.
++      return null;
++    }
++  }
++
++  function applyTheme(theme) {
++    html.setAttribute('data-bs-theme', theme);
++    html.classList.toggle('cc--darkmode', theme === 'dark');
++    // Mirror the current state for assistive tech
++    for (const btn of document.querySelectorAll('[data-theme-toggle]')) {
++      btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
++    }
++    // Let page-specific widgets (HERE maps base layer, third-party embeds,
++    // any data-viz that paints to a canvas) react to the flip. We dispatch
++    // on `document` so it reaches the widest set of listeners; bubbling
++    // stays inside the document tree and never crosses tabs.
++    document.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
++  }
++
++  function writeStored(theme) {
++    try {
++      window.localStorage.setItem(STORAGE_KEY, theme);
++    } catch {
++      // Same fallback as readStored: no-op if storage is unavailable.
++    }
++  }
++
++  function currentTheme() {
++    const attr = html.getAttribute('data-bs-theme');
++    return VALID.includes(attr) ? attr : 'light';
++  }
++
++  function onToggleClick(event) {
++    event.preventDefault();
++    const next = currentTheme() === 'dark' ? 'light' : 'dark';
++    applyTheme(next);
++    writeStored(next);
++  }
++
++  // Wire up the toggle button. We attach the handler to any element with
++  // data-theme-toggle rather than hardcoding a single id, so the header
++  // markup stays free of js-only hooks.
++  document.addEventListener('click', (event) => {
++    const target = event.target.closest('[data-theme-toggle]');
++    if (target) onToggleClick(event);
++  });
++
++  // Sync theme across tabs. The `storage` event fires in *other* tabs
++  // when localStorage changes, so a toggle in one tab immediately updates
++  // the others.
++  window.addEventListener('storage', (event) => {
++    if (event.key !== STORAGE_KEY) return;
++    const next = readStored();
++    if (next && next !== currentTheme()) applyTheme(next);
++  });
++
++  // First-paint sync for the toggle button's `aria-pressed`. The inline
++  // <head> script stamps `data-bs-theme` from localStorage / OS pref
++  // before this file even loads, so the DOM has the right theme — but
++  // the toggle button is rendered after that script, with a hardcoded
++  // `aria-pressed="false"` in the header markup. Align the button with
++  // whatever the page actually rendered as.
++  for (const btn of document.querySelectorAll('[data-theme-toggle]')) {
++    btn.setAttribute('aria-pressed', currentTheme() === 'dark' ? 'true' : 'false');
++  }
++})();
+diff --git a/test/e2e-nokey/github-api.e2e.test.js b/test/e2e-nokey/github-api.e2e.test.js
+index 41ec203..98a2434 100644
+--- a/test/e2e-nokey/github-api.e2e.test.js
++++ b/test/e2e-nokey/github-api.e2e.test.js
+@@ -77,7 +77,7 @@ test.describe('GitHub API Integration', () => {
+     await expect(repoSection).toBeVisible({ timeout: 10000 });
+     await expect(sharedPage.locator('.card-header h6')).toContainText('Repository Lookup Example');
+ 
+-    const repoContent = sharedPage.locator('.card-body.text-dark.bg-white');
++    const repoContent = sharedPage.locator('.card-body.bg-body.text-body');
+     await expect(repoContent).toBeVisible();
+ 
+     const repoLink = sharedPage.locator('a[href*="github.com"]');
+diff --git a/test/e2e-nokey/theme.e2e.test.js b/test/e2e-nokey/theme.e2e.test.js
+new file mode 100644
+index 0000000..ff5bc9b
+--- /dev/null
++++ b/test/e2e-nokey/theme.e2e.test.js
+@@ -0,0 +1,117 @@
++process.env.API_TEST_FILE = 'e2e-nokey/theme.e2e.test.js';
++const { test, expect } = require('@playwright/test');
++const { registerTestInManifest, isInManifest } = require('../tools/fixture-helpers');
++
++// Self-register this test in the manifest when recording
++registerTestInManifest('e2e-nokey/theme.e2e.test.js');
++
++// Skip this file during replay if it's not in the manifest
++if (process.env.API_MODE === 'replay' && !isInManifest('e2e-nokey/theme.e2e.test.js')) {
++  console.log('[fixtures] skipping e2e-nokey/theme.e2e.test.js as it is not in manifest for replay mode - 4 tests');
++  test.skip(true, 'Not in manifest for replay mode');
++}
++
++// All theme tests share a single browser context so localStorage (the
++// persistence layer under test) is the same instance the application sees.
++// We pin `colorScheme: 'light'` so the inline head script's prefers-color-scheme
++// fallback resolves to a known value — otherwise this suite would flake on
++// CI runners whose host OS prefers dark.
++test.describe('Dark mode toggle', () => {
++  test.describe.configure({ mode: 'serial' });
++
++  let page;
++
++  test.beforeAll(async ({ browser }) => {
++    const context = await browser.newContext({ colorScheme: 'light' });
++    page = await context.newPage();
++    await page.goto('/');
++    await page.waitForLoadState('networkidle');
++  });
++
++  test.afterAll(async () => {
++    if (page) await page.context().close();
++  });
++
++  test('stamps data-bs-theme on <html> on first paint and exposes a toggle button', async () => {
++    // The inline <script> in <head> runs before the stylesheets load, so
++    // by the time we get here the attribute is already on <html>.
++    const html = page.locator('html');
++    const theme = await html.getAttribute('data-bs-theme');
++    expect(theme === 'light' || theme === 'dark').toBeTruthy();
++
++    const toggle = page.locator('[data-theme-toggle]');
++    await expect(toggle).toBeVisible();
++
++    // `aria-pressed` is the contract screen readers and other assistive
++    // tech rely on to read the toggle's current state. The first-paint
++    // sync in /js/theme.js must align it with the rendered theme.
++    const ariaPressed = await toggle.getAttribute('aria-pressed');
++    const expectedPressed = theme === 'dark' ? 'true' : 'false';
++    expect(ariaPressed).toBe(expectedPressed);
++  });
++
++  test('clicking the toggle flips data-bs-theme and persists to localStorage', async () => {
++    // Start from a known state so the assertion direction is unambiguous.
++    await page.evaluate(() => localStorage.removeItem('theme'));
++    await page.reload();
++    await page.waitForLoadState('networkidle');
++
++    const html = page.locator('html');
++    const before = await html.getAttribute('data-bs-theme');
++    expect(before).toBe('light');
++
++    await page.locator('[data-theme-toggle]').click();
++
++    const after = await html.getAttribute('data-bs-theme');
++    expect(after).toBe('dark');
++
++    const stored = await page.evaluate(() => localStorage.getItem('theme'));
++    expect(stored).toBe('dark');
++
++    // Toggling back to light is symmetric.
++    await page.locator('[data-theme-toggle]').click();
++    expect(await html.getAttribute('data-bs-theme')).toBe('light');
++    expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('light');
++  });
++
++  test('persisted theme is restored on the next page load', async () => {
++    // Force a known state via the toggle, then reload to a different URL
++    // and verify the inline head script stamps the right theme.
++    await page.evaluate(() => localStorage.setItem('theme', 'dark'));
++    await page.goto('/api/wikipedia');
++    await page.waitForLoadState('networkidle');
++
++    const html = page.locator('html');
++    expect(await html.getAttribute('data-bs-theme')).toBe('dark');
++
++    // Reset so other suites (and the next test run) see a clean slate.
++    await page.evaluate(() => localStorage.setItem('theme', 'light'));
++  });
++
++  test('dispatches a themechange event on document for page-level widgets to react to', async () => {
++    // Reset state explicitly: the previous test leaves us on /api/wikipedia
++    // with localStorage.theme = 'dark', so the page theme attribute is
++    // 'dark' when this test starts. Force a known state before installing
++    // the listener.
++    await page.evaluate(() => localStorage.setItem('theme', 'light'));
++    await page.goto('/');
++    await page.waitForLoadState('networkidle');
++
++    // Attach a listener that records the event, then click the toggle and
++    // assert the listener saw a CustomEvent with `detail.theme` matching
++    // the new attribute. This is the contract here-maps.pug (and any
++    // other theme-aware widget) depends on.
++    await page.evaluate(() => {
++      window.__themeEvents = [];
++      document.addEventListener('themechange', (e) => {
++        window.__themeEvents.push(e.detail.theme);
++      });
++    });
++
++    await page.locator('[data-theme-toggle]').click();
++    await page.locator('[data-theme-toggle]').click();
++
++    const events = await page.evaluate(() => window.__themeEvents);
++    expect(events).toEqual(['dark', 'light']);
++  });
++});
+diff --git a/views/account/login.pug b/views/account/login.pug
+index fd90108..ce0d2b8 100644
+--- a/views/account/login.pug
++++ b/views/account/login.pug
+@@ -29,7 +29,7 @@ block content
+         hr
+     .form-group.row.mb-3
+       .col-md-3.offset-md-3.d-grid.gap-2
+-        button#biometricLogin.btn.btn-outline-dark(type='submit', formaction='/login/webauthn-start', formmethod='POST', style='display: none')
++        button#biometricLogin.btn.btn-outline-secondary(type='submit', formaction='/login/webauthn-start', formmethod='POST', style='display: none')
+           i.fas.fa-fingerprint.fa-sm.me-2
+           | Continue with passkey / biometrics
+     #biometricEmailOption.form-group.row(style='display: none')
+diff --git a/views/account/profile.pug b/views/account/profile.pug
+index e588eff..7a311ce 100644
+--- a/views/account/profile.pug
++++ b/views/account/profile.pug
+@@ -103,7 +103,7 @@ block content
+           | Biometric login is not supported by this browser or device.
+         form#biometricEnableForm(action='/account/webauthn/register', method='POST', style='display: none')
+           input(type='hidden', name='_csrf', value=_csrf)
+-          button.btn.btn-outline-dark(type='submit')
++          button.btn.btn-outline-secondary(type='submit')
+             i.fas.fa-fingerprint.fa-sm.me-2
+             | Enable biometric login
+ 
+@@ -139,13 +139,13 @@ block content
+               | Verify your email address to add additional 2FA method(s).
+           else
+             if !user.twoFactorMethods || !user.twoFactorMethods.includes('totp')
+-              a.btn.btn-outline-dark(href='/account/2fa/totp/setup')
++              a.btn.btn-outline-secondary(href='/account/2fa/totp/setup')
+                 i.fas.fa-mobile-alt.fa-sm.me-2
+                 | Add Authenticator App
+             if !user.twoFactorMethods || !user.twoFactorMethods.includes('email')
+               form.ms-2(action='/account/2fa/email/enable', method='POST', style='display: inline')
+                 input(type='hidden', name='_csrf', value=_csrf)
+-                button.btn.btn-outline-dark(type='submit')
++                button.btn.btn-outline-secondary(type='submit')
+                   i.fas.fa-envelope.fa-sm.me-2
+                   | Add 2FA by Email
+       else
+@@ -156,13 +156,13 @@ block content
+         if user.password && user.emailVerified
+           p.mb-3 Add an extra layer of security to your account.
+           .mb-2
+-            a.btn.btn-outline-dark(href='/account/2fa/totp/setup')
++            a.btn.btn-outline-secondary(href='/account/2fa/totp/setup')
+               i.fas.fa-mobile-alt.fa-sm.me-2
+               | Setup Authenticator App
+           .mb-2
+             form(action='/account/2fa/email/enable', method='POST', style='display: inline')
+               input(type='hidden', name='_csrf', value=_csrf)
+-              button.btn.btn-outline-dark(type='submit')
++              button.btn.btn-outline-secondary(type='submit')
+                 i.fas.fa-envelope.fa-sm.me-2
+                 | Enable Email 2FA
+ 
+diff --git a/views/ai/rag.pug b/views/ai/rag.pug
+index b94d7e0..c1333f0 100644
+--- a/views/ai/rag.pug
++++ b/views/ai/rag.pug
+@@ -25,7 +25,7 @@ block content
+       .row.g-4.mt-1
+         .col-md-12
+           .card.shadow-sm
+-            .card-body.bg-light
++            .card-body.bg-body-secondary
+               .text-left
+                 strong Question Asked:
+                 | &nbsp;
+@@ -35,7 +35,7 @@ block content
+         if ragResponse
+           .col-md-6
+             .card.shadow-sm
+-              .card-body.bg-light
++              .card-body.bg-body-secondary
+                 h3.text-center
+                   i.fas.fa-search.fa-2xs.me-2
+                   i.fas.fa-arrow-right.fa-2xs.me-2
+@@ -47,7 +47,7 @@ block content
+         if llmResponse
+           .col-md-6
+             .card.shadow-sm
+-              .card-body.bg-light
++              .card-body.bg-body-secondary
+                 h3.text-center
+                   i.fas.fa-robot.fa-sm.me-2
+                   | No-RAG LLM Response
+@@ -57,7 +57,7 @@ block content
+     .row.g-4.mt-1
+       .col-md-6
+         .card.shadow-sm
+-          .card-body.bg-light
++          .card-body.bg-body-secondary
+             h3.text-center Ingested Files
+             if ingestedFiles && ingestedFiles.length > 0
+               table.table.table-striped.table-bordered
+@@ -83,7 +83,7 @@ block content
+ 
+       .col-md-6
+         .card.shadow-sm
+-          .card-body.bg-light
++          .card-body.bg-body-secondary
+             h3.text-center Ask a Question
+             p.text-left Try asking a question about information in the ingested RAG documents that was not part of the LLM's training data.
+             .fw-bold Example Questions:
+@@ -105,7 +105,7 @@ block content
+     hr.border-primary.my-4
+ 
+     .card.shadow-sm
+-      .card-body.bg-light
++      .card-body.bg-body-secondary
+         .row.align-items-top.g-4
+           .col-md-5
+             h4
+diff --git a/views/api/foursquare.pug b/views/api/foursquare.pug
+index 9893693..be12c7d 100644
+--- a/views/api/foursquare.pug
++++ b/views/api/foursquare.pug
+@@ -31,7 +31,7 @@ block content
+             tr
+               td.d-xs
+                 if venue.categories && venue.categories.length > 0
+-                  img(src=venue.categories[0].icon.prefix + '32' + venue.categories[0].icon.suffix, alt=venue.categories[0].name, width='32', height='32')
++                  img(src=venue.categories[0].icon.prefix + 'bg_32' + venue.categories[0].icon.suffix, alt=venue.categories[0].name, width='32', height='32')
+                 else
+                   | N/A
+               td= venue.name
+diff --git a/views/api/giphy.pug b/views/api/giphy.pug
+index 98ffc30..e1211ee 100644
+--- a/views/api/giphy.pug
++++ b/views/api/giphy.pug
+@@ -17,7 +17,7 @@ block content
+   .card.text-white.bg-info.mb-4
+     .card-header
+       h6.panel-title.mb-0 Search GIPHY GIFs
+-    .card-body.text-dark.bg-white
++    .card-body.bg-body.text-body
+       form(role='form', method='GET', action='/api/giphy')
+         .form-group.mb-3
+           label.col-form-label.font-weight-bold Search Term
+@@ -32,7 +32,7 @@ block content
+     .card.text-white.bg-success.mb-4
+       .card-header
+         h6.panel-title.mb-0 Results for "#{ search }"
+-      .card-body.text-dark.bg-white
++      .card-body.bg-body.text-body
+         .row
+           each gif in gifs
+             .col-md-4
+diff --git a/views/api/github.pug b/views/api/github.pug
+index 8ff6836..6cdbf36 100644
+--- a/views/api/github.pug
++++ b/views/api/github.pug
+@@ -18,7 +18,7 @@ block content
+     .card.text-white.bg-success.mb-4
+       .card-header
+         h6.panel-title.mb-0 Your GitHub Profile
+-      .card-body.text-dark.bg-white
++      .card-body.bg-body.text-body
+         .row
+           .col-3
+             img.img-thumbnail(src=userInfo.avatar_url, alt='User Avatar')
+@@ -139,7 +139,7 @@ block content
+   .card.text-white.bg-primary.mb-4
+     .card-header
+       h6.panel-title.mb-0 Repository Lookup Example
+-    .card-body.text-dark.bg-white
++    .card-body.bg-body.text-body
+       .row
+         .col-8
+           h4
+diff --git a/views/api/here-maps.pug b/views/api/here-maps.pug
+index 1a8190f..088bcf5 100644
+--- a/views/api/here-maps.pug
++++ b/views/api/here-maps.pug
+@@ -25,11 +25,11 @@ block content
+     #directLineDistance
+     | &nbsp;miles.
+ 
+-  script(src='https://js.api.here.com/v3/3.1/mapsjs-core.js', type='text/javascript', charset='utf-8')
+-  script(src='https://js.api.here.com/v3/3.1/mapsjs-service.js', type='text/javascript', charset='utf-8')
+-  script(src='https://js.api.here.com/v3/3.1/mapsjs-mapevents.js', type='text/javascript', charset='utf-8')
+-  script(src='https://js.api.here.com/v3/3.1/mapsjs-ui.js', type='text/javascript', charset='utf-8')
+-  link(rel='stylesheet', type='text/css', href='https://js.api.here.com/v3/3.1/mapsjs-ui.css')
++  script(src='https://js.api.here.com/v3/3.2/mapsjs-core.js', type='text/javascript', charset='utf-8')
++  script(src='https://js.api.here.com/v3/3.2/mapsjs-service.js', type='text/javascript', charset='utf-8')
++  script(src='https://js.api.here.com/v3/3.2/mapsjs-mapevents.js', type='text/javascript', charset='utf-8')
++  script(src='https://js.api.here.com/v3/3.2/mapsjs-ui.js', type='text/javascript', charset='utf-8')
++  link(rel='stylesheet', type='text/css', href='https://js.api.here.com/v3/3.2/mapsjs-ui.css')
+ 
+   script.
+     const platform = new H.service.Platform({
+@@ -38,10 +38,24 @@ block content
+     });
+ 
+     const defaultLayers = platform.createDefaultLayers();
+-    const map = new H.Map(document.getElementById('map'), defaultLayers.vector.normal.map, {
++    // Pick the dark vs. light base layer based on the current page theme.
++    // The inline <script> in <head> stamps `data-bs-theme` from localStorage
++    // (falling back to prefers-color-scheme) before any of these scripts run,
++    // so reading the attribute once at construction is correct for the
++    // initial paint. Subsequent toggles dispatch a `themechange` event from
++    // /js/theme.js, which we listen for here and call `setBaseLayer` to
++    // swap the tile source in place.
++    const darkBase = defaultLayers.vector.normal.mapnight;
++    const lightBase = defaultLayers.vector.normal.map;
++    const isDark = () => document.documentElement.getAttribute('data-bs-theme') === 'dark';
++    const initialBase = isDark() ? darkBase : lightBase;
++    const map = new H.Map(document.getElementById('map'), initialBase, {
+       zoom: 12,
+       center: { lat: 47.6573676, lng: -122.3126527 },
+     });
++    document.addEventListener('themechange', (event) => {
++      map.setBaseLayer(event.detail.theme === 'dark' ? darkBase : lightBase);
++    });
+ 
+     const mapEvents = new H.mapevents.MapEvents(map);
+     const behavior = new H.mapevents.Behavior(mapEvents);
+@@ -59,8 +73,9 @@ block content
+     lineString.pushLatLngAlt(47.6162956, -122.3555097);
+     lineString.pushLatLngAlt(47.6205099, -122.3514661);
+ 
+-    // Create polygon
+-    const polygon = new H.map.Polygon(lineString, { style: { lineWidth: 2, strokeColor: 'black', fillColor: 'rgba(255, 0, 255, 0.5)' } });
++    // Create polygon.
++    const polygonGeometry = new H.geo.Polygon(lineString);
++    const polygon = new H.map.Polygon(polygonGeometry, { style: { lineWidth: 2, strokeColor: 'black', fillColor: 'rgba(255, 0, 255, 0.5)' } });
+ 
+     // Create circle
+     const circle = new H.map.Circle({ lat: 47.6205099, lng: -122.3514661 }, 3000, { style: { strokeColor: 'rgba(0,128,0, 0.6)', lineWidth: 1, fillColor: 'rgba(0, 128, 0, 0.3)' } });
+diff --git a/views/api/index.pug b/views/api/index.pug
+index 26a4bd9..f5ccd0b 100644
+--- a/views/api/index.pug
++++ b/views/api/index.pug
+@@ -6,146 +6,146 @@ block content
+ 
+   .row
+     .col-md-4
+-      a(href='/api/github', style='color: #fff')
+-        .card.text-white.mb-3(style='background-color: #000')
+-          .card-body
++      a(href='/api/github')
++        .card.mb-3(style='background-color: #000')
++          .card-body.text-white
+             img(src='https://i.imgur.com/17XNMzb.png', height=40, style='padding: 0px 10px 0px 0px')
+             | GitHub
+     .col-md-4
+-      a(href='/api/facebook', style='color: #fff')
+-        .card.text-white.mb-3(style='background-color: #3b5998')
+-          .card-body.light-dark
++      a(href='/api/facebook')
++        .card.mb-3(style='background-color: #3b5998')
++          .card-body.text-white
+             img(src='https://i.imgur.com/jiztYCH.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Facebook
+     .col-md-4
+-      a(href='/api/foursquare', style='color: #000')
++      a(href='/api/foursquare')
+         .card.mb-3(style='background-color: #1cafec')
+-          .card-body
++          .card-body.text-dark
+             img(src='https://i.imgur.com/PixH9li.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Foursquare
+     .col-md-4
+-      a(href='/api/lastfm', style='color: #fff')
+-        .card.text-white.mb-3(style='background-color: #d21309')
+-          .card-body
++      a(href='/api/lastfm')
++        .card.mb-3(style='background-color: #d21309')
++          .card-body.text-white
+             img(src='https://i.imgur.com/KfZY876.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Last.fm
+     .col-md-4
+-      a(href='/api/nyt', style='color: #fff')
+-        .card.text-white.mb-3(style='background-color: #454442')
+-          .card-body
++      a(href='/api/nyt')
++        .card.mb-3(style='background-color: #454442')
++          .card-body.text-white
+             img(src='https://i.imgur.com/e3sjmYj.png', height=40, style='padding: 0px 10px 0px 0px')
+             | New York Times
+     .col-md-4
+-      a(href='/api/steam', style='color: #fff')
+-        .card.text-white.mb-3(style='background-color: #000')
+-          .card-body
++      a(href='/api/steam')
++        .card.mb-3(style='background-color: #000')
++          .card-body.text-white
+             img(src='https://i.imgur.com/6WXcNeg.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Steam
+     .col-md-4
+-      a(href='/api/twitch', style='color: #fff')
+-        .card.text-white.mb-3(style='background-color: #6441a5')
+-          .card-body
++      a(href='/api/twitch')
++        .card.mb-3(style='background-color: #6441a5')
++          .card-body.text-white
+             img(src='https://i.imgur.com/dWEkSRX.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Twitch
+     .col-md-4
+-      a(href='/api/stripe', style='color: #000')
++      a(href='/api/stripe')
+         .card.mb-3(style='background-color: #3da8e5')
+-          .card-body
++          .card-body.text-dark
+             img(src='https://i.imgur.com/w3s2RvW.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Stripe
+     .col-md-4
+-      a(href='/api/paypal', style='color: #000')
++      a(href='/api/paypal')
+         .card.mb-3(style='background-color: #f5f5f5')
+-          .card-body
++          .card-body.text-dark
+             img(src='https://i.imgur.com/JNc0iaX.png', height=40, style='padding: 0px 10px 0px 0px')
+             | PayPal
+     .col-md-4
+-      a(href='/api/quickbooks', style='color: #fff')
+-        .card.text-white.mb-3(style='background-color: #0077c5')
+-          .card-body
++      a(href='/api/quickbooks')
++        .card.mb-3(style='background-color: #0077c5')
++          .card-body.text-white
+             img(src='https://i.imgur.com/hHk0IgS.png', height=40, style='padding: 0px 10px 0px 0px')
+             | QuickBooks
+     .col-md-4
+-      a(href='/api/twilio', style='color: #fff')
+-        .card.text-white.mb-3(style='background-color: #fd0404')
+-          .card-body
++      a(href='/api/twilio')
++        .card.mb-3(style='background-color: #fd0404')
++          .card-body.text-white
+             img(src='https://i.imgur.com/mEUd6zM.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Twilio (text messaging)
+     .col-md-4
+-      a(href='/api/tumblr', style='color: #fff')
+-        .card.text-white.mb-3(style='background-color: #304e6c')
+-          .card-body
++      a(href='/api/tumblr')
++        .card.mb-3(style='background-color: #304e6c')
++          .card-body.text-white
+             img(src='https://i.imgur.com/rZGQShS.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Tumblr
+     .col-md-4
+-      a(href='/api/scraping', style='color: #fff')
+-        .card.text-white.mb-3(style='background-color: #ff6500')
+-          .card-body
++      a(href='/api/scraping')
++        .card.mb-3(style='background-color: #ff6500')
++          .card-body.text-white
+             img(src='https://i.imgur.com/RGCVvyR.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Web Scraping
+     .col-md-4
+-      a(href='/api/lob', style='color: #000')
++      a(href='/api/lob')
+         .card.mb-3(style='background-color: #f5f5f5')
+-          .card-body
++          .card-body.text-dark
+             img(src='https://i.imgur.com/48Q05kF.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Lob (USPS mailing)
+     .col-md-4
+-      a(href='/api/upload', style='color: #000')
++      a(href='/api/upload')
+         .card.mb-3(style='background-color: #f5f5f5')
+-          .card-body
++          .card-body.text-dark
+             img(src='https://i.imgur.com/UPTzIdC.png', height=40, style='padding: 0px 10px 0px 0px')
+             | File Upload
+     .col-md-4
+-      a(href='/api/google-maps', style='color: #000')
++      a(href='/api/google-maps')
+         .card.mb-3(style='background-color: #0f9d58')
+-          .card-body
++          .card-body.text-dark
+             img(src='https://i.imgur.com/Er2ZqgZ.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Google Maps
+     .col-md-4
+-      a(href='/api/here-maps', style='color: #000')
++      a(href='/api/here-maps')
+         .card.mb-3(style='background-color: #d1f6f3')
+-          .card-body
++          .card-body.text-dark
+             img(src='https://imgur.com/yWi4aZw.png', height=40, style='padding: 0px 10px 0px 0px')
+             | HERE Maps
+     .col-md-4
+-      a(href='/api/chart', style='color: #000')
++      a(href='/api/chart')
+         .card.mb-3(style='background-color: #f5f5f5')
+-          .card-body
++          .card-body.text-dark
+             img(src='https://www.chartjs.org/img/chartjs-logo.svg', height=40, style='padding: 0px 10px 0px 0px')
+             | Chart.js + Alpha Vantage
+     .col-md-4
+-      a(href='/api/google/drive', style='color: #000')
++      a(href='/api/google/drive')
+         .card.mb-3(style='background-color: #f5f5f5')
+-          .card-body
++          .card-body.text-dark
+             img(src='https://www.gstatic.com/images/branding/product/1x/drive_48dp.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Google Drive
+     .col-md-4
+-      a(href='/api/google/sheets', style='color: #000')
++      a(href='/api/google/sheets')
+         .card.mb-3(style='background-color: #f5f5f5')
+-          .card-body
++          .card-body.text-dark
+             img(src='https://www.gstatic.com/images/icons/material/product/1x/sheets_64dp.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Google Sheets
+     .col-md-4
+-      a(href='/api/trakt', style='color: #000')
++      a(href='/api/trakt')
+         .card.mb-3(style='background-color: #fff')
+-          .card-body
++          .card-body.text-dark
+             img(src='https://i.imgur.com/Adtl9qg.png', height=40, style='padding: 0px 10px 0px 0px')
+             | trakt.tv
+     .col-md-4
+-      a(href='/api/pubchem', style='color: #fff')
+-        .card.text-white.mb-3(style='background-color: rgba(128, 200, 255, 1)')
+-          .card-body
++      a(href='/api/pubchem')
++        .card.mb-3(style='background-color: rgba(128, 200, 255, 1)')
++          .card-body.text-white
+             img(src='https://i.imgur.com/J9bd6qK.png', height=40, style='padding: 5px 10px 5px 0px')
+             | PubChem
+     .col-md-4
+-      a(href='/api/wikipedia', style='color: #000')
++      a(href='/api/wikipedia')
+         .card.mb-3(style='background-color: #f5f5f5')
+-          .card-body
++          .card-body.text-dark
+             img(src='https://image2url.com/images/1759085205020-1c2e0d66-ca19-4b9c-be3a-bd908e6bc485.png', height=40, style='padding: 0px 10px 0px 0px')
+             | Wikipedia
+     .col-md-4
+-      a(href='/api/giphy', style='color: #fff')
+-        .card.text-white.mb-3(style='background-color: #000')
+-          .card-body
++      a(href='/api/giphy')
++        .card.mb-3(style='background-color: #000')
++          .card-body.text-white
+             img(src='https://i.imgur.com/ddl2VjR.png', height=40)
+             | GIPHY GIFs
+diff --git a/views/api/pubchem.pug b/views/api/pubchem.pug
+index 7721b5b..74a0dc4 100644
+--- a/views/api/pubchem.pug
++++ b/views/api/pubchem.pug
+@@ -19,7 +19,7 @@ block content
+     .card.text-white.bg-success.mb-4
+       .card-header
+         h6.panel-title.mb-0 Chemical Information - Aspirin
+-      .card-body.text-dark.bg-white
++      .card-body.bg-body.text-body
+         .row
+           .col-4
+             if imageUrl
+@@ -60,7 +60,7 @@ block content
+     .card.text-white.bg-info.mb-4
+       .card-header
+         h6.panel-title.mb-0 Chemical and Physical Properties
+-      .card-body.text-dark.bg-white
++      .card-body.bg-body.text-body
+         .row
+           .col-md-6
+             h6 Molecular Properties
+@@ -114,7 +114,7 @@ block content
+     .card.text-white.bg-warning.mb-4
+       .card-header
+         h6.panel-title.mb-0 Safety and Hazard Information
+-      .card-body.text-dark.bg-white
++      .card-body.bg-body.text-body
+         .row
+           each info, category in safetyInfo
+             if info && info.length > 0
+@@ -130,7 +130,7 @@ block content
+   .card.text-white.bg-dark.mb-4
+     .card-header
+       h6.panel-title.mb-0 Additional Information & Usage
+-    .card-body.text-dark.bg-white
++    .card-body.bg-body.text-body
+       .row
+         .col-md-6
+           h6 Medical Information
+diff --git a/views/api/stripe.pug b/views/api/stripe.pug
+index c7e9079..8b9ea7b 100644
+--- a/views/api/stripe.pug
++++ b/views/api/stripe.pug
+@@ -70,7 +70,7 @@ block content
+ 
+   .card.text-white.bg-primary
+     .card-header Stripe Successful Charge Example
+-    .card-body.text-dark.bg-white
++    .card-body.bg-body.text-body
+       p This is the response you will get when customer's card has been charged successfully.
+         | You could use some of the data below for logging purposes.
+       pre.card.bg-light.
+diff --git a/views/api/trakt.pug b/views/api/trakt.pug
+index 678abb0..94bfa7e 100644
+--- a/views/api/trakt.pug
++++ b/views/api/trakt.pug
+@@ -17,10 +17,10 @@ block content
+ 
+   // User Profile and Recently Watched
+   if userInfo
+-    .card.text-white.bg-success.mb-4f
++    .card.text-white.bg-success.mb-4
+       .card-header
+         h6.panel-title.mb-0 Your Trakt.tv Profile & Recently Watched
+-      .card-body.text-dark.bg-white
++      .card-body.bg-body.text-body
+         ul.list-unstyled
+           li
+             strong Username:
+@@ -68,7 +68,7 @@ block content
+     .card.text-white.bg-info.mb-4
+       .card-header
+         h6.panel-title.mb-0 Trending Movies (Public API, top 6)
+-      .card-body.text-dark.bg-white
++      .card-body.bg-body.text-body
+         .row
+           each item in trending
+             .col-md-4.col-6.mb-3
+@@ -86,7 +86,7 @@ block content
+     .card.text-white.bg-primary.mb-4
+       .card-header
+         h6.panel-title.mb-0 Top Trending Movie Details (Public API)
+-      .card-body.text-dark.bg-white
++      .card-body.bg-body.text-body
+         .row
+           .col-md-5
+             .mb-3(style='width: 100%; max-width: 480px; margin: auto')
+diff --git a/views/api/tumblr.pug b/views/api/tumblr.pug
+index 3730dfd..79b944e 100644
+--- a/views/api/tumblr.pug
++++ b/views/api/tumblr.pug
+@@ -14,7 +14,7 @@ block content
+   .card.text-white.bg-success.mb-4
+     .card-header
+       h6.panel-title.mb-0 Your Profile
+-    .card-body.text-dark.bg-white
++    .card-body.bg-body.text-body
+       .row
+         .col-8
+           h5 Name: #{ userInfo.name }
+@@ -29,7 +29,7 @@ block content
+   .card.text-white.bg-primary.mb-4
+     .card-header
+       h6.panel-title.mb-0 Blog Lookup Example
+-    .card-body.text-dark.bg-white
++    .card-body.bg-body.text-body
+       .row
+         .col-8
+           if blog.avatar && blog.avatar.length > 0
+diff --git a/views/api/twitch.pug b/views/api/twitch.pug
+index dfbf79b..6aacbc1 100644
+--- a/views/api/twitch.pug
++++ b/views/api/twitch.pug
+@@ -14,7 +14,7 @@ block content
+   .card.text-white.bg-success.mb-4
+     .card-header
+       h6.panel-title.mb-0 Your Profile
+-    .card-body.text-dark.bg-white
++    .card-body.bg-body.text-body
+       .row
+         .col-sm-2
+           img(src=yourTwitchUserData.profile_image_url, width='150', height='150')
+@@ -29,7 +29,7 @@ block content
+   .card.text-white.bg-primary.mb-4
+     .card-header
+       h6.panel-title.mb-0 Top Streamer Playing Destiny 2
+-    .card-body.text-dark.bg-white
++    .card-body.bg-body.text-body
+       .row
+         .col-sm-2
+           img(src=otherTwitchStreamerInfo.profile_image_url, width='150', height='150')
+@@ -54,7 +54,7 @@ block content
+             div
+               span Stream tags:
+               each tag in otherTwitchStreamStatus.tags
+-                span.badge.bg-primary.text-dark.mx-2= tag
++                span.badge.bg-primary-subtle.text-primary-emphasis.mx-2= tag
+             br
+             img(src=otherTwitchStreamStatus.thumbnail_url.replace('{width}x{height}', '640x360'), width='640', height='360')
+           else
+diff --git a/views/api/wikipedia.pug b/views/api/wikipedia.pug
+index 451b781..0fc3276 100644
+--- a/views/api/wikipedia.pug
++++ b/views/api/wikipedia.pug
+@@ -17,7 +17,7 @@ block content
+   .card.text-white.bg-success.mb-4
+     .card-header
+       h6.panel-title.mb-0 Content Example: Node.js
+-    .card-body.text-dark.bg-white
++    .card-body.bg-body.text-body
+       .row
+         .col-md-4
+           if pageFirstImage
+@@ -49,7 +49,7 @@ block content
+   .card.text-white.bg-info.mb-4
+     .card-header
+       h6.panel-title.mb-0 Search Wikipedia
+-    .card-body.text-dark.bg-white
++    .card-body.bg-body.text-body
+       .row
+         .col-md-8
+           form(role='form', method='GET', action='/api/wikipedia')
+diff --git a/views/layout.pug b/views/layout.pug
+index dd1a30d..34c3037 100644
+--- a/views/layout.pug
++++ b/views/layout.pug
+@@ -11,6 +11,31 @@ html.h-100(lang='en')
+     title #{ title } - Hackathon Starter
+     link(rel='shortcut icon', href='/favicon.ico')
+     //link(rel='stylesheet', href='/css/bootstrap.min.css') // bootstrap css gets added to main.css via main.scss build
++    //- Theme bootstrap: stamp `data-bs-theme` (Bootstrap 5.3's data color mode)
++    //- and the cookieconsent `cc--darkmode` class BEFORE the stylesheets load,
++    //- so the first paint is already in the right theme. The preference lives
++    //- entirely in the browser — localStorage for an explicit choice,
++    //- prefers-color-scheme as the first-visit fallback. The runtime
++    //- toggle + cross-tab sync live in /js/theme.js.
++    script.
++      (function () {
++        var html = document.documentElement;
++        var stored = null;
++        try {
++          stored = localStorage.getItem('theme');
++        } catch (e) {}
++        // Guard matchMedia the same way we guard localStorage: the only
++        // practical environment where it is missing is an exotic legacy
++        // webview, but if it ever throws we don't want the whole IIFE to
++        // abort before the theme attribute is stamped.
++        var prefersDark = false;
++        try {
++          prefersDark = typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches;
++        } catch (e) {}
++        var theme = stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light';
++        html.setAttribute('data-bs-theme', theme);
++        html.classList.toggle('cc--darkmode', theme === 'dark');
++      })();
+     link(rel='stylesheet', href='/css/main.css?v=' + getFileHash('/css/main.css'))
+     link(rel='stylesheet', href='/css/lib/cookieconsent.min.css?v=' + getFileHash('/css/lib/cookieconsent.min.css'))
+     block head
+@@ -28,6 +53,7 @@ html.h-100(lang='en')
+     script(src='/js/lib/jquery.min.js?v=' + getFileHash('/js/lib/jquery.min.js'))
+     script(src='/js/lib/bootstrap.min.js?v=' + getFileHash('/js/lib/bootstrap.min.js'))
+     script(src='/js/main.js?v=' + getFileHash('/js/main.js'))
++    script(src='/js/theme.js?v=' + getFileHash('/js/theme.js'))
+     script(src='/js/lib/cookieconsent.umd.min.js?v=' + getFileHash('/js/lib/cookieconsent.umd.min.js'))
+     //- Default Google consent state, CookieConsent config, and Facebook Pixel
+     //- queue stub all live in this single file. The FACEBOOK_PIXEL_ID data
+diff --git a/views/partials/header.pug b/views/partials/header.pug
+index f8ec9ea..a6dbb83 100644
+--- a/views/partials/header.pug
++++ b/views/partials/header.pug
+@@ -18,6 +18,10 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
+           a.nav-link(class=title === 'Contact' ? 'active' : '', href='/contact') Contact
+ 
+       form.d-flex
++        //- aria-pressed is kept in sync with data-bs-theme by /js/theme.js.
++        button.btn.btn-outline-light.me-2(type='button', data-theme-toggle, title='Toggle theme', aria-label='Toggle theme', aria-pressed='false')
++          i.fa-solid.fa-moon.theme-icon-moon(aria-hidden='true')
++          i.fa-solid.fa-sun.theme-icon-sun(aria-hidden='true')
+         if !user
+           a.btn.btn-outline-light.me-2(href='/login') Login
+           a.btn.btn-primary(href='/signup') Create Account
+-- 
+2.53.0
+

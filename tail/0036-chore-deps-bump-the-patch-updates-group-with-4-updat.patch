@@ -1,0 +1,210 @@
+From 67be9741f3cd23da81b4377c119fb0e91a0148c2 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Wed, 18 Mar 2026 13:30:00 +0000
+Subject: [PATCH 036/200] chore(deps): bump the patch-updates group with 4
+ updates (#1578)
+
+Bumps the patch-updates group with 4 updates: [@langchain/langgraph](https://github.com/langchain-ai/langgraphjs/tree/HEAD/libs/langgraph-core), [langchain](https://github.com/langchain-ai/langchainjs), [mongoose](https://github.com/Automattic/mongoose) and [nodemailer](https://github.com/nodemailer/nodemailer).
+
+
+Updates `@langchain/langgraph` from 1.2.2 to 1.2.3
+- [Release notes](https://github.com/langchain-ai/langgraphjs/releases)
+- [Changelog](https://github.com/langchain-ai/langgraphjs/blob/main/libs/langgraph-core/CHANGELOG.md)
+- [Commits](https://github.com/langchain-ai/langgraphjs/commits/@langchain/langgraph@1.2.3/libs/langgraph-core)
+
+Updates `langchain` from 1.2.33 to 1.2.34
+- [Release notes](https://github.com/langchain-ai/langchainjs/releases)
+- [Commits](https://github.com/langchain-ai/langchainjs/compare/langchain@1.2.33...langchain@1.2.34)
+
+Updates `mongoose` from 9.3.0 to 9.3.1
+- [Release notes](https://github.com/Automattic/mongoose/releases)
+- [Changelog](https://github.com/Automattic/mongoose/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/Automattic/mongoose/compare/9.3.0...9.3.1)
+
+Updates `nodemailer` from 8.0.2 to 8.0.3
+- [Release notes](https://github.com/nodemailer/nodemailer/releases)
+- [Changelog](https://github.com/nodemailer/nodemailer/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/nodemailer/nodemailer/compare/v8.0.2...v8.0.3)
+
+---
+updated-dependencies:
+- dependency-name: "@langchain/langgraph"
+  dependency-version: 1.2.3
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: langchain
+  dependency-version: 1.2.34
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: mongoose
+  dependency-version: 9.3.1
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: nodemailer
+  dependency-version: 8.0.3
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 48 +++++++++++++++++++++++------------------------
+ package.json      |  8 ++++----
+ 2 files changed, 28 insertions(+), 28 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index a58be2e..ec7d3a3 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -18,7 +18,7 @@
+         "@langchain/community": "^1.1.24",
+         "@langchain/core": "^1.1.32",
+         "@langchain/groq": "^1.1.5",
+-        "@langchain/langgraph": "^1.2.2",
++        "@langchain/langgraph": "^1.2.3",
+         "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+         "@langchain/mongodb": "^1.1.0",
+         "@langchain/textsplitters": "^1.0.1",
+@@ -42,15 +42,15 @@
+         "express-session": "^1.19.0",
+         "jquery": "^4.0.0",
+         "keyv": "^5.6.0",
+-        "langchain": "^1.2.33",
++        "langchain": "^1.2.34",
+         "lastfm": "^0.9.4",
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.20",
+         "mongodb": "^7.1.0",
+-        "mongoose": "^9.3.0",
++        "mongoose": "^9.3.1",
+         "morgan": "^1.10.1",
+         "multer": "^2.1.1",
+-        "nodemailer": "^8.0.2",
++        "nodemailer": "^8.0.3",
+         "oauth": "^0.10.2",
+         "otpauth": "^9.5.0",
+         "passport": "^0.7.0",
+@@ -1197,13 +1197,13 @@
+       }
+     },
+     "node_modules/@langchain/langgraph": {
+-      "version": "1.2.2",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.2.2.tgz",
+-      "integrity": "sha512-1F94azb3b3TpHi5Jxa7gFvAYXuSIsEobEXk3/PD7+gkOobIC5Jty3+/ATSkH7joUo0bXCF/rgMOjRGusi6YvSQ==",
++      "version": "1.2.3",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.2.3.tgz",
++      "integrity": "sha512-wvc7cQ4t6aLmI3PtVvvpN7VTqEmQunrlVnuR6t7z/1l98bj6TnQg8uS+NiJ+gF2TkVC5YXkfqY8Z4EpdD6FlcQ==",
+       "license": "MIT",
+       "dependencies": {
+-        "@langchain/langgraph-checkpoint": "^1.0.0",
+-        "@langchain/langgraph-sdk": "~1.7.0",
++        "@langchain/langgraph-checkpoint": "^1.0.1",
++        "@langchain/langgraph-sdk": "~1.7.3",
+         "@standard-schema/spec": "1.1.0",
+         "uuid": "^10.0.0"
+       },
+@@ -1222,9 +1222,9 @@
+       }
+     },
+     "node_modules/@langchain/langgraph-checkpoint": {
+-      "version": "1.0.0",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph-checkpoint/-/langgraph-checkpoint-1.0.0.tgz",
+-      "integrity": "sha512-xrclBGvNCXDmi0Nz28t3vjpxSH6UYx6w5XAXSiiB1WEdc2xD2iY/a913I3x3a31XpInUW/GGfXXfePfaghV54A==",
++      "version": "1.0.1",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph-checkpoint/-/langgraph-checkpoint-1.0.1.tgz",
++      "integrity": "sha512-HM0cJLRpIsSlWBQ/xuDC67l52SqZ62Bh2Y61DX+Xorqwoh5e1KxYvfCD7GnSTbWWhjBOutvnR0vPhu4orFkZfw==",
+       "license": "MIT",
+       "dependencies": {
+         "uuid": "^10.0.0"
+@@ -1327,9 +1327,9 @@
+       }
+     },
+     "node_modules/@langchain/langgraph-sdk": {
+-      "version": "1.7.2",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph-sdk/-/langgraph-sdk-1.7.2.tgz",
+-      "integrity": "sha512-8ad5OTwqc15J/DxLNJYLn3IC2mpfow09nxJdszxhwm3KgsolGZIUV6g7m67C2p4j3cbQZD5USHt3hKEL0ahqoA==",
++      "version": "1.7.4",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph-sdk/-/langgraph-sdk-1.7.4.tgz",
++      "integrity": "sha512-SuQyFvL9Q/eBJdSAHLaM1mmfKoh5JAmRF4PdIokX9pyVYBvJqUpvsOcUYtkC3zniHOh/65y1eqvojt/WgPvN8Q==",
+       "license": "MIT",
+       "dependencies": {
+         "@types/json-schema": "^7.0.15",
+@@ -6314,9 +6314,9 @@
+       }
+     },
+     "node_modules/langchain": {
+-      "version": "1.2.33",
+-      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.2.33.tgz",
+-      "integrity": "sha512-6Z+4wYCC3j6AxNshX5sNKMlIdcQwtiTujH2shSWEsQ4F9rXgCC9RtN5gQbJwCXRKT4Q8CwOVQWVRAwivQ0KzZg==",
++      "version": "1.2.34",
++      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.2.34.tgz",
++      "integrity": "sha512-7Ij3VK3P9phCUgGjV5ckkBqgR7tw+0n54sx4lb1aqZfpbzda9PWgt0hUeTKVEV51VSZ7eBVomYnG6qUQ4IlX2w==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph": "^1.1.2",
+@@ -6878,9 +6878,9 @@
+       "license": "MIT"
+     },
+     "node_modules/mongoose": {
+-      "version": "9.3.0",
+-      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-9.3.0.tgz",
+-      "integrity": "sha512-Tv2p3DLBkftoGFp+VM/19k0t0RYPAAYjGIbCVGlV6Tf5Dnq6TICfYyeKeYvwQ06nK9sRDvymP3B+tjGHnUlaxw==",
++      "version": "9.3.1",
++      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-9.3.1.tgz",
++      "integrity": "sha512-58DuQti+LlRS74/UfWN4F3wZsC0Yr1dgTWZ2Wd3/TuSvm6rIdyAjDWbx2xGyuBooqJYdAWotVv4mQgVdivh+3Q==",
+       "license": "MIT",
+       "dependencies": {
+         "kareem": "3.2.0",
+@@ -7123,9 +7123,9 @@
+       "optional": true
+     },
+     "node_modules/nodemailer": {
+-      "version": "8.0.2",
+-      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-8.0.2.tgz",
+-      "integrity": "sha512-zbj002pZAIkWQFxyAaqoxvn+zoIwRnS40hgjqTXudKOOJkiFFgBeNqjgD3/YCR12sZnrghWYBY+yP1ZucdDRpw==",
++      "version": "8.0.3",
++      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-8.0.3.tgz",
++      "integrity": "sha512-JQNBqvK+bj3NMhUFR3wmCl3SYcOeMotDiwDBvIoCuQdF0PvlIY0BH+FJ2CG7u4cXKPChplE78oowlH/Otsc4ZQ==",
+       "license": "MIT-0",
+       "engines": {
+         "node": ">=6.0.0"
+diff --git a/package.json b/package.json
+index f6c7973..aa215ae 100644
+--- a/package.json
++++ b/package.json
+@@ -37,7 +37,7 @@
+     "@langchain/community": "^1.1.24",
+     "@langchain/core": "^1.1.32",
+     "@langchain/groq": "^1.1.5",
+-    "@langchain/langgraph": "^1.2.2",
++    "@langchain/langgraph": "^1.2.3",
+     "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+     "@langchain/mongodb": "^1.1.0",
+     "@langchain/textsplitters": "^1.0.1",
+@@ -61,15 +61,15 @@
+     "express-session": "^1.19.0",
+     "jquery": "^4.0.0",
+     "keyv": "^5.6.0",
+-    "langchain": "^1.2.33",
++    "langchain": "^1.2.34",
+     "lastfm": "^0.9.4",
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.20",
+     "mongodb": "^7.1.0",
+-    "mongoose": "^9.3.0",
++    "mongoose": "^9.3.1",
+     "morgan": "^1.10.1",
+     "multer": "^2.1.1",
+-    "nodemailer": "^8.0.2",
++    "nodemailer": "^8.0.3",
+     "oauth": "^0.10.2",
+     "otpauth": "^9.5.0",
+     "passport": "^0.7.0",
+-- 
+2.53.0
+

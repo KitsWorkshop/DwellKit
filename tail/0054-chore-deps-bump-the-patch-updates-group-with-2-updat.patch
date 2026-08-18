@@ -1,0 +1,131 @@
+From 6245296da6a6e5843afd989c2d92a642b56d003b Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Fri, 27 Mar 2026 13:29:51 +0000
+Subject: [PATCH 053/200] chore(deps): bump the patch-updates group with 2
+ updates (#1595)
+
+Bumps the patch-updates group with 2 updates: [@langchain/langgraph](https://github.com/langchain-ai/langgraphjs/tree/HEAD/libs/langgraph-core) and [stripe](https://github.com/stripe/stripe-node).
+
+
+Updates `@langchain/langgraph` from 1.2.5 to 1.2.6
+- [Release notes](https://github.com/langchain-ai/langgraphjs/releases)
+- [Changelog](https://github.com/langchain-ai/langgraphjs/blob/main/libs/langgraph-core/CHANGELOG.md)
+- [Commits](https://github.com/langchain-ai/langgraphjs/commits/@langchain/langgraph@1.2.6/libs/langgraph-core)
+
+Updates `stripe` from 21.0.0 to 21.0.1
+- [Release notes](https://github.com/stripe/stripe-node/releases)
+- [Changelog](https://github.com/stripe/stripe-node/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/stripe/stripe-node/compare/v21.0.0...v21.0.1)
+
+---
+updated-dependencies:
+- dependency-name: "@langchain/langgraph"
+  dependency-version: 1.2.6
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: stripe
+  dependency-version: 21.0.1
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 24 ++++++++++++------------
+ package.json      |  4 ++--
+ 2 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index a355a7a..b23e548 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -18,7 +18,7 @@
+         "@langchain/community": "^1.1.25",
+         "@langchain/core": "^1.1.36",
+         "@langchain/groq": "^1.1.5",
+-        "@langchain/langgraph": "^1.2.5",
++        "@langchain/langgraph": "^1.2.6",
+         "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+         "@langchain/mongodb": "^1.1.0",
+         "@langchain/textsplitters": "^1.0.1",
+@@ -67,7 +67,7 @@
+         "pug": "^3.0.4",
+         "qr": "^0.5.5",
+         "sass": "^1.98.0",
+-        "stripe": "^21.0.0",
++        "stripe": "^21.0.1",
+         "twilio": "^5.13.1",
+         "twitch-passport": "^1.0.6",
+         "validator": "^13.15.26"
+@@ -1211,13 +1211,13 @@
+       }
+     },
+     "node_modules/@langchain/langgraph": {
+-      "version": "1.2.5",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.2.5.tgz",
+-      "integrity": "sha512-O/ROF1oaXN7VK6+WTpXsDvJp7L+YyTOHa9rt3L85jrvwxBqQQRIlRLOWT8ehB/ywE3M1K7WAWOAXbmorCYzviQ==",
++      "version": "1.2.6",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.2.6.tgz",
++      "integrity": "sha512-5cX402dNGN6w9+0mlMU2dgUiKx6Y1tlENp7x05e9ByDbQCHSDc0kyqRWNFLGc7vatQ92S4ylxQrcCJvi8Fr4SQ==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph-checkpoint": "^1.0.1",
+-        "@langchain/langgraph-sdk": "~1.8.0",
++        "@langchain/langgraph-sdk": "~1.8.1",
+         "@standard-schema/spec": "1.1.0",
+         "uuid": "^10.0.0"
+       },
+@@ -1341,9 +1341,9 @@
+       }
+     },
+     "node_modules/@langchain/langgraph-sdk": {
+-      "version": "1.8.0",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph-sdk/-/langgraph-sdk-1.8.0.tgz",
+-      "integrity": "sha512-TPowjgfLjRll4zUDiOUVgd8qLgSOhy5uHt0sWhpvxgQd+dcUs4x/3nKjrepSvmp24KQKbF6GJy6MaHBDj3Ubtw==",
++      "version": "1.8.1",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph-sdk/-/langgraph-sdk-1.8.1.tgz",
++      "integrity": "sha512-le+rRwCN3wK7CEqxepraFK/aO5dOQ0heLNHBOcWugC6P6k1UqrqUBX+dBHZxcIz5d6n0FqierFyv74Ky8XIBew==",
+       "license": "MIT",
+       "dependencies": {
+         "@types/json-schema": "^7.0.15",
+@@ -8801,9 +8801,9 @@
+       }
+     },
+     "node_modules/stripe": {
+-      "version": "21.0.0",
+-      "resolved": "https://registry.npmjs.org/stripe/-/stripe-21.0.0.tgz",
+-      "integrity": "sha512-VlQ1QhjQAhmCgY3g3BgfZFLo8AkJw1r9zTrG4hdjSDX2AcwS5sPz4eHJG0zfzCO8zO/md0Xe+zrkxRqg604ZWA==",
++      "version": "21.0.1",
++      "resolved": "https://registry.npmjs.org/stripe/-/stripe-21.0.1.tgz",
++      "integrity": "sha512-ocv0j7dWttswDWV2XL/kb6+yiLpDXNXL3RQAOB5OB2kr49z0cEatdQc12+zP/j5nrXk6rAsT4N3y/NUvBbK7Pw==",
+       "license": "MIT",
+       "engines": {
+         "node": ">=18"
+diff --git a/package.json b/package.json
+index 35983d0..cdcc570 100644
+--- a/package.json
++++ b/package.json
+@@ -37,7 +37,7 @@
+     "@langchain/community": "^1.1.25",
+     "@langchain/core": "^1.1.36",
+     "@langchain/groq": "^1.1.5",
+-    "@langchain/langgraph": "^1.2.5",
++    "@langchain/langgraph": "^1.2.6",
+     "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+     "@langchain/mongodb": "^1.1.0",
+     "@langchain/textsplitters": "^1.0.1",
+@@ -86,7 +86,7 @@
+     "pug": "^3.0.4",
+     "qr": "^0.5.5",
+     "sass": "^1.98.0",
+-    "stripe": "^21.0.0",
++    "stripe": "^21.0.1",
+     "twilio": "^5.13.1",
+     "twitch-passport": "^1.0.6",
+     "validator": "^13.15.26"
+-- 
+2.53.0
+

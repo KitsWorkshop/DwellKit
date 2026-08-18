@@ -1,0 +1,25 @@
+From fc1eb59ad1346406f7085862a5994cef142f0c86 Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <YasharF.Git1@ydftech.com>
+Date: Wed, 20 May 2026 13:16:13 -0700
+Subject: [PATCH 097/200] ci: don't run Node 26 workflow on push
+
+---
+ .github/workflows/build-Node26-preview.yml | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/.github/workflows/build-Node26-preview.yml b/.github/workflows/build-Node26-preview.yml
+index 5928ad6..7b501c7 100644
+--- a/.github/workflows/build-Node26-preview.yml
++++ b/.github/workflows/build-Node26-preview.yml
+@@ -1,8 +1,6 @@
+ name: Node.js 26 Preview CI
+ 
+ on:
+-  push:
+-    branches: ['master']
+   pull_request:
+     branches: ['master']
+ 
+-- 
+2.53.0
+

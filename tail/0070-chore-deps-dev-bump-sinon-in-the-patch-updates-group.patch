@@ -1,0 +1,128 @@
+From 072e687258b7608153d67e6dbd0aabbe20a3a5be Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Mon, 13 Apr 2026 14:35:16 +0000
+Subject: [PATCH 069/200] chore(deps-dev): bump sinon in the patch-updates
+ group (#1614)
+
+Bumps the patch-updates group with 1 update: [sinon](https://github.com/sinonjs/sinon).
+
+
+Updates `sinon` from 21.1.0 to 21.1.2
+- [Release notes](https://github.com/sinonjs/sinon/releases)
+- [Changelog](https://github.com/sinonjs/sinon/blob/main/docs/changelog.md)
+- [Commits](https://github.com/sinonjs/sinon/compare/v21.1.0...v21.1.2)
+
+---
+updated-dependencies:
+- dependency-name: sinon
+  dependency-version: 21.1.2
+  dependency-type: direct:development
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 40 +++++++++++++---------------------------
+ package.json      |  2 +-
+ 2 files changed, 14 insertions(+), 28 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 8ae4f01..08f125c 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -86,7 +86,7 @@
+         "mocha": "*",
+         "mongodb-memory-server": "^11.0.1",
+         "prettier": "^3.8.2",
+-        "sinon": "^21.1.0",
++        "sinon": "^21.1.2",
+         "supertest": "^7.2.2"
+       },
+       "engines": {
+@@ -2883,9 +2883,9 @@
+       }
+     },
+     "node_modules/@sinonjs/fake-timers": {
+-      "version": "15.3.0",
+-      "resolved": "https://registry.npmjs.org/@sinonjs/fake-timers/-/fake-timers-15.3.0.tgz",
+-      "integrity": "sha512-m2xozxSfCIxjDdvbhIWazlP2i2aha/iUmbl94alpsIbd3iLTfeXgfBVbwyWogB6l++istyGZqamgA/EcqYf+Bg==",
++      "version": "15.3.2",
++      "resolved": "https://registry.npmjs.org/@sinonjs/fake-timers/-/fake-timers-15.3.2.tgz",
++      "integrity": "sha512-mrn35Jl2pCpns+mE3HaZa1yPN5EYCRgiMI+135COjr2hr8Cls9DXqIZ57vZe2cz7y2XVSq92tcs6kGQcT1J8Rw==",
+       "dev": true,
+       "license": "BSD-3-Clause",
+       "dependencies": {
+@@ -2893,9 +2893,9 @@
+       }
+     },
+     "node_modules/@sinonjs/samsam": {
+-      "version": "10.0.1",
+-      "resolved": "https://registry.npmjs.org/@sinonjs/samsam/-/samsam-10.0.1.tgz",
+-      "integrity": "sha512-q2mHXfkviqX+roGbzFJF6r5GR4TJDGngJuPrtj0IZRZZGnFlYTjdeoiZ6vCISmOjTLsZm0+CqHPupXR/BRVZjA==",
++      "version": "10.0.2",
++      "resolved": "https://registry.npmjs.org/@sinonjs/samsam/-/samsam-10.0.2.tgz",
++      "integrity": "sha512-8lVwD1Df1BmzoaOLhMcGGcz/Jyr5QY2KSB75/YK1QgKzoabTeLdIVyhXNZK9ojfSKSdirbXqdbsXXqP9/Ve8+A==",
+       "dev": true,
+       "license": "BSD-3-Clause",
+       "dependencies": {
+@@ -8674,36 +8674,22 @@
+       "license": "MIT"
+     },
+     "node_modules/sinon": {
+-      "version": "21.1.0",
+-      "resolved": "https://registry.npmjs.org/sinon/-/sinon-21.1.0.tgz",
+-      "integrity": "sha512-eyGgN8TGu8LZ3cNFatmeK+kM3T3ZjxZ+742ua4wMcm1yK6AQoQVibm2HnM+b1DT/a5ErAtmYL0R0c4ooDEcqNQ==",
++      "version": "21.1.2",
++      "resolved": "https://registry.npmjs.org/sinon/-/sinon-21.1.2.tgz",
++      "integrity": "sha512-FS6mN+/bx7e2ajpXkEmOcWB6xBzWiuNoAQT18/+a20SS4U7FSYl8Ms7N6VTUxN/1JAjkx7aXp+THMC8xdpp0gA==",
+       "dev": true,
+       "license": "BSD-3-Clause",
+       "dependencies": {
+         "@sinonjs/commons": "^3.0.1",
+-        "@sinonjs/fake-timers": "^15.3.0",
+-        "@sinonjs/samsam": "^10.0.0",
+-        "diff": "^8.0.4",
+-        "supports-color": "^10.2.2"
++        "@sinonjs/fake-timers": "^15.3.2",
++        "@sinonjs/samsam": "^10.0.2",
++        "diff": "^8.0.4"
+       },
+       "funding": {
+         "type": "opencollective",
+         "url": "https://opencollective.com/sinon"
+       }
+     },
+-    "node_modules/sinon/node_modules/supports-color": {
+-      "version": "10.2.2",
+-      "resolved": "https://registry.npmjs.org/supports-color/-/supports-color-10.2.2.tgz",
+-      "integrity": "sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g==",
+-      "dev": true,
+-      "license": "MIT",
+-      "engines": {
+-        "node": ">=18"
+-      },
+-      "funding": {
+-        "url": "https://github.com/chalk/supports-color?sponsor=1"
+-      }
+-    },
+     "node_modules/slash": {
+       "version": "2.0.0",
+       "resolved": "https://registry.npmjs.org/slash/-/slash-2.0.0.tgz",
+diff --git a/package.json b/package.json
+index 10df6f8..7be73a4 100644
+--- a/package.json
++++ b/package.json
+@@ -105,7 +105,7 @@
+     "mocha": "next",
+     "mongodb-memory-server": "^11.0.1",
+     "prettier": "^3.8.2",
+-    "sinon": "^21.1.0",
++    "sinon": "^21.1.2",
+     "supertest": "^7.2.2"
+   },
+   "overrides": {
+-- 
+2.53.0
+

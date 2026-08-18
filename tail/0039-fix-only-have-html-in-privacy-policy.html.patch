@@ -1,0 +1,25 @@
+From 09bcb8ea3a6ce6a6186579806f294c278cb2d220 Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <6448697+YasharF@users.noreply.github.com>
+Date: Mon, 23 Mar 2026 00:59:41 -0700
+Subject: [PATCH 039/200] fix: only have html in privacy-policy.html
+
+---
+ public/privacy-policy.html | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/public/privacy-policy.html b/public/privacy-policy.html
+index 0ce2432..d8272d3 100644
+--- a/public/privacy-policy.html
++++ b/public/privacy-policy.html
+@@ -37,7 +37,7 @@
+ 
+       <h2>Data Retention & Deletion</h2>
+       <p>
+-        We retain personal data only as long as necessary to fulfill the purposes outlined in this policy. Users may request data deletion at any time via the **“Delete My Account”** button on the **“My Account”** page or by contacting us through our
++        We retain personal data only as long as necessary to fulfill the purposes outlined in this policy. Users may request data deletion at any time via the <strong>“Delete My Account”</strong> button on the <strong>“My Account”</strong> page or by contacting us through our
+         <a href="https://hackathon-starter-1.ydftech.com/contact">Contact Page</a>.
+       </p>
+ 
+-- 
+2.53.0
+

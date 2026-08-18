@@ -1,0 +1,72 @@
+From 7ad588a1941e27b462af7aec2ff072d16fb2bc29 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Thu, 26 Mar 2026 13:31:44 +0000
+Subject: [PATCH 052/200] chore(deps): bump mongoose in the patch-updates group
+ (#1594)
+
+Bumps the patch-updates group with 1 update: [mongoose](https://github.com/Automattic/mongoose).
+
+
+Updates `mongoose` from 9.3.2 to 9.3.3
+- [Release notes](https://github.com/Automattic/mongoose/releases)
+- [Changelog](https://github.com/Automattic/mongoose/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/Automattic/mongoose/compare/9.3.2...9.3.3)
+
+---
+updated-dependencies:
+- dependency-name: mongoose
+  dependency-version: 9.3.3
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 8 ++++----
+ package.json      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index b4c32fe..a355a7a 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -47,7 +47,7 @@
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.20",
+         "mongodb": "^7.1.1",
+-        "mongoose": "^9.3.2",
++        "mongoose": "^9.3.3",
+         "morgan": "^1.10.1",
+         "multer": "^2.1.1",
+         "nodemailer": "^8.0.4",
+@@ -6922,9 +6922,9 @@
+       "license": "MIT"
+     },
+     "node_modules/mongoose": {
+-      "version": "9.3.2",
+-      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-9.3.2.tgz",
+-      "integrity": "sha512-4hMJA4vLAeNG6LnDwJImPYM+uJMVw+sFs7jtS/91OKOT7rzv19ytAAeswtAdWoinVBUVrzmClL/ZoPhcU5RL8w==",
++      "version": "9.3.3",
++      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-9.3.3.tgz",
++      "integrity": "sha512-sfv5LOIPWeN5o/281kp4Rx9ZnuXb0g8CtvBTi7trYQs2PYYx8LWXegXxG3ar7VEns1o+d4h9LI/Dtc7dTTyYmA==",
+       "license": "MIT",
+       "dependencies": {
+         "kareem": "3.2.0",
+diff --git a/package.json b/package.json
+index 2541a73..35983d0 100644
+--- a/package.json
++++ b/package.json
+@@ -66,7 +66,7 @@
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.20",
+     "mongodb": "^7.1.1",
+-    "mongoose": "^9.3.2",
++    "mongoose": "^9.3.3",
+     "morgan": "^1.10.1",
+     "multer": "^2.1.1",
+     "nodemailer": "^8.0.4",
+-- 
+2.53.0
+

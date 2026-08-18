@@ -1,0 +1,71 @@
+From 7256ea13051f7f63f8c2c10acbfd1385231d37fc Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Thu, 21 May 2026 14:35:36 +0000
+Subject: [PATCH 100/200] chore(deps): bump @huggingface/inference in the
+ patch-updates group (#1651)
+
+Bumps the patch-updates group with 1 update: [@huggingface/inference](https://github.com/huggingface/huggingface.js).
+
+
+Updates `@huggingface/inference` from 4.13.17 to 4.13.18
+- [Release notes](https://github.com/huggingface/huggingface.js/releases)
+- [Commits](https://github.com/huggingface/huggingface.js/compare/inference-v4.13.17...inference-v4.13.18)
+
+---
+updated-dependencies:
+- dependency-name: "@huggingface/inference"
+  dependency-version: 4.13.18
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 8 ++++----
+ package.json      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index f79309d..f3f52f0 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -13,7 +13,7 @@
+         "@fortawesome/fontawesome-free": "^7.2.0",
+         "@googleapis/drive": "^20.2.0",
+         "@googleapis/sheets": "^13.0.2",
+-        "@huggingface/inference": "^4.13.17",
++        "@huggingface/inference": "^4.13.18",
+         "@keyv/mongo": "^3.1.0",
+         "@langchain/community": "^1.1.28",
+         "@langchain/core": "^1.1.47",
+@@ -471,9 +471,9 @@
+       "license": "MIT"
+     },
+     "node_modules/@huggingface/inference": {
+-      "version": "4.13.17",
+-      "resolved": "https://registry.npmjs.org/@huggingface/inference/-/inference-4.13.17.tgz",
+-      "integrity": "sha512-+qA6wrGjh2L6FfFkE2nJmiA7XcJJV5/9+WEwYzA/Y2kibPypGecvVSgsXTATeb9CmkCP8v+uhtDGVHJTuaAXOg==",
++      "version": "4.13.18",
++      "resolved": "https://registry.npmjs.org/@huggingface/inference/-/inference-4.13.18.tgz",
++      "integrity": "sha512-n0dP3FhmIqJoLU5yGoG6lBZVW50+IgeLDubLL1P28zG4Adp2rhKYQGt5j52JCwlmKDf2ruWjuIcfrjkobT0RlQ==",
+       "license": "MIT",
+       "dependencies": {
+         "@huggingface/jinja": "^0.5.9",
+diff --git a/package.json b/package.json
+index 1a9fda5..99f2ec9 100644
+--- a/package.json
++++ b/package.json
+@@ -32,7 +32,7 @@
+     "@fortawesome/fontawesome-free": "^7.2.0",
+     "@googleapis/drive": "^20.2.0",
+     "@googleapis/sheets": "^13.0.2",
+-    "@huggingface/inference": "^4.13.17",
++    "@huggingface/inference": "^4.13.18",
+     "@keyv/mongo": "^3.1.0",
+     "@langchain/community": "^1.1.28",
+     "@langchain/core": "^1.1.47",
+-- 
+2.53.0
+

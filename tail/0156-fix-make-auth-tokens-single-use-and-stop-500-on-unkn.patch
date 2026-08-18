@@ -1,0 +1,318 @@
+From 817595f159f20a523c0060a4f04fe5c7636ebbb5 Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <6448697+YasharF@users.noreply.github.com>
+Date: Wed, 1 Jul 2026 21:36:40 -0700
+Subject: [PATCH 154/200] fix: make auth tokens single-use and stop 500 on
+ unknown reset token (#1706)
+
+---
+ controllers/user.js |  8 +++---
+ models/User.js      | 41 +++++++++++++++++++++------
+ test/models.test.js | 68 +++++++++++++++++++++++++++++++++++++++++++++
+ test/user.test.js   | 42 +++++++++++++++++++++++-----
+ 4 files changed, 139 insertions(+), 20 deletions(-)
+
+diff --git a/controllers/user.js b/controllers/user.js
+index ff3edb0..a4bedd3 100644
+--- a/controllers/user.js
++++ b/controllers/user.js
+@@ -494,7 +494,7 @@ exports.getLoginByEmail = async (req, res, next) => {
+   try {
+     const user = await User.findOne({ loginToken: { $eq: req.params.token } });
+ 
+-    if (!user || !user.verifyTokenAndIp(user.loginToken, req.ip, 'login')) {
++    if (!user || !user.consumeToken(req.params.token, req.ip, 'login')) {
+       req.flash('errors', { msg: 'Invalid or expired login link.' });
+       return res.redirect('/login');
+     }
+@@ -561,7 +561,7 @@ exports.getVerifyEmailToken = async (req, res, next) => {
+   }
+ 
+   try {
+-    if (!req.user.verifyTokenAndIp(req.user.emailVerificationToken, req.ip, 'emailVerification')) {
++    if (!req.user.consumeToken(req.params.token, req.ip, 'emailVerification')) {
+       req.flash('errors', { msg: 'Invalid or expired verification link.' });
+       return res.redirect('/account');
+     }
+@@ -651,9 +651,9 @@ exports.postReset = async (req, res, next) => {
+ 
+   try {
+     const user = await User.findOne({ passwordResetToken: { $eq: req.params.token } });
+-    if (!user || !user.verifyTokenAndIp(user.passwordResetToken, req.ip, 'passwordReset')) {
++    if (!user || !user.consumeToken(req.params.token, req.ip, 'passwordReset')) {
+       req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
+-      return res.redirect(user.get('Referrer') || '/');
++      return res.redirect('/forgot');
+     }
+     user.password = req.body.password;
+     user.emailVerified = true; // Mark email as verified as well since they proved ownership
+diff --git a/models/User.js b/models/User.js
+index d7331b5..df8b782 100644
+--- a/models/User.js
++++ b/models/User.js
+@@ -104,21 +104,15 @@ userSchema.pre('save', function clearExpiredTokens() {
+   const now = Date.now();
+ 
+   if (this.passwordResetExpires && this.passwordResetExpires < now) {
+-    this.passwordResetToken = undefined;
+-    this.passwordResetExpires = undefined;
+-    this.passwordResetIpHash = undefined;
++    this.clearToken('passwordReset');
+   }
+ 
+   if (this.emailVerificationExpires && this.emailVerificationExpires < now) {
+-    this.emailVerificationToken = undefined;
+-    this.emailVerificationExpires = undefined;
+-    this.emailVerificationIpHash = undefined;
++    this.clearToken('emailVerification');
+   }
+ 
+   if (this.loginExpires && this.loginExpires < now) {
+-    this.loginToken = undefined;
+-    this.loginExpires = undefined;
+-    this.loginIpHash = undefined;
++    this.clearToken('login');
+   }
+ 
+   if (this.twoFactorExpires && this.twoFactorExpires < now) {
+@@ -191,6 +185,17 @@ userSchema.methods.clearTwoFactorCode = function clearTwoFactorCode() {
+   this.twoFactorIpHash = undefined;
+ };
+ 
++// Helper method for clearing the fields of a ${tokenType}Token/Expires/IpHash token
++// (after use or expiration). tokenType matches the values used by verifyTokenAndIp,
++// e.g. 'passwordReset', 'login', 'emailVerification'. Clearing on use is what makes
++// the corresponding link single-use. (2FA uses a different field naming scheme; see
++// clearTwoFactorCode.)
++userSchema.methods.clearToken = function clearToken(tokenType) {
++  this[`${tokenType}Token`] = undefined;
++  this[`${tokenType}Expires`] = undefined;
++  this[`${tokenType}IpHash`] = undefined;
++};
++
+ // Helper methods for creating hashed IP addresses
+ // This is used to prevent CSRF attacks by ensuring that the token is valid for
+ // the IP address it was generated from
+@@ -260,6 +265,24 @@ userSchema.methods.verifyCodeAndIp = function verifyCodeAndIp(code, ip, codeType
+   }
+ };
+ 
++// Single-use token consumption helpers: verify the candidate token from the request
++// against the stored one and, on success, clear it so the link can only be used once.
++// These only mutate the in-memory document; the caller is responsible for the single
++// save() that persists the clear together with any other changes (e.g. the new
++// password) in one document write. Note that verify-then-save leaves a small
++// concurrency window between the check and the write; strictly serializing
++// consumption would need a conditional DB update (e.g. findOneAndUpdate with $unset),
++// at the cost of losing the token when a later step of the request fails (such as
++// the password hash), which would force the user to request a fresh link.
++// Read-only checks that must NOT consume the token (e.g. rendering the reset form
++// in getReset) should keep using verifyTokenAndIp directly. tokenType matches the
++// values used by verifyTokenAndIp, e.g. 'passwordReset', 'login', 'emailVerification'.
++userSchema.methods.consumeToken = function consumeToken(token, ip, tokenType) {
++  const valid = this.verifyTokenAndIp(token, ip, tokenType);
++  if (valid) this.clearToken(tokenType);
++  return valid;
++};
++
+ const User = mongoose.model('User', userSchema);
+ 
+ module.exports = User;
+diff --git a/test/models.test.js b/test/models.test.js
+index ffa1ec1..b4d43a2 100644
+--- a/test/models.test.js
++++ b/test/models.test.js
+@@ -463,6 +463,74 @@ describe('User Model', () => {
+     });
+   });
+ 
++  describe('Single-use token consumption', () => {
++    const ip = '127.0.0.1';
++
++    it('consumeToken clears a passwordReset token on success and returns true', () => {
++      const token = 'a'.repeat(64);
++      const user = new User({
++        passwordResetToken: token,
++        passwordResetIpHash: User.hashIP(ip),
++        passwordResetExpires: Date.now() + 3600000,
++      });
++      expect(user.consumeToken(token, ip, 'passwordReset')).to.be.true;
++      expect(user.passwordResetToken).to.be.undefined;
++      expect(user.passwordResetExpires).to.be.undefined;
++      expect(user.passwordResetIpHash).to.be.undefined;
++      // A second attempt with the same token must now fail (single-use)
++      expect(user.consumeToken(token, ip, 'passwordReset')).to.be.false;
++    });
++
++    it('consumeToken does NOT clear the token on failure (wrong IP)', () => {
++      const token = 'a'.repeat(64);
++      const user = new User({
++        passwordResetToken: token,
++        passwordResetIpHash: User.hashIP('10.0.0.1'),
++        passwordResetExpires: Date.now() + 3600000,
++      });
++      expect(user.consumeToken(token, ip, 'passwordReset')).to.be.false;
++      // Token is preserved so a legitimate retry from the right IP still works
++      expect(user.passwordResetToken).to.equal(token);
++    });
++
++    it('consumeToken clears a login token on success and returns true', () => {
++      const token = 'b'.repeat(64);
++      const user = new User({
++        loginToken: token,
++        loginIpHash: User.hashIP(ip),
++        loginExpires: Date.now() + 3600000,
++      });
++      expect(user.consumeToken(token, ip, 'login')).to.be.true;
++      expect(user.loginToken).to.be.undefined;
++      expect(user.consumeToken(token, ip, 'login')).to.be.false;
++    });
++
++    it('consumeToken clears an emailVerification token on success and returns true', () => {
++      const token = 'c'.repeat(64);
++      const user = new User({
++        emailVerificationToken: token,
++        emailVerificationIpHash: User.hashIP(ip),
++        emailVerificationExpires: Date.now() + 3600000,
++      });
++      expect(user.consumeToken(token, ip, 'emailVerification')).to.be.true;
++      expect(user.emailVerificationToken).to.be.undefined;
++      expect(user.consumeToken(token, ip, 'emailVerification')).to.be.false;
++    });
++
++    it('consumeToken rejects a candidate token that does not match the stored one', () => {
++      // Regression: the handler must compare the token from the URL against the
++      // stored token, not the stored token against itself.
++      const token = 'c'.repeat(64);
++      const user = new User({
++        emailVerificationToken: token,
++        emailVerificationIpHash: User.hashIP(ip),
++        emailVerificationExpires: Date.now() + 3600000,
++      });
++      expect(user.consumeToken('d'.repeat(64), ip, 'emailVerification')).to.be.false;
++      expect(user.emailVerificationToken).to.equal(token);
++    });
++  });
++
+   describe('IP Hashing', () => {
+     it('should consistently hash the same IP', () => {
+       const ip = '127.0.0.1';
+diff --git a/test/user.test.js b/test/user.test.js
+index 6929253..b68afd6 100644
+--- a/test/user.test.js
++++ b/test/user.test.js
+@@ -47,6 +47,8 @@ function makeFakeUser(overrides = {}) {
+       profile: { pictures: new Map(), picture: undefined, pictureSource: undefined },
+       save: sinon.stub().resolves(),
+       clearTwoFactorCode: sinon.spy(),
++      // consumeToken verifies-and-clears in one call; default to a valid token.
++      consumeToken: sinon.stub().returns(true),
+     },
+     overrides,
+   );
+@@ -812,7 +814,6 @@ describe('User Controller', () => {
+         loginToken: 'validhex',
+         loginExpires: Date.now() + 900000,
+         loginIpHash: 'hashed-ip',
+-        verifyTokenAndIp: sinon.stub().returns(true),
+       });
+       userFindOneStub = sinon.stub().resolves(fakeUser);
+ 
+@@ -848,7 +849,7 @@ describe('User Controller', () => {
+     });
+ 
+     it('should flash error and redirect /login when token not found or invalid', async () => {
+-      fakeUser.verifyTokenAndIp.returns(false);
++      fakeUser.consumeToken.returns(false);
+       await userController.getLoginByEmail(req, res, next);
+       expect(req.flash.calledWith('errors')).to.be.true;
+       expect(res.redirect.calledWith('/login')).to.be.true;
+@@ -874,6 +875,11 @@ describe('User Controller', () => {
+       await userController.getLoginByEmail(req, res, next);
+       expect(res.redirect.calledWith('/')).to.be.true;
+     });
++
++    it('should invalidate the login token on success so the link is single-use', async () => {
++      await userController.getLoginByEmail(req, res, next);
++      expect(fakeUser.consumeToken.calledOnceWith(req.params.token, req.ip, 'login')).to.be.true;
++    });
+   });
+ 
+   // =========================================================================
+@@ -958,7 +964,6 @@ describe('User Controller', () => {
+     beforeEach(() => {
+       fakeUser = makeFakeUser({
+         passwordResetToken: 'a'.repeat(64),
+-        verifyTokenAndIp: sinon.stub().returns(true),
+       });
+       userFindOneStub = sinon.stub().resolves(fakeUser);
+       nodemailerSendMailStub = sinon.stub().resolves();
+@@ -1007,10 +1012,20 @@ describe('User Controller', () => {
+     });
+ 
+     it('should flash error when token is invalid or expired', async () => {
+-      fakeUser.verifyTokenAndIp.returns(false);
+-      fakeUser.get = sinon.stub().returns(undefined);
++      fakeUser.consumeToken.returns(false);
+       await userController.postReset(req, res, next);
+       expect(req.flash.calledWith('errors')).to.be.true;
++      expect(res.redirect.calledWith('/forgot')).to.be.true;
++      expect(next.called).to.be.false;
++    });
++
++    it('should redirect /forgot without throwing when the token matches no user', async () => {
++      // Regression: a well-formed but unknown token made findOne return null,
++      // and the handler called user.get(...) on null -> TypeError -> HTTP 500.
++      userFindOneStub.resolves(null);
++      await userController.postReset(req, res, next);
++      expect(req.flash.calledWith('errors')).to.be.true;
++      expect(res.redirect.calledWith('/forgot')).to.be.true;
+       expect(next.called).to.be.false;
+     });
+ 
+@@ -1023,6 +1038,13 @@ describe('User Controller', () => {
+       expect(nodemailerSendMailStub.calledOnce).to.be.true;
+       expect(res.redirect.calledWith('/')).to.be.true;
+     });
++
++    it('should invalidate the reset token on success so the link is single-use', async () => {
++      await userController.postReset(req, res, next);
++      expect(fakeUser.consumeToken.calledOnceWith(req.params.token, req.ip, 'passwordReset')).to.be.true;
++      // Token must be consumed before the save that persists the change
++      expect(fakeUser.consumeToken.calledBefore(fakeUser.save)).to.be.true;
++    });
+   });
+ 
+   // =========================================================================
+@@ -1885,7 +1907,7 @@ describe('User Controller', () => {
+         user: {
+           emailVerified: false,
+           emailVerificationToken: 'a'.repeat(64),
+-          verifyTokenAndIp: sinon.stub().returns(true),
++          consumeToken: sinon.stub().returns(true),
+           save: sinon.stub().resolves(),
+         },
+         params: { token: 'a'.repeat(64) },
+@@ -1916,7 +1938,7 @@ describe('User Controller', () => {
+     });
+ 
+     it('should flash error when token does not match', async () => {
+-      req.user.verifyTokenAndIp.returns(false);
++      req.user.consumeToken.returns(false);
+       await userController.getVerifyEmailToken(req, res, next);
+       expect(req.flash.calledWith('errors')).to.be.true;
+       expect(res.redirect.calledWith('/account')).to.be.true;
+@@ -1930,5 +1952,11 @@ describe('User Controller', () => {
+       expect(req.flash.calledWith('success')).to.be.true;
+       expect(res.redirect.calledWith('/account')).to.be.true;
+     });
++
++    it('should invalidate the verification token on success so the link is single-use', async () => {
++      await userController.getVerifyEmailToken(req, res, next);
++      // Must consume using the token from the URL, not the stored token
++      expect(req.user.consumeToken.calledOnceWith(req.params.token, req.ip, 'emailVerification')).to.be.true;
++    });
+   });
+ });
+-- 
+2.53.0
+

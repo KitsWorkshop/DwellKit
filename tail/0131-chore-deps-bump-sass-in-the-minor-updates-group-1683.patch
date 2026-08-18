@@ -1,0 +1,72 @@
+From 5673f4c8d946d11e1307079d193a041fcca263fd Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Fri, 12 Jun 2026 13:28:32 +0000
+Subject: [PATCH 129/200] chore(deps): bump sass in the minor-updates group
+ (#1683)
+
+Bumps the minor-updates group with 1 update: [sass](https://github.com/sass/dart-sass).
+
+
+Updates `sass` from 1.100.0 to 1.101.0
+- [Release notes](https://github.com/sass/dart-sass/releases)
+- [Changelog](https://github.com/sass/dart-sass/blob/main/CHANGELOG.md)
+- [Commits](https://github.com/sass/dart-sass/compare/1.100.0...1.101.0)
+
+---
+updated-dependencies:
+- dependency-name: sass
+  dependency-version: 1.101.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: minor-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 8 ++++----
+ package.json      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index f34f406..0652b4f 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -66,7 +66,7 @@
+         "pdfjs-dist": "^6.0.227",
+         "pug": "^3.0.4",
+         "qr": "^0.6.0",
+-        "sass": "^1.100.0",
++        "sass": "^1.101.0",
+         "stripe": "^22.2.0",
+         "twilio": "^6.0.2",
+         "twitch-passport": "^1.0.6",
+@@ -7745,9 +7745,9 @@
+       "license": "MIT"
+     },
+     "node_modules/sass": {
+-      "version": "1.100.0",
+-      "resolved": "https://registry.npmjs.org/sass/-/sass-1.100.0.tgz",
+-      "integrity": "sha512-B5j0rYMlinhhOo9tjQebMVVn0TfyXAF+wB3b2ggZUuJ/is/Y+7+JGjirAMxHZ9Z3hIP98NPfamlAkBHa1lAaXQ==",
++      "version": "1.101.0",
++      "resolved": "https://registry.npmjs.org/sass/-/sass-1.101.0.tgz",
++      "integrity": "sha512-OL3GoQyoUdDt843DpVmDO6y2k1sc5IhUDSpu8XucEI+35neq5QivZ1iuegnpraEVTJXlQGK1gl27zKcTLEPbQw==",
+       "license": "MIT",
+       "dependencies": {
+         "chokidar": "^5.0.0",
+diff --git a/package.json b/package.json
+index fdb6fa6..62e7cb3 100644
+--- a/package.json
++++ b/package.json
+@@ -85,7 +85,7 @@
+     "pdfjs-dist": "^6.0.227",
+     "pug": "^3.0.4",
+     "qr": "^0.6.0",
+-    "sass": "^1.100.0",
++    "sass": "^1.101.0",
+     "stripe": "^22.2.0",
+     "twilio": "^6.0.2",
+     "twitch-passport": "^1.0.6",
+-- 
+2.53.0
+

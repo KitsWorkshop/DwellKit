@@ -1,0 +1,120 @@
+From 7453b92b4c78f529765702364d4543580b11d726 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Thu, 19 Mar 2026 13:29:26 +0000
+Subject: [PATCH 037/200] chore(deps): bump the patch-updates group with 2
+ updates (#1579)
+
+Bumps the patch-updates group with 2 updates: [@langchain/core](https://github.com/langchain-ai/langchainjs) and [langchain](https://github.com/langchain-ai/langchainjs).
+
+
+Updates `@langchain/core` from 1.1.33 to 1.1.34
+- [Release notes](https://github.com/langchain-ai/langchainjs/releases)
+- [Commits](https://github.com/langchain-ai/langchainjs/compare/@langchain/core@1.1.33...@langchain/core@1.1.34)
+
+Updates `langchain` from 1.2.34 to 1.2.35
+- [Release notes](https://github.com/langchain-ai/langchainjs/releases)
+- [Commits](https://github.com/langchain-ai/langchainjs/compare/langchain@1.2.34...langchain@1.2.35)
+
+---
+updated-dependencies:
+- dependency-name: "@langchain/core"
+  dependency-version: 1.1.34
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: langchain
+  dependency-version: 1.2.35
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 18 +++++++++---------
+ package.json      |  4 ++--
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index ec7d3a3..01cfd57 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16,7 +16,7 @@
+         "@huggingface/inference": "^4.13.15",
+         "@keyv/mongo": "^3.1.0",
+         "@langchain/community": "^1.1.24",
+-        "@langchain/core": "^1.1.32",
++        "@langchain/core": "^1.1.34",
+         "@langchain/groq": "^1.1.5",
+         "@langchain/langgraph": "^1.2.3",
+         "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+@@ -42,7 +42,7 @@
+         "express-session": "^1.19.0",
+         "jquery": "^4.0.0",
+         "keyv": "^5.6.0",
+-        "langchain": "^1.2.34",
++        "langchain": "^1.2.35",
+         "lastfm": "^0.9.4",
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.20",
+@@ -1147,9 +1147,9 @@
+       }
+     },
+     "node_modules/@langchain/core": {
+-      "version": "1.1.33",
+-      "resolved": "https://registry.npmjs.org/@langchain/core/-/core-1.1.33.tgz",
+-      "integrity": "sha512-At1ooBmPlHMkhTkG6NqeOVjNscuJwneBB8F88rFRvBvIfhTACVLzEwMiZFWNTM8DzUXUOcxxqS7xKRyr6JBbOQ==",
++      "version": "1.1.34",
++      "resolved": "https://registry.npmjs.org/@langchain/core/-/core-1.1.34.tgz",
++      "integrity": "sha512-IDlZES5Vexo5meLQRCGkAU7NM0tPGPfPP5wcUzBd7Ot+JoFBmSXutC4gGzvZod5AKRVn3I0Qy5k8vkTraY21jA==",
+       "license": "MIT",
+       "dependencies": {
+         "@cfworker/json-schema": "^4.0.2",
+@@ -6314,9 +6314,9 @@
+       }
+     },
+     "node_modules/langchain": {
+-      "version": "1.2.34",
+-      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.2.34.tgz",
+-      "integrity": "sha512-7Ij3VK3P9phCUgGjV5ckkBqgR7tw+0n54sx4lb1aqZfpbzda9PWgt0hUeTKVEV51VSZ7eBVomYnG6qUQ4IlX2w==",
++      "version": "1.2.35",
++      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.2.35.tgz",
++      "integrity": "sha512-uMK/YZu8i4mCfGarB3EJ/efd7CKidtphw7M5qcgTxWvXMXxHCG8KMLMq70hnJ63GQa1TpgreOzePrK4bvdE2ig==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph": "^1.1.2",
+@@ -6329,7 +6329,7 @@
+         "node": ">=20"
+       },
+       "peerDependencies": {
+-        "@langchain/core": "^1.1.33"
++        "@langchain/core": "^1.1.34"
+       }
+     },
+     "node_modules/langchain/node_modules/uuid": {
+diff --git a/package.json b/package.json
+index aa215ae..bab12a1 100644
+--- a/package.json
++++ b/package.json
+@@ -35,7 +35,7 @@
+     "@huggingface/inference": "^4.13.15",
+     "@keyv/mongo": "^3.1.0",
+     "@langchain/community": "^1.1.24",
+-    "@langchain/core": "^1.1.32",
++    "@langchain/core": "^1.1.34",
+     "@langchain/groq": "^1.1.5",
+     "@langchain/langgraph": "^1.2.3",
+     "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+@@ -61,7 +61,7 @@
+     "express-session": "^1.19.0",
+     "jquery": "^4.0.0",
+     "keyv": "^5.6.0",
+-    "langchain": "^1.2.34",
++    "langchain": "^1.2.35",
+     "lastfm": "^0.9.4",
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.20",
+-- 
+2.53.0
+

@@ -1,0 +1,215 @@
+From 6de2eb32d58c2f76311bec31c174b2690f690db0 Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <6448697+YasharF@users.noreply.github.com>
+Date: Tue, 24 Feb 2026 15:47:27 -0800
+Subject: [PATCH 006/200] refactor: use native Node.js loadEnvFile instead of
+ dotenv (#1554)
+
+---
+ .env.example                  |  3 ---
+ README.md                     |  1 -
+ app.js                        | 11 +++++++++--
+ package-lock.json             |  8 ++++----
+ package.json                  |  2 --
+ test/.env.test                |  3 ---
+ test/auth.opt.test.js         |  2 +-
+ test/passport.test.js         |  2 +-
+ test/playwright.config.js     | 11 ++++++-----
+ test/token-revocation.test.js |  2 +-
+ test/webauthn.test.js         |  2 +-
+ 11 files changed, 23 insertions(+), 24 deletions(-)
+
+diff --git a/.env.example b/.env.example
+index 50e592d..e197c2c 100644
+--- a/.env.example
++++ b/.env.example
+@@ -25,9 +25,6 @@ ALPHA_VANTAGE_KEY=api-key
+ DISCORD_CLIENT_ID=discord-client-id/discord-app-id
+ DISCORD_CLIENT_SECRET=discord-client-secret
+ 
+-# To suppress multiple tip/advertisement lines about the dotenvx service
+-DOTENV_KEY=""
+-
+ FACEBOOK_ID=754220301289665
+ FACEBOOK_SECRET=41860e58c256a3d7ad8267d3c1939a4a
+ # FB Pixel ID is optional if you are trying to do customer rtracking
+diff --git a/README.md b/README.md
+index 0fd5a22..c76ded0 100644
+--- a/README.md
++++ b/README.md
+@@ -621,7 +621,6 @@ Required to run the project before your modifications
+ | cheerio                       | Scrape web pages using jQuery-style syntax.                           |
+ | compression                   | Node.js compression middleware.                                       |
+ | connect-mongo                 | MongoDB session store for Express.                                    |
+-| dotenv                        | Loads environment variables from .env file.                           |
+ | errorhandler                  | Development-only error handler middleware.                            |
+ | express                       | Node.js web framework.                                                |
+ | express-rate-limit            | Rate limiting middleware for abuse protection.                        |
+diff --git a/app.js b/app.js
+index fc4afb0..68437a3 100644
+--- a/app.js
++++ b/app.js
+@@ -7,7 +7,6 @@ const compression = require('compression');
+ const session = require('express-session');
+ const errorHandler = require('errorhandler');
+ const lusca = require('lusca');
+-const dotenv = require('dotenv');
+ const { MongoStore } = require('connect-mongo');
+ const mongoose = require('mongoose');
+ const passport = require('passport');
+@@ -17,7 +16,15 @@ const { flash } = require('./config/flash');
+ /**
+  * Load environment variables from .env file, where API keys and passwords are configured.
+  */
+-dotenv.config({ path: '.env.example', quiet: true });
++try {
++  process.loadEnvFile('.env.example');
++} catch (err) {
++  if (err && err.code === 'ENOENT') {
++    console.log('No .env.example file found. This is OK if the required environment variables are already set in your environment.');
++  } else {
++    console.error('Error loading .env.example file:', err);
++  }
++}
+ 
+ /**
+  * Set config values
+diff --git a/package-lock.json b/package-lock.json
+index 4ff81bd..558ef0c 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -36,7 +36,6 @@
+         "cheerio": "^1.2.0",
+         "compression": "^1.8.1",
+         "connect-mongo": "^6.0.0",
+-        "dotenv": "^17.3.1",
+         "errorhandler": "^1.5.2",
+         "express": "^5.2.1",
+         "express-rate-limit": "^8.2.1",
+@@ -4190,10 +4189,11 @@
+       }
+     },
+     "node_modules/dotenv": {
+-      "version": "17.3.1",
+-      "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-17.3.1.tgz",
+-      "integrity": "sha512-IO8C/dzEb6O3F9/twg6ZLXz164a2fhTnEWb95H23Dm4OuN+92NmEAlTrupP9VW6Jm3sO26tQlqyvyi4CsnY9GA==",
++      "version": "16.6.1",
++      "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.6.1.tgz",
++      "integrity": "sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==",
+       "license": "BSD-2-Clause",
++      "peer": true,
+       "engines": {
+         "node": ">=12"
+       },
+diff --git a/package.json b/package.json
+index d3ad0d6..db26660 100644
+--- a/package.json
++++ b/package.json
+@@ -55,7 +55,6 @@
+     "cheerio": "^1.2.0",
+     "compression": "^1.8.1",
+     "connect-mongo": "^6.0.0",
+-    "dotenv": "^17.3.1",
+     "errorhandler": "^1.5.2",
+     "express": "^5.2.1",
+     "express-rate-limit": "^8.2.1",
+@@ -108,7 +107,6 @@
+     "supertest": "^7.2.2"
+   },
+   "overrides": {
+-    "dotenv": "^17.3.1",
+     "encoding-sniffer": "github:SeattleDevs/encoding-sniffer",
+     "fetch-blob": "github:SeattleDevs/fetch-blob",
+     "formdata-node": "^6.0.3",
+diff --git a/test/.env.test b/test/.env.test
+index 07203f4..e80c5f5 100644
+--- a/test/.env.test
++++ b/test/.env.test
+@@ -17,9 +17,6 @@ ALPHA_VANTAGE_KEY=api-key
+ DISCORD_CLIENT_ID=discord-client-id/discord-app-id
+ DISCORD_CLIENT_SECRET=discord-client-secret
+ 
+-# To suppress multiple tip/advertisement lines about the dotenvx service
+-DOTENV_KEY=""
+-
+ FACEBOOK_ID=1234567890123456
+ FACEBOOK_SECRET=test_facebook_secret
+ FACEBOOK_PIXEL_ID=
+diff --git a/test/auth.opt.test.js b/test/auth.opt.test.js
+index 087be74..fa12928 100644
+--- a/test/auth.opt.test.js
++++ b/test/auth.opt.test.js
+@@ -2,7 +2,7 @@ const path = require('node:path');
+ const { expect } = require('chai');
+ const sinon = require('sinon');
+ const mongoose = require('mongoose');
+-require('dotenv').config({ path: path.join(__dirname, '.env.test') });
++process.loadEnvFile(path.join(__dirname, '.env.test'));
+ const { _saveOAuth2UserTokens } = require('../config/passport');
+ const User = require('../models/User');
+ 
+diff --git a/test/passport.test.js b/test/passport.test.js
+index 20e8eaa..b19be60 100644
+--- a/test/passport.test.js
++++ b/test/passport.test.js
+@@ -4,7 +4,7 @@ const sinon = require('sinon');
+ const refresh = require('passport-oauth2-refresh');
+ const mongoose = require('mongoose');
+ const validator = require('validator');
+-require('dotenv').config({ path: path.join(__dirname, '.env.test') });
++process.loadEnvFile(path.join(__dirname, '.env.test'));
+ const passportModule = require('../config/passport');
+ const { isAuthorized, _saveOAuth2UserTokens, _handleAuthLogin } = passportModule;
+ const User = require('../models/User');
+diff --git a/test/playwright.config.js b/test/playwright.config.js
+index fdf0cac..9365b85 100644
+--- a/test/playwright.config.js
++++ b/test/playwright.config.js
+@@ -1,13 +1,14 @@
+ const fs = require('node:fs');
+ const path = require('node:path');
+ const { defineConfig, devices } = require('@playwright/test');
+-const dotenv = require('dotenv');
+-// Preserve any MONGODB_URI that was set before loading dotenv, since it is set to the memory server starter
++// Preserve any MONGODB_URI that was set before loading env file, since it is set to the memory server starter
+ const originalMongoUri = process.env.MONGODB_URI;
+-const result = dotenv.config({ path: path.resolve(__dirname, '.env.test'), quiet: true });
++process.loadEnvFile(path.resolve(__dirname, '.env.test'));
+ // If MONGODB_URI was not set by the outer environment (originalMongoUri undefined)
+-// but exists in the parsed dotenv, remove it so the memory-server starter can create a DB.
+-if (!originalMongoUri && result && result.parsed && result.parsed.MONGODB_URI) {
++// but was loaded from the env file, remove it so the memory-server starter can create a DB.
++if (originalMongoUri !== undefined) {
++  process.env.MONGODB_URI = originalMongoUri;
++} else if (process.env.MONGODB_URI !== undefined) {
+   delete process.env.MONGODB_URI;
+ }
+ 
+diff --git a/test/token-revocation.test.js b/test/token-revocation.test.js
+index 4f190ce..1e4a80b 100644
+--- a/test/token-revocation.test.js
++++ b/test/token-revocation.test.js
+@@ -1,7 +1,7 @@
+ const path = require('node:path');
+ const { expect } = require('chai');
+ const sinon = require('sinon');
+-require('dotenv').config({ path: path.join(__dirname, '.env.test') });
++process.loadEnvFile(path.join(__dirname, '.env.test'));
+ const { providerRevocationConfig } = require('../config/passport');
+ const { revokeProviderTokens, revokeAllProviderTokens } = require('../config/token-revocation');
+ 
+diff --git a/test/webauthn.test.js b/test/webauthn.test.js
+index c4a2941..6227ea2 100644
+--- a/test/webauthn.test.js
++++ b/test/webauthn.test.js
+@@ -5,7 +5,7 @@ const { expect } = require('chai');
+ const sinon = require('sinon');
+ const { generateRegistrationOptions, generateAuthenticationOptions } = require('@simplewebauthn/server');
+ 
+-require('dotenv').config({ path: path.join(__dirname, '.env.test') });
++process.loadEnvFile(path.join(__dirname, '.env.test'));
+ 
+ describe('WebAuthn Controller', () => {
+   let generateRegistrationOptionsStub;
+-- 
+2.53.0
+

@@ -1,0 +1,152 @@
+From 806fa66c5c1bac5fdba89736ab16b7cf0813628e Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Wed, 10 Jun 2026 13:28:55 +0000
+Subject: [PATCH 124/200] chore(deps): bump the minor-updates group with 2
+ updates (#1677)
+
+Bumps the minor-updates group with 2 updates: [mongodb](https://github.com/mongodb/node-mongodb-native) and [mongoose](https://github.com/Automattic/mongoose).
+
+
+Updates `mongodb` from 7.2.0 to 7.3.0
+- [Release notes](https://github.com/mongodb/node-mongodb-native/releases)
+- [Changelog](https://github.com/mongodb/node-mongodb-native/blob/main/HISTORY.md)
+- [Commits](https://github.com/mongodb/node-mongodb-native/compare/v7.2.0...v7.3.0)
+
+Updates `mongoose` from 9.6.3 to 9.7.0
+- [Release notes](https://github.com/Automattic/mongoose/releases)
+- [Changelog](https://github.com/Automattic/mongoose/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/Automattic/mongoose/compare/9.6.3...9.7.0)
+
+---
+updated-dependencies:
+- dependency-name: mongodb
+  dependency-version: 7.3.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: minor-updates
+- dependency-name: mongoose
+  dependency-version: 9.7.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: minor-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 62 +++++++++++++++++++++++++++++++++++++++++------
+ package.json      |  4 +--
+ 2 files changed, 56 insertions(+), 10 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index dbba010..2341fb3 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -46,8 +46,8 @@
+         "lastfm": "^0.9.4",
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.20",
+-        "mongodb": "^7.2.0",
+-        "mongoose": "^9.6.3",
++        "mongodb": "^7.3.0",
++        "mongoose": "^9.7.0",
+         "morgan": "^1.11.0",
+         "multer": "^2.1.1",
+         "nodemailer": "^8.0.10",
+@@ -6102,9 +6102,9 @@
+       }
+     },
+     "node_modules/mongodb": {
+-      "version": "7.2.0",
+-      "resolved": "https://registry.npmjs.org/mongodb/-/mongodb-7.2.0.tgz",
+-      "integrity": "sha512-F/2+BMZtLVhY30ioZp0dAmZ+IRZMBqI+nrv6t5+9/1AIwCa8sMRC3jBf81lpxMhnZgqq8CoUD503Z1oZWq1/sw==",
++      "version": "7.3.0",
++      "resolved": "https://registry.npmjs.org/mongodb/-/mongodb-7.3.0.tgz",
++      "integrity": "sha512-WpCqSx7JAU9vcyjm/SU7ydnHls2YrfU3Y3sx4Ml9D7sPe4mXPlaapndiurDXrQ7/VvJkB4/i7b7WovHb8bd8sg==",
+       "license": "Apache-2.0",
+       "dependencies": {
+         "@mongodb-js/saslprep": "^1.3.0",
+@@ -6249,9 +6249,9 @@
+       "license": "MIT"
+     },
+     "node_modules/mongoose": {
+-      "version": "9.6.3",
+-      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-9.6.3.tgz",
+-      "integrity": "sha512-vI6dTTlQnfMCyyQ5TrvhG0bCRs4dq5e1uFNPtOOWsOhn0fSg8AoIHjfyyCYr8aybyvPs845dRHGxsC3w/fHcBA==",
++      "version": "9.7.0",
++      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-9.7.0.tgz",
++      "integrity": "sha512-pkrLZ6U41pD4Ai0ju/FYL7o5I5k+rV3RZINQTG937hbhnLGKRuqqYm1Dlt/kTQ+M4FHijzV6JawzsdHKRGt7QA==",
+       "license": "MIT",
+       "dependencies": {
+         "kareem": "3.3.0",
+@@ -6269,6 +6269,52 @@
+         "url": "https://opencollective.com/mongoose"
+       }
+     },
++    "node_modules/mongoose/node_modules/mongodb": {
++      "version": "7.2.0",
++      "resolved": "https://registry.npmjs.org/mongodb/-/mongodb-7.2.0.tgz",
++      "integrity": "sha512-F/2+BMZtLVhY30ioZp0dAmZ+IRZMBqI+nrv6t5+9/1AIwCa8sMRC3jBf81lpxMhnZgqq8CoUD503Z1oZWq1/sw==",
++      "license": "Apache-2.0",
++      "dependencies": {
++        "@mongodb-js/saslprep": "^1.3.0",
++        "bson": "^7.2.0",
++        "mongodb-connection-string-url": "^7.0.0"
++      },
++      "engines": {
++        "node": ">=20.19.0"
++      },
++      "peerDependencies": {
++        "@aws-sdk/credential-providers": "^3.806.0",
++        "@mongodb-js/zstd": "^7.0.0",
++        "gcp-metadata": "^7.0.1",
++        "kerberos": "^7.0.0",
++        "mongodb-client-encryption": ">=7.0.0 <7.1.0",
++        "snappy": "^7.3.2",
++        "socks": "^2.8.6"
++      },
++      "peerDependenciesMeta": {
++        "@aws-sdk/credential-providers": {
++          "optional": true
++        },
++        "@mongodb-js/zstd": {
++          "optional": true
++        },
++        "gcp-metadata": {
++          "optional": true
++        },
++        "kerberos": {
++          "optional": true
++        },
++        "mongodb-client-encryption": {
++          "optional": true
++        },
++        "snappy": {
++          "optional": true
++        },
++        "socks": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/mongoose/node_modules/ms": {
+       "version": "2.1.3",
+       "resolved": "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz",
+diff --git a/package.json b/package.json
+index 44b4632..17ee776 100644
+--- a/package.json
++++ b/package.json
+@@ -65,8 +65,8 @@
+     "lastfm": "^0.9.4",
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.20",
+-    "mongodb": "^7.2.0",
+-    "mongoose": "^9.6.3",
++    "mongodb": "^7.3.0",
++    "mongoose": "^9.7.0",
+     "morgan": "^1.11.0",
+     "multer": "^2.1.1",
+     "nodemailer": "^8.0.10",
+-- 
+2.53.0
+

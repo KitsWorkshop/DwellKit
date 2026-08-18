@@ -1,0 +1,32 @@
+From c1d1bc39825b6e846d0f39cf8c6233a7c733c43d Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <YasharF.Git1@ydftech.com>
+Date: Tue, 21 Jul 2026 19:53:24 -0700
+Subject: [PATCH 174/200] chore: remove c8+12.0.0.patch - no longer needed
+
+---
+ patches/c8+12.0.0.patch | 13 -------------
+ 1 file changed, 13 deletions(-)
+ delete mode 100644 patches/c8+12.0.0.patch
+
+diff --git a/patches/c8+12.0.0.patch b/patches/c8+12.0.0.patch
+deleted file mode 100644
+index dc63c7c..0000000
+--- a/patches/c8+12.0.0.patch
++++ /dev/null
+@@ -1,13 +0,0 @@
+-diff --git a/node_modules/c8/lib/parse-args.js b/node_modules/c8/lib/parse-args.js
+-index 84ff8e3..a448399 100644
+---- a/node_modules/c8/lib/parse-args.js
+-+++ b/node_modules/c8/lib/parse-args.js
+-@@ -2,7 +2,7 @@ const defaultExclude = require('@istanbuljs/schema/default-exclude')
+- const defaultExtension = require('@istanbuljs/schema/default-extension')
+- const findUp = require('find-up')
+- const { readFileSync } = require('fs')
+--const Yargs = require('yargs/yargs')
+-+const Yargs = require('yargs')
+- const { applyExtends } = require('yargs/helpers')
+- const parser = require('yargs-parser')
+- const { resolve } = require('path')
+-- 
+2.53.0
+

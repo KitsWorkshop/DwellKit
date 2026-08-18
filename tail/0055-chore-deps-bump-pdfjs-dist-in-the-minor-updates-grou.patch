@@ -1,0 +1,78 @@
+From 1649283dda3c94b525434d3a66c90a2b4ab5d5a8 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Mon, 30 Mar 2026 14:36:42 +0000
+Subject: [PATCH 054/200] chore(deps): bump pdfjs-dist in the minor-updates
+ group (#1596)
+
+Bumps the minor-updates group with 1 update: [pdfjs-dist](https://github.com/mozilla/pdf.js).
+
+
+Updates `pdfjs-dist` from 5.5.207 to 5.6.205
+- [Release notes](https://github.com/mozilla/pdf.js/releases)
+- [Commits](https://github.com/mozilla/pdf.js/compare/v5.5.207...v5.6.205)
+
+---
+updated-dependencies:
+- dependency-name: pdfjs-dist
+  dependency-version: 5.6.205
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: minor-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 10 +++++-----
+ package.json      |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index b23e548..e688395 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -63,7 +63,7 @@
+         "passport-oauth2-refresh": "^2.2.0",
+         "passport-steam-openid": "^1.1.9",
+         "patch-package": "^8.0.1",
+-        "pdfjs-dist": "^5.5.207",
++        "pdfjs-dist": "^5.6.205",
+         "pug": "^3.0.4",
+         "qr": "^0.5.5",
+         "sass": "^1.98.0",
+@@ -7783,15 +7783,15 @@
+       "integrity": "sha512-KG8UEiEVkR3wGEb4m5yZkVCzigAD+cVEJck2CzYZO37ZGJfctvVptVO192MwrtPhzONn6go8ylnOdMhKqi4nfg=="
+     },
+     "node_modules/pdfjs-dist": {
+-      "version": "5.5.207",
+-      "resolved": "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-5.5.207.tgz",
+-      "integrity": "sha512-WMqqw06w1vUt9ZfT0gOFhMf3wHsWhaCrxGrckGs5Cci6ybDW87IvPaOd2pnBwT6BJuP/CzXDZxjFgmSULLdsdw==",
++      "version": "5.6.205",
++      "resolved": "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-5.6.205.tgz",
++      "integrity": "sha512-tlUj+2IDa7G1SbvBNN74UHRLJybZDWYom+k6p5KIZl7huBvsA4APi6mKL+zCxd3tLjN5hOOEE9Tv7VdzO88pfg==",
+       "license": "Apache-2.0",
+       "engines": {
+         "node": ">=20.19.0 || >=22.13.0 || >=24"
+       },
+       "optionalDependencies": {
+-        "@napi-rs/canvas": "^0.1.95",
++        "@napi-rs/canvas": "^0.1.96",
+         "node-readable-to-web-readable-stream": "^0.4.2"
+       }
+     },
+diff --git a/package.json b/package.json
+index cdcc570..14784e4 100644
+--- a/package.json
++++ b/package.json
+@@ -82,7 +82,7 @@
+     "passport-oauth2-refresh": "^2.2.0",
+     "passport-steam-openid": "^1.1.9",
+     "patch-package": "^8.0.1",
+-    "pdfjs-dist": "^5.5.207",
++    "pdfjs-dist": "^5.6.205",
+     "pug": "^3.0.4",
+     "qr": "^0.5.5",
+     "sass": "^1.98.0",
+-- 
+2.53.0
+

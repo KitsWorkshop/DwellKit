@@ -1,0 +1,72 @@
+From a9aa23de1982f73b7635f2344e2f8822cd8baf64 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Fri, 3 Apr 2026 13:29:24 +0000
+Subject: [PATCH 059/200] chore(deps): bump validator in the patch-updates
+ group (#1603)
+
+Bumps the patch-updates group with 1 update: [validator](https://github.com/validatorjs/validator.js).
+
+
+Updates `validator` from 13.15.26 to 13.15.35
+- [Release notes](https://github.com/validatorjs/validator.js/releases)
+- [Changelog](https://github.com/validatorjs/validator.js/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/validatorjs/validator.js/compare/13.15.26...13.15.35)
+
+---
+updated-dependencies:
+- dependency-name: validator
+  dependency-version: 13.15.35
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 8 ++++----
+ package.json      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index db24335..6182cbc 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -70,7 +70,7 @@
+         "stripe": "^21.0.1",
+         "twilio": "^5.13.1",
+         "twitch-passport": "^1.0.6",
+-        "validator": "^13.15.26"
++        "validator": "^13.15.35"
+       },
+       "devDependencies": {
+         "@eslint/js": "^10.0.1",
+@@ -9476,9 +9476,9 @@
+       }
+     },
+     "node_modules/validator": {
+-      "version": "13.15.26",
+-      "resolved": "https://registry.npmjs.org/validator/-/validator-13.15.26.tgz",
+-      "integrity": "sha512-spH26xU080ydGggxRyR1Yhcbgx+j3y5jbNXk/8L+iRvdIEQ4uTRH2Sgf2dokud6Q4oAtsbNvJ1Ft+9xmm6IZcA==",
++      "version": "13.15.35",
++      "resolved": "https://registry.npmjs.org/validator/-/validator-13.15.35.tgz",
++      "integrity": "sha512-TQ5pAGhd5whStmqWvYF4OjQROlmv9SMFVt37qoCBdqRffuuklWYQlCNnEs2ZaIBD1kZRNnikiZOS1eqgkar0iw==",
+       "license": "MIT",
+       "engines": {
+         "node": ">= 0.10"
+diff --git a/package.json b/package.json
+index 7e5367f..384608d 100644
+--- a/package.json
++++ b/package.json
+@@ -89,7 +89,7 @@
+     "stripe": "^21.0.1",
+     "twilio": "^5.13.1",
+     "twitch-passport": "^1.0.6",
+-    "validator": "^13.15.26"
++    "validator": "^13.15.35"
+   },
+   "devDependencies": {
+     "@eslint/js": "^10.0.1",
+-- 
+2.53.0
+

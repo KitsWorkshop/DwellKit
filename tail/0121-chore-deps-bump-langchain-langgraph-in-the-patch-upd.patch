@@ -1,0 +1,90 @@
+From d88cb5c58f9e49985f1421d7a82242b41cdcc2f6 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Mon, 8 Jun 2026 13:34:07 +0000
+Subject: [PATCH 120/200] chore(deps): bump @langchain/langgraph in the
+ patch-updates group (#1674)
+
+Bumps the patch-updates group with 1 update: [@langchain/langgraph](https://github.com/langchain-ai/langgraphjs/tree/HEAD/libs/langgraph-core).
+
+
+Updates `@langchain/langgraph` from 1.3.5 to 1.3.6
+- [Release notes](https://github.com/langchain-ai/langgraphjs/releases)
+- [Changelog](https://github.com/langchain-ai/langgraphjs/blob/main/libs/langgraph-core/CHANGELOG.md)
+- [Commits](https://github.com/langchain-ai/langgraphjs/commits/@langchain/langgraph@1.3.6/libs/langgraph-core)
+
+---
+updated-dependencies:
+- dependency-name: "@langchain/langgraph"
+  dependency-version: 1.3.6
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 16 ++++++++--------
+ package.json      |  2 +-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 9c0dec5..eb16487 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -17,7 +17,7 @@
+         "@keyv/mongo": "^3.1.0",
+         "@langchain/core": "^1.1.48",
+         "@langchain/groq": "^1.2.1",
+-        "@langchain/langgraph": "^1.3.5",
++        "@langchain/langgraph": "^1.3.6",
+         "@langchain/langgraph-checkpoint-mongodb": "^1.3.3",
+         "@langchain/mongodb": "^1.2.1",
+         "@langchain/textsplitters": "^1.0.1",
+@@ -681,13 +681,13 @@
+       }
+     },
+     "node_modules/@langchain/langgraph": {
+-      "version": "1.3.5",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.3.5.tgz",
+-      "integrity": "sha512-4LXO2VP+wNQTJlUhqr7PdsWLC7z2RF3CkfMq6WqYYWml1NQjnRvYddlVlviFtxs/DAVwlTaChx4QCa99BD8Hqg==",
++      "version": "1.3.6",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.3.6.tgz",
++      "integrity": "sha512-OlpIhaMYs2IlN5hCGUMF9B/jgVacLK5nYbwri1AQatB+CcFIk1xVi9jHcD+fkAtn+7ExFbwiOAAdhuGeWQA9BA==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph-checkpoint": "^1.0.4",
+-        "@langchain/langgraph-sdk": "~1.9.16",
++        "@langchain/langgraph-sdk": "~1.9.17",
+         "@langchain/protocol": "^0.0.16",
+         "@standard-schema/spec": "1.1.0",
+         "uuid": "^14.0.0"
+@@ -812,9 +812,9 @@
+       }
+     },
+     "node_modules/@langchain/langgraph-sdk": {
+-      "version": "1.9.16",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph-sdk/-/langgraph-sdk-1.9.16.tgz",
+-      "integrity": "sha512-wshd/aD3b32164a1oAuBCkORkD9jIYngluTozZJPUEXiubHG2blLk5pfxhtpcKem8AYyrC74zT05+OA1Vo8kfA==",
++      "version": "1.9.18",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph-sdk/-/langgraph-sdk-1.9.18.tgz",
++      "integrity": "sha512-EQLlop/GLlm52Rii06oZDv1bPvrWARnDuzSY6in4d1gnZX2KSQvxajeZH8GYfMjapDVhbo324DRYJgL9euo2fg==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/protocol": "^0.0.16",
+diff --git a/package.json b/package.json
+index 457dec4..154980c 100644
+--- a/package.json
++++ b/package.json
+@@ -36,7 +36,7 @@
+     "@keyv/mongo": "^3.1.0",
+     "@langchain/core": "^1.1.48",
+     "@langchain/groq": "^1.2.1",
+-    "@langchain/langgraph": "^1.3.5",
++    "@langchain/langgraph": "^1.3.6",
+     "@langchain/langgraph-checkpoint-mongodb": "^1.3.3",
+     "@langchain/mongodb": "^1.2.1",
+     "@langchain/textsplitters": "^1.0.1",
+-- 
+2.53.0
+

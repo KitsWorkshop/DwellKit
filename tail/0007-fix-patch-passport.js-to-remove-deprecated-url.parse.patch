@@ -1,0 +1,186 @@
+From f07093fd7681171d6143f72ece4190e7855b1488 Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <YasharF.Git1@ydftech.com>
+Date: Tue, 24 Feb 2026 18:59:38 -0800
+Subject: [PATCH 007/200] fix: patch passport.js to remove deprecated
+ url.parse()
+
+---
+ patches/passport-oauth1+1.3.0.patch | 64 ++++++++++++++++++++++
+ patches/passport-oauth2+1.8.0.patch | 85 +++++++++++++++++++++++++++--
+ 2 files changed, 144 insertions(+), 5 deletions(-)
+ create mode 100644 patches/passport-oauth1+1.3.0.patch
+
+diff --git a/patches/passport-oauth1+1.3.0.patch b/patches/passport-oauth1+1.3.0.patch
+new file mode 100644
+index 0000000..7cce958
+--- /dev/null
++++ b/patches/passport-oauth1+1.3.0.patch
+@@ -0,0 +1,64 @@
++diff --git a/node_modules/passport-oauth1/lib/strategy.js b/node_modules/passport-oauth1/lib/strategy.js
++index 337c7e8..f762513 100644
++--- a/node_modules/passport-oauth1/lib/strategy.js
+++++ b/node_modules/passport-oauth1/lib/strategy.js
++@@ -1,6 +1,5 @@
++ // Load modules.
++ var passport = require('passport-strategy')
++-  , url = require('url')
++   , util = require('util')
++   , utils = require('./utils')
++   , OAuth = require('oauth').OAuth
++@@ -239,11 +238,10 @@ OAuthStrategy.prototype.authenticate = function(req, options) {
++     var params = this.requestTokenParams(options);
++     var callbackURL = options.callbackURL || this._callbackURL;
++     if (callbackURL) {
++-      var parsed = url.parse(callbackURL);
++-      if (!parsed.protocol) {
+++      if (!/^[a-zA-Z][a-zA-Z0-9+\-.]*:/.test(callbackURL)) {
++         // The callback URL is relative, resolve a fully qualified URL from the
++         // URL of the originating request.
++-        callbackURL = url.resolve(utils.originalURL(req, { proxy: this._trustProxy }), callbackURL);
+++        callbackURL = new URL(callbackURL, utils.originalURL(req, { proxy: this._trustProxy })).href;
++       }
++     }
++     params.oauth_callback = callbackURL;
++@@ -261,18 +259,32 @@ OAuthStrategy.prototype.authenticate = function(req, options) {
++       function stored(err) {
++         if (err) { return self.error(err); }
++ 
++-        var parsed = url.parse(self._userAuthorizationURL, true);
++-        parsed.query.oauth_token = token;
+++        var parsed = new URL(self._userAuthorizationURL);
+++        parsed.searchParams.set('oauth_token', token);
++         if (!params.oauth_callback_confirmed && callbackURL) {
++           // NOTE: If oauth_callback_confirmed=true is not present when issuing a
++           //       request token, the server does not support OAuth 1.0a.  In this
++           //       circumstance, `oauth_callback` is passed when redirecting the
++           //       user to the service provider.
++-          parsed.query.oauth_callback = callbackURL;
+++          parsed.searchParams.set('oauth_callback', callbackURL);
++         }
++-        utils.merge(parsed.query, self.userAuthorizationParams(options));
++-        delete parsed.search;
++-        var location = url.format(parsed);
+++        var authParams = self.userAuthorizationParams(options) || {};
+++        for (var key in authParams) {
+++          if (!Object.prototype.hasOwnProperty.call(authParams, key)) { continue; }
+++          var value = authParams[key];
+++          if (value === null || typeof value === 'undefined') { continue; }
+++          if (Array.isArray(value)) {
+++            parsed.searchParams.delete(key);
+++            for (var i = 0; i < value.length; i++) {
+++              if (value[i] === null || typeof value[i] === 'undefined') { continue; }
+++              parsed.searchParams.append(key, String(value[i]));
+++            }
+++          } else {
+++            parsed.searchParams.set(key, String(value));
+++          }
+++        }
+++        parsed.search = parsed.search.replace(/\+/g, '%20');
+++        var location = parsed.href;
++         self.redirect(location);
++       }
++ 
+diff --git a/patches/passport-oauth2+1.8.0.patch b/patches/passport-oauth2+1.8.0.patch
+index d0536e7..4ece263 100644
+--- a/patches/passport-oauth2+1.8.0.patch
++++ b/patches/passport-oauth2+1.8.0.patch
+@@ -1,16 +1,91 @@
+ diff --git a/node_modules/passport-oauth2/lib/strategy.js b/node_modules/passport-oauth2/lib/strategy.js
+-index 8575b72..3cfd4d4
++index 8575b72..76c798f 100644
+ --- a/node_modules/passport-oauth2/lib/strategy.js
+ +++ b/node_modules/passport-oauth2/lib/strategy.js
+-@@ -174,7 +174,10 @@ OAuth2Strategy.prototype.authenticate = function(req, options) {
++@@ -1,7 +1,5 @@
++ // Load modules.
++ var passport = require('passport-strategy')
++-  , url = require('url')
++-  , uid = require('uid2')
++   , crypto = require('crypto')
++   , base64url = require('base64url')
++   , util = require('util')
++@@ -100,7 +98,7 @@ function OAuth2Strategy(options, verify) {
++   this._scope = options.scope;
++   this._scopeSeparator = options.scopeSeparator || ' ';
++   this._pkceMethod = (options.pkce === true) ? 'S256' : options.pkce;
++-  this._key = options.sessionKey || ('oauth2:' + url.parse(options.authorizationURL).hostname);
+++  this._key = options.sessionKey || ('oauth2:' + new URL(options.authorizationURL).hostname);
++ 
++   if (options.store && typeof options.store == 'object') {
++     this._stateStore = options.store;
++@@ -141,11 +139,10 @@ OAuth2Strategy.prototype.authenticate = function(req, options) {
++ 
++   var callbackURL = options.callbackURL || this._callbackURL;
++   if (callbackURL) {
++-    var parsed = url.parse(callbackURL);
++-    if (!parsed.protocol) {
+++    if (!/^[a-zA-Z][a-zA-Z0-9+\-.]*:/.test(callbackURL)) {
++       // The callback URL is relative, resolve a fully qualified URL from the
++       // URL of the originating request.
++-      callbackURL = url.resolve(utils.originalURL(req, { proxy: this._trustProxy }), callbackURL);
+++      callbackURL = new URL(callbackURL, utils.originalURL(req, { proxy: this._trustProxy })).href;
++     }
++   }
++ 
++@@ -174,7 +171,9 @@ OAuth2Strategy.prototype.authenticate = function(req, options) {
+  
+        self._oauth2.getOAuthAccessToken(code, params,
+          function(err, accessToken, refreshToken, params) {
+ -          if (err) { return self.error(self._createOAuthError('Failed to obtain access token', err)); }
+ +          if (err) {
+-+              console.warn("Failed to obtain access token: ", err);
+-+              return self.error(self._createOAuthError('Failed to obtain access token', err));
+-+            }
+++            return self.error(self._createOAuthError('Failed to obtain access token', err));
+++          }
+            if (!accessToken) { return self.error(new Error('Failed to obtain access token')); }
+  
+            self._loadUserProfile(accessToken, function(err, profile) {
++@@ -266,22 +265,34 @@ OAuth2Strategy.prototype.authenticate = function(req, options) {
++       //       state store.
++       params.state = state;
++       
++-      var parsed = url.parse(this._oauth2._authorizeUrl, true);
++-      utils.merge(parsed.query, params);
++-      parsed.query['client_id'] = this._oauth2._clientId;
++-      delete parsed.search;
++-      var location = url.format(parsed);
+++      var parsed = new URL(this._oauth2._authorizeUrl);
+++      var query = {};
+++      parsed.searchParams.forEach(function(value, key) {query[key] = value;});
+++      utils.merge(query, params);
+++      query['client_id'] = this._oauth2._clientId;
+++      parsed.search = '';
+++      Object.keys(query).forEach(function(key) {parsed.searchParams.set(key, query[key]);});
+++      parsed.search = parsed.search.replace(/\+/g, '%20');
+++      var location = parsed.href;
++       this.redirect(location);
++     } else {
++       function stored(err, state) {
++         if (err) { return self.error(err); }
++ 
++         if (state) { params.state = state; }
++-        var parsed = url.parse(self._oauth2._authorizeUrl, true);
++-        utils.merge(parsed.query, params);
++-        parsed.query['client_id'] = self._oauth2._clientId;
++-        delete parsed.search;
++-        var location = url.format(parsed);
+++        var parsed = new URL(self._oauth2._authorizeUrl);
+++        var query = {};
+++        parsed.searchParams.forEach(function(value, key) {
+++          query[key] = value;
+++        });
+++        utils.merge(query, params);
+++        query['client_id'] = self._oauth2._clientId;
+++        parsed.search = '';
+++        Object.keys(query).forEach(function(key) {
+++          parsed.searchParams.set(key, query[key]);
+++        });
+++        parsed.search = parsed.search.replace(/\+/g, '%20');
+++        var location = parsed.href;
++         self.redirect(location);
++       }
++ 
+-- 
+2.53.0
+

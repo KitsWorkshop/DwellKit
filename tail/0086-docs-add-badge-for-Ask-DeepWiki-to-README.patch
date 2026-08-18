@@ -1,0 +1,24 @@
+From 8aa3139fb4f1ed71c36242c657ea11e5946157eb Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <6448697+YasharF@users.noreply.github.com>
+Date: Wed, 29 Apr 2026 10:14:54 -0700
+Subject: [PATCH 085/200] docs: add badge for Ask DeepWiki to README
+
+---
+ README.md | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/README.md b/README.md
+index 514fd94..1565853 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,7 @@
+ ![](https://lh4.googleusercontent.com/-PVw-ZUM9vV8/UuWeH51os0I/AAAAAAAAD6M/0Ikg7viJftQ/w1286-h566-no/hackathon-starter-logo.jpg)
+ Hackathon Starter
+ =======================
++[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/sahat/hackathon-starter)
+ 
+ **Live Demo**: [Link](https://hackathon-starter-1.ydftech.com)
+ 
+-- 
+2.53.0
+

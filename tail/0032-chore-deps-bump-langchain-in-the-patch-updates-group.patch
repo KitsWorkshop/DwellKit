@@ -1,0 +1,71 @@
+From 02fed87bfba327c0f00162ca70b4ba20415b9abb Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Fri, 13 Mar 2026 13:29:00 +0000
+Subject: [PATCH 032/200] chore(deps): bump langchain in the patch-updates
+ group (#1575)
+
+Bumps the patch-updates group with 1 update: [langchain](https://github.com/langchain-ai/langchainjs).
+
+
+Updates `langchain` from 1.2.31 to 1.2.32
+- [Release notes](https://github.com/langchain-ai/langchainjs/releases)
+- [Commits](https://github.com/langchain-ai/langchainjs/compare/langchain@1.2.31...langchain@1.2.32)
+
+---
+updated-dependencies:
+- dependency-name: langchain
+  dependency-version: 1.2.32
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 8 ++++----
+ package.json      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 325be31..b257ea1 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -42,7 +42,7 @@
+         "express-session": "^1.19.0",
+         "jquery": "^4.0.0",
+         "keyv": "^5.6.0",
+-        "langchain": "^1.2.31",
++        "langchain": "^1.2.32",
+         "lastfm": "^0.9.4",
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.20",
+@@ -6293,9 +6293,9 @@
+       }
+     },
+     "node_modules/langchain": {
+-      "version": "1.2.31",
+-      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.2.31.tgz",
+-      "integrity": "sha512-dKafIQKyNUoMlZX7NaEaDt9pqofZbsF2UoJkPrybC99vV9QbUEiLKT0yGdixA3qFHXmsFdJWpu4n4a+B87Q2Zw==",
++      "version": "1.2.32",
++      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.2.32.tgz",
++      "integrity": "sha512-LwT0+ClCx9dLDSt8SQpZAdOHLlmcbPJUvUhFgS18boGfKvUFbXom8+xN20wiHMktwB3RB1CRyDLPRMP+tMabMA==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph": "^1.1.2",
+diff --git a/package.json b/package.json
+index f9b6990..4ec6019 100644
+--- a/package.json
++++ b/package.json
+@@ -61,7 +61,7 @@
+     "express-session": "^1.19.0",
+     "jquery": "^4.0.0",
+     "keyv": "^5.6.0",
+-    "langchain": "^1.2.31",
++    "langchain": "^1.2.32",
+     "lastfm": "^0.9.4",
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.20",
+-- 
+2.53.0
+

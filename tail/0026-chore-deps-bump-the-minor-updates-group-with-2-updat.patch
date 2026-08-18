@@ -1,0 +1,95 @@
+From 6c0f3c410d93827b8455562bf0a15b4c727fda79 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Tue, 10 Mar 2026 13:30:12 +0000
+Subject: [PATCH 026/200] chore(deps): bump the minor-updates group with 2
+ updates (#1569)
+
+Bumps the minor-updates group with 2 updates: [@simplewebauthn/browser](https://github.com/MasterKale/SimpleWebAuthn/tree/HEAD/packages/browser) and [@simplewebauthn/server](https://github.com/MasterKale/SimpleWebAuthn/tree/HEAD/packages/server).
+
+
+Updates `@simplewebauthn/browser` from 13.2.2 to 13.3.0
+- [Release notes](https://github.com/MasterKale/SimpleWebAuthn/releases)
+- [Changelog](https://github.com/MasterKale/SimpleWebAuthn/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/MasterKale/SimpleWebAuthn/commits/v13.3.0/packages/browser)
+
+Updates `@simplewebauthn/server` from 13.2.3 to 13.3.0
+- [Release notes](https://github.com/MasterKale/SimpleWebAuthn/releases)
+- [Changelog](https://github.com/MasterKale/SimpleWebAuthn/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/MasterKale/SimpleWebAuthn/commits/v13.3.0/packages/server)
+
+---
+updated-dependencies:
+- dependency-name: "@simplewebauthn/browser"
+  dependency-version: 13.3.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: minor-updates
+- dependency-name: "@simplewebauthn/server"
+  dependency-version: 13.3.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: minor-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 16 ++++++++--------
+ package.json      |  4 ++--
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index de5b7e3..597f5f5 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -27,8 +27,8 @@
+         "@octokit/rest": "^22.0.1",
+         "@passport-js/passport-twitter": "^1.0.10",
+         "@popperjs/core": "^2.11.8",
+-        "@simplewebauthn/browser": "^13.2.2",
+-        "@simplewebauthn/server": "^13.2.3",
++        "@simplewebauthn/browser": "^13.3.0",
++        "@simplewebauthn/server": "^13.3.0",
+         "bootstrap": "^5.3.8",
+         "bootstrap-social": "github:SeattleDevs/bootstrap-social",
+         "bowser": "^2.14.1",
+@@ -2815,15 +2815,15 @@
+       }
+     },
+     "node_modules/@simplewebauthn/browser": {
+-      "version": "13.2.2",
+-      "resolved": "https://registry.npmjs.org/@simplewebauthn/browser/-/browser-13.2.2.tgz",
+-      "integrity": "sha512-FNW1oLQpTJyqG5kkDg5ZsotvWgmBaC6jCHR7Ej0qUNep36Wl9tj2eZu7J5rP+uhXgHaLk+QQ3lqcw2vS5MX1IA==",
++      "version": "13.3.0",
++      "resolved": "https://registry.npmjs.org/@simplewebauthn/browser/-/browser-13.3.0.tgz",
++      "integrity": "sha512-BE/UWv6FOToAdVk0EokzkqQQDOWtNydYlY6+OrmiZ5SCNmb41VehttboTetUM3T/fr6EAFYVXjz4My2wg230rQ==",
+       "license": "MIT"
+     },
+     "node_modules/@simplewebauthn/server": {
+-      "version": "13.2.3",
+-      "resolved": "https://registry.npmjs.org/@simplewebauthn/server/-/server-13.2.3.tgz",
+-      "integrity": "sha512-ZhcVBOw63birYx9jVfbhK6rTehckVes8PeWV324zpmdxr0BUfylospwMzcrxrdMcOi48MHWj2LCA+S528LnGvg==",
++      "version": "13.3.0",
++      "resolved": "https://registry.npmjs.org/@simplewebauthn/server/-/server-13.3.0.tgz",
++      "integrity": "sha512-MLHYFrYG8/wK2i+86XMhiecK72nMaHKKt4bo+7Q1TbuG9iGjlSdfkPWKO5ZFE/BX+ygCJ7pr8H/AJeyAj1EaTQ==",
+       "license": "MIT",
+       "dependencies": {
+         "@hexagon/base64": "^1.1.27",
+diff --git a/package.json b/package.json
+index e9fb864..df894e6 100644
+--- a/package.json
++++ b/package.json
+@@ -46,8 +46,8 @@
+     "@octokit/rest": "^22.0.1",
+     "@passport-js/passport-twitter": "^1.0.10",
+     "@popperjs/core": "^2.11.8",
+-    "@simplewebauthn/browser": "^13.2.2",
+-    "@simplewebauthn/server": "^13.2.3",
++    "@simplewebauthn/browser": "^13.3.0",
++    "@simplewebauthn/server": "^13.3.0",
+     "bootstrap": "^5.3.8",
+     "bootstrap-social": "github:SeattleDevs/bootstrap-social",
+     "bowser": "^2.14.1",
+-- 
+2.53.0
+

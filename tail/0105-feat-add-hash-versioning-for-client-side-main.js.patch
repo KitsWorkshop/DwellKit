@@ -1,0 +1,52 @@
+From 8aa0d99a39c0bfa1b3f8167716662ec59fdd780e Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <YasharF.Git1@ydftech.com>
+Date: Sat, 23 May 2026 12:47:29 -0700
+Subject: [PATCH 104/200] feat: add hash versioning for client side main.js
+
+---
+ app.js           | 8 ++++++++
+ views/layout.pug | 2 +-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/app.js b/app.js
+index c1f146d..df383ea 100644
+--- a/app.js
++++ b/app.js
+@@ -2,6 +2,8 @@
+  * Module dependencies.
+  */
+ const path = require('node:path');
++const crypto = require('node:crypto');
++const fs = require('node:fs');
+ const express = require('express');
+ const compression = require('compression');
+ const session = require('express-session');
+@@ -207,6 +209,12 @@ app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/@simpleweba
+ app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
+ app.use('/image-cache', express.static(path.join(__dirname, 'tmp/image-cache'), { maxAge: 31557600000 }));
+ 
++app.locals.mainJsHash = crypto
++  .createHash('sha256')
++  .update(fs.readFileSync(path.join(__dirname, 'public', 'js', 'main.js')))
++  .digest('hex')
++  .slice(0, 8);
++
+ /**
+  * Analytics IDs needed thru layout.pug; set as express local so we don't have to pass them with each render call
+  */
+diff --git a/views/layout.pug b/views/layout.pug
+index 9ad7737..e371772 100644
+--- a/views/layout.pug
++++ b/views/layout.pug
+@@ -27,7 +27,7 @@ html.h-100(lang='en')
+ 
+     script(src='/js/lib/jquery.min.js')
+     script(src='/js/lib/bootstrap.min.js')
+-    script(src='/js/main.js')
++    script(src='/js/main.js?v=' + mainJsHash)
+     script(src='https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js')
+ 
+     script(type='text/javascript').
+-- 
+2.53.0
+

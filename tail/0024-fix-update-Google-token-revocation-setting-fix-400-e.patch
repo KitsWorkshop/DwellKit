@@ -1,0 +1,28 @@
+From e82c9ec043f16868c6cead8acc97b5350491e328 Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <YasharF.Git1@ydftech.com>
+Date: Fri, 6 Mar 2026 10:18:53 -0800
+Subject: [PATCH 024/200] fix: update Google token revocation setting - fix 400
+ err in logs
+
+---
+ config/passport.js | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/config/passport.js b/config/passport.js
+index bcca468..f510550 100644
+--- a/config/passport.js
++++ b/config/passport.js
+@@ -857,7 +857,9 @@ refresh.use('discord', discordStrategyConfig);
+ const providerRevocationConfig = {
+   google: {
+     revokeURL: 'https://oauth2.googleapis.com/revoke',
+-    authMethod: 'token_only',
++    clientId: process.env.GOOGLE_CLIENT_ID,
++    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
++    authMethod: 'basic',
+   },
+   facebook: {
+     revokeURL: 'https://graph.facebook.com/me/permissions',
+-- 
+2.53.0
+

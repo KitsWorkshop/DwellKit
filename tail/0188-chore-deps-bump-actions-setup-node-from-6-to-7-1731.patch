@@ -1,0 +1,54 @@
+From d20161b9e81e817d38b3633e08349f327b01d974 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Sat, 1 Aug 2026 13:29:08 +0000
+Subject: [PATCH 186/200] chore(deps): bump actions/setup-node from 6 to 7
+ (#1731)
+
+Bumps [actions/setup-node](https://github.com/actions/setup-node) from 6 to 7.
+- [Release notes](https://github.com/actions/setup-node/releases)
+- [Commits](https://github.com/actions/setup-node/compare/v6...v7)
+
+---
+updated-dependencies:
+- dependency-name: actions/setup-node
+  dependency-version: '7'
+  dependency-type: direct:production
+  update-type: version-update:semver-major
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ .github/workflows/build.yml                | 2 +-
+ .github/workflows/dependabot-automerge.yml | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
+index 35e02c7..d11a175 100644
+--- a/.github/workflows/build.yml
++++ b/.github/workflows/build.yml
+@@ -27,7 +27,7 @@ jobs:
+     steps:
+       - uses: actions/checkout@v7
+       - name: Use Node.js ${{ matrix.node-version }}
+-        uses: actions/setup-node@v6
++        uses: actions/setup-node@v7
+         with:
+           node-version: ${{ matrix.node-version }}
+           cache: 'npm'
+diff --git a/.github/workflows/dependabot-automerge.yml b/.github/workflows/dependabot-automerge.yml
+index 16eebed..66bb830 100644
+--- a/.github/workflows/dependabot-automerge.yml
++++ b/.github/workflows/dependabot-automerge.yml
+@@ -47,7 +47,7 @@ jobs:
+           ref: master
+ 
+       - name: Set up Node.js
+-        uses: actions/setup-node@v6
++        uses: actions/setup-node@v7
+         with:
+           node-version: 'lts/*'
+           cache: 'npm'
+-- 
+2.53.0
+

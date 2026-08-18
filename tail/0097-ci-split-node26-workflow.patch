@@ -1,0 +1,93 @@
+From 81be543fb803ee561c9cdf119a5149016fa7a19a Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <YasharF.Git1@ydftech.com>
+Date: Wed, 20 May 2026 13:07:34 -0700
+Subject: [PATCH 096/200] ci: split node26 workflow
+
+---
+ .github/workflows/build-Node26-preview.yml | 53 ++++++++++++++++++++++
+ .github/workflows/build.yml                |  4 +-
+ 2 files changed, 55 insertions(+), 2 deletions(-)
+ create mode 100644 .github/workflows/build-Node26-preview.yml
+
+diff --git a/.github/workflows/build-Node26-preview.yml b/.github/workflows/build-Node26-preview.yml
+new file mode 100644
+index 0000000..5928ad6
+--- /dev/null
++++ b/.github/workflows/build-Node26-preview.yml
+@@ -0,0 +1,53 @@
++name: Node.js 26 Preview CI
++
++on:
++  push:
++    branches: ['master']
++  pull_request:
++    branches: ['master']
++
++permissions:
++  contents: read
++  pull-requests: read
++
++concurrency:
++  group: ${{ github.workflow }}-${{ github.ref }}
++  cancel-in-progress: true
++
++jobs:
++  build:
++    runs-on: ${{ matrix.os }}
++    env:
++      RUN_E2E: ${{ vars.RUN_E2E }} # from repository settings -> Actions -> Variables
++    strategy:
++      matrix:
++        node-version: [26.x]
++        os: [ubuntu-latest, windows-latest]
++    steps:
++      - uses: actions/checkout@v6
++      - name: Use Node.js ${{ matrix.node-version }}
++        uses: actions/setup-node@v6
++        with:
++          node-version: ${{ matrix.node-version }}
++          cache: 'npm'
++      - run: npm install
++      - run: npm run lint-check
++      - run: npm run test
++
++      # For testing in Windows CI, we need to limit the path to exclude the additional executables
++      # that the default github runner has, but are not on a vanilla Windows OS installation.
++      - if: ${{ (env.RUN_E2E == 'true' || github.repository == 'sahat/hackathon-starter') && matrix.os == 'windows-latest' }}
++        env:
++          PATH: 'C:\Windows\System32;C:\Windows'
++        run: npm run test:e2e:replay
++
++        # if not Windows, run normally
++      - if: ${{ (env.RUN_E2E == 'true' || github.repository == 'sahat/hackathon-starter') && matrix.os != 'windows-latest' }}
++        run: npm run test:e2e:replay
++
++      - name: Upload tmp as an artifact (Playwrite artifacts, code coverage report, etc)
++        if: always()
++        uses: actions/upload-artifact@v7
++        with:
++          name: tmp-artifacts-${{ matrix.os }}-${{ github.job }}-${{ github.run_id }}
++          path: tmp/**
+diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
+index 71b3e51..3dedc5f 100644
+--- a/.github/workflows/build.yml
++++ b/.github/workflows/build.yml
+@@ -21,7 +21,7 @@ jobs:
+       RUN_E2E: ${{ vars.RUN_E2E }} # from repository settings -> Actions -> Variables
+     strategy:
+       matrix:
+-        node-version: [24.x, 26.x]
++        node-version: [24.x]
+         os: [ubuntu-latest, windows-latest]
+     steps:
+       - uses: actions/checkout@v6
+@@ -49,5 +49,5 @@ jobs:
+         if: always()
+         uses: actions/upload-artifact@v7
+         with:
+-          name: tmp-artifacts-${{ matrix.os }}-${{ matrix.node-version }}-${{ github.job }}-${{ github.run_id }}
++          name: tmp-artifacts-${{ matrix.os }}-${{ github.job }}-${{ github.run_id }}
+           path: tmp/**
+-- 
+2.53.0
+

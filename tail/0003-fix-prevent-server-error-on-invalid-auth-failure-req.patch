@@ -1,0 +1,67 @@
+From 891ef800482e399bce79f3205008383961df8c08 Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <6448697+YasharF@users.noreply.github.com>
+Date: Tue, 17 Feb 2026 11:38:59 -0800
+Subject: [PATCH 003/200] fix: prevent server error on invalid /auth/failure
+ requests (#1552)
+
+- The /auth/failure route attempted to set the redirect response twice, causing Express to log a server error. The fix returns immediately after the first redirect.
+- Added test cases to verify that GET requests to core routes do not cause unintended server-side errors.
+- Removed the /api test case from app.test.js to keep the tests focused on core application routes, as the /api route is likely to be removed during customization.
+---
+ app.js           |  2 +-
+ test/app.test.js | 22 ++++++++++++++++------
+ 2 files changed, 17 insertions(+), 7 deletions(-)
+
+diff --git a/app.js b/app.js
+index 3cbd91a..fc4afb0 100644
+--- a/app.js
++++ b/app.js
+@@ -320,7 +320,7 @@ app.get('/auth/failure', (req, res) => {
+   const redirectTarget = baseReturnTo || returnTo;
+ 
+   if (!redirectTarget || !isSafeRedirect(redirectTarget) || redirectTarget === req.originalUrl || redirectTarget.startsWith('/auth/')) {
+-    res.redirect('/');
++    return res.redirect('/');
+   }
+   res.redirect(redirectTarget);
+ });
+diff --git a/test/app.test.js b/test/app.test.js
+index 122ff88..5513eba 100644
+--- a/test/app.test.js
++++ b/test/app.test.js
+@@ -46,12 +46,6 @@ describe('GET /forgot', () => {
+   });
+ });
+ 
+-describe('GET /api', () => {
+-  it('should return 200 OK', (done) => {
+-    request(app).get('/api').expect(200, done);
+-  });
+-});
+-
+ describe('GET /contact', () => {
+   it('should return 200 OK', (done) => {
+     request(app).get('/contact').expect(200, done);
+@@ -63,3 +57,19 @@ describe('GET /random-url', () => {
+     request(app).get('/reset').expect(404, done);
+   });
+ });
++
++describe('Other core GET routes do not cause errors', () => {
++  const routes = ['/logout', '/login/2fa', '/login/2fa/totp', '/login/webauthn-start', '/login/verify/testtoken', '/reset/testtoken', '/account', '/account/verify', '/account/verify/testtoken', '/account/2fa/totp/setup', '/account/webauthn/register', '/auth/failure'];
++
++  routes.forEach((route) => {
++    it(`GET ${route}`, async () => {
++      await request(app)
++        .get(route)
++        .expect((res) => {
++          if (res.status >= 500) {
++            throw new Error(`Expected non-5xx status for ${route} but got ${res.status}`);
++          }
++        });
++    });
++  });
++});
+-- 
+2.53.0
+

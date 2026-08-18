@@ -1,0 +1,252 @@
+From 21b0db23eb1e1e11ee25823616818c4128f7ba97 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Fri, 5 Jun 2026 13:29:08 +0000
+Subject: [PATCH 117/200] chore(deps-dev): bump @playwright/test (#1672)
+
+Bumps [@playwright/test](https://github.com/microsoft/playwright) from 1.61.0-alpha-2026-06-05 to 1.61.0-alpha-1780010946000.
+- [Release notes](https://github.com/microsoft/playwright/releases)
+- [Commits](https://github.com/microsoft/playwright/commits)
+
+---
+updated-dependencies:
+- dependency-name: "@playwright/test"
+  dependency-version: 1.61.0-alpha-1780010946000
+  dependency-type: direct:development
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 69 +++++++++--------------------------------------
+ package.json      |  2 +-
+ 2 files changed, 13 insertions(+), 58 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 415247c..623a9b7 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -74,7 +74,7 @@
+       },
+       "devDependencies": {
+         "@eslint/js": "^10.0.1",
+-        "@playwright/test": "^1.61.0-alpha-2026-06-05",
++        "@playwright/test": "^1.61.0-alpha-1780010946000",
+         "@prettier/plugin-pug": "^3.4.2",
+         "c8": "^11.0.0",
+         "chai": "^6.2.2",
+@@ -1135,9 +1135,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1158,9 +1155,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1181,9 +1175,6 @@
+       "cpu": [
+         "riscv64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1204,9 +1195,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1227,9 +1215,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1439,9 +1424,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1458,9 +1440,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1477,9 +1456,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1496,9 +1472,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1873,9 +1846,6 @@
+       "cpu": [
+         "arm"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1896,9 +1866,6 @@
+       "cpu": [
+         "arm"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1919,9 +1886,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1942,9 +1906,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1965,9 +1926,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1988,9 +1946,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -2284,13 +2239,13 @@
+       }
+     },
+     "node_modules/@playwright/test": {
+-      "version": "1.61.0-alpha-2026-06-05",
+-      "resolved": "https://registry.npmjs.org/@playwright/test/-/test-1.61.0-alpha-2026-06-05.tgz",
+-      "integrity": "sha512-pzjxsDPeNyF79Z40mxfChL8trXgU2aQVB+9kZQ1eRJixUNF/t9KZycHU9gWGa/leL+bRv+VUxz9taF0Vll5fyQ==",
++      "version": "1.61.0-alpha-1780010946000",
++      "resolved": "https://registry.npmjs.org/@playwright/test/-/test-1.61.0-alpha-1780010946000.tgz",
++      "integrity": "sha512-gaslepOWrG1jds3/dTAAzyzl89Ogv61CqMeHx4o10BpYmkvUw5m6e9wBPB26G2N1CYkExAjT2DsLKh/dwynWKg==",
+       "dev": true,
+       "license": "Apache-2.0",
+       "dependencies": {
+-        "playwright": "1.61.0-alpha-2026-06-05"
++        "playwright": "1.61.0-alpha-1780010946000"
+       },
+       "bin": {
+         "playwright": "cli.js"
+@@ -6972,13 +6927,13 @@
+       }
+     },
+     "node_modules/playwright": {
+-      "version": "1.61.0-alpha-2026-06-05",
+-      "resolved": "https://registry.npmjs.org/playwright/-/playwright-1.61.0-alpha-2026-06-05.tgz",
+-      "integrity": "sha512-d/imuDyEg9wvRCgp9ZsGfDY16FLMkYzsIwglmsjqnCxhcmjSNacdySrh/uCYN0kqFpr44b+ZMk7pMGhw0GLxPg==",
++      "version": "1.61.0-alpha-1780010946000",
++      "resolved": "https://registry.npmjs.org/playwright/-/playwright-1.61.0-alpha-1780010946000.tgz",
++      "integrity": "sha512-T3N06lJ4ZCS4Ey9c90xOSW0PiRX34EEp58I/IHUePOV/88s8rAGb8k461TuP0DttTuKFv0+yztoDtQ8pFTUZzw==",
+       "dev": true,
+       "license": "Apache-2.0",
+       "dependencies": {
+-        "playwright-core": "1.61.0-alpha-2026-06-05"
++        "playwright-core": "1.61.0-alpha-1780010946000"
+       },
+       "bin": {
+         "playwright": "cli.js"
+@@ -6991,9 +6946,9 @@
+       }
+     },
+     "node_modules/playwright-core": {
+-      "version": "1.61.0-alpha-2026-06-05",
+-      "resolved": "https://registry.npmjs.org/playwright-core/-/playwright-core-1.61.0-alpha-2026-06-05.tgz",
+-      "integrity": "sha512-Qm9LQmcVu8QD2gjGepNdYBfUvuuQulcIaK6vuzbeKGLCd+z20DGMTWFPjdAnzAiEJbAXFRGz88sohc+ArDaJOQ==",
++      "version": "1.61.0-alpha-1780010946000",
++      "resolved": "https://registry.npmjs.org/playwright-core/-/playwright-core-1.61.0-alpha-1780010946000.tgz",
++      "integrity": "sha512-kR1p1igFEPH6eQhdBWaXD0y7qx82fwo59Sid8q4JHorelYzq7+vEIuakQzWznwgsFiH/3NyGYOWUxlK8oEbhNQ==",
+       "dev": true,
+       "license": "Apache-2.0",
+       "bin": {
+diff --git a/package.json b/package.json
+index 9d8c340..dba0c18 100644
+--- a/package.json
++++ b/package.json
+@@ -93,7 +93,7 @@
+   },
+   "devDependencies": {
+     "@eslint/js": "^10.0.1",
+-    "@playwright/test": "^1.61.0-alpha-2026-06-05",
++    "@playwright/test": "^1.61.0-alpha-1780010946000",
+     "@prettier/plugin-pug": "^3.4.2",
+     "c8": "^11.0.0",
+     "chai": "^6.2.2",
+-- 
+2.53.0
+

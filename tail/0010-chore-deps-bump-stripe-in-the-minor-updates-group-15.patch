@@ -1,0 +1,72 @@
+From 82f0abf25f6b47f62960bf66e869cf73571a10ee Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Thu, 26 Feb 2026 11:08:01 +0000
+Subject: [PATCH 010/200] chore(deps): bump stripe in the minor-updates group
+ (#1555)
+
+Bumps the minor-updates group with 1 update: [stripe](https://github.com/stripe/stripe-node).
+
+
+Updates `stripe` from 20.3.1 to 20.4.0
+- [Release notes](https://github.com/stripe/stripe-node/releases)
+- [Changelog](https://github.com/stripe/stripe-node/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/stripe/stripe-node/compare/v20.3.1...v20.4.0)
+
+---
+updated-dependencies:
+- dependency-name: stripe
+  dependency-version: 20.4.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: minor-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 8 ++++----
+ package.json      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index b81b506..5faa8a8 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -65,7 +65,7 @@
+         "pdfjs-dist": "^5.4.624",
+         "pug": "^3.0.3",
+         "sass": "^1.97.3",
+-        "stripe": "^20.3.1",
++        "stripe": "^20.4.0",
+         "twilio": "^5.12.2",
+         "twitch-passport": "^1.0.6",
+         "validator": "^13.15.26"
+@@ -8706,9 +8706,9 @@
+       }
+     },
+     "node_modules/stripe": {
+-      "version": "20.3.1",
+-      "resolved": "https://registry.npmjs.org/stripe/-/stripe-20.3.1.tgz",
+-      "integrity": "sha512-k990yOT5G5rhX3XluRPw5Y8RLdJDW4dzQ29wWT66piHrbnM2KyamJ1dKgPsw4HzGHRWjDiSSdcI2WdxQUPV3aQ==",
++      "version": "20.4.0",
++      "resolved": "https://registry.npmjs.org/stripe/-/stripe-20.4.0.tgz",
++      "integrity": "sha512-F/aN1IQ9vHmlyLNi3DkiIbyzQb6gyBG0uYFd/VrEVQSc9BLtlgknPUx0EvzZdBMRLFuRaPFIFd7Mxwtg7Pbwzw==",
+       "license": "MIT",
+       "engines": {
+         "node": ">=16"
+diff --git a/package.json b/package.json
+index b1ecac2..1e3a8ed 100644
+--- a/package.json
++++ b/package.json
+@@ -84,7 +84,7 @@
+     "pdfjs-dist": "^5.4.624",
+     "pug": "^3.0.3",
+     "sass": "^1.97.3",
+-    "stripe": "^20.3.1",
++    "stripe": "^20.4.0",
+     "twilio": "^5.12.2",
+     "twitch-passport": "^1.0.6",
+     "validator": "^13.15.26"
+-- 
+2.53.0
+

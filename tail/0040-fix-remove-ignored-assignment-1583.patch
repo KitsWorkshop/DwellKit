@@ -1,0 +1,33 @@
+From e54527c621f09d4230670458d49c84820e23b653 Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <6448697+YasharF@users.noreply.github.com>
+Date: Mon, 23 Mar 2026 01:23:06 -0700
+Subject: [PATCH 040/200] fix: remove ignored assignment (#1583)
+
+The User schema doesn't define profile.email, so Mongoose ignores it in strict mode. The email field is populated at account creation (it is required), so this line is unnecessary.
+---
+ config/passport.js | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/config/passport.js b/config/passport.js
+index f510550..a89abe7 100644
+--- a/config/passport.js
++++ b/config/passport.js
+@@ -110,7 +110,6 @@ async function handleAuthLogin(req, accessToken, refreshToken, providerName, par
+ 
+     user.profile.location = user.profile.location || providerProfile.location;
+     user.profile.website = user.profile.website || providerProfile.website;
+-    user.profile.email = user.profile.email || providerProfile.email;
+     await user.save();
+     return user;
+   }
+@@ -150,7 +149,6 @@ async function handleAuthLogin(req, accessToken, refreshToken, providerName, par
+ 
+   user.profile.location = providerProfile.location;
+   user.profile.website = providerProfile.website;
+-  user.profile.email = providerProfile.email;
+   await user.save();
+   return user;
+ }
+-- 
+2.53.0
+

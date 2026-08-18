@@ -1,0 +1,303 @@
+From ffae7d43d5fc071b9594eec0338c9cb7b405acd9 Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <YasharF.Git1@ydftech.com>
+Date: Tue, 24 Mar 2026 19:24:20 -0700
+Subject: [PATCH 049/200] fix: minor bugs and improvements
+
+- Split passport-oauth into passport-oauth1 and passport-oauth2 to make it easier to strip unused dependencies when starting a new project using this boilerplate.
+- Add missing autocomplete in profile views.
+- Add missing list-inline in the footer partial.
+- Add QR to the package table in README.md.
+- Add missing next parameter in the error handler in app.js.
+---
+ README.md                 |  4 ++-
+ app.js                    |  2 +-
+ config/passport.js        |  4 +--
+ package-lock.json         | 65 ++++++++++++++++-----------------------
+ package.json              | 11 ++++---
+ views/account/profile.pug |  2 +-
+ views/partials/footer.pug |  2 +-
+ 7 files changed, 41 insertions(+), 49 deletions(-)
+
+diff --git a/README.md b/README.md
+index c76ded0..514fd94 100644
+--- a/README.md
++++ b/README.md
+@@ -643,12 +643,14 @@ Required to run the project before your modifications
+ | passport-github2              | Sign-in with GitHub plugin.                                           |
+ | passport-google-oauth         | Sign-in with Google plugin.                                           |
+ | passport-local                | Sign-in with Username and Password plugin.                            |
+-| passport-oauth                | Allows you to set up your own OAuth 1.0a and OAuth 2.0 strategies.    |
++| passport-oauth1               | Allows you to set up your own OAuth 1.0a strategy.                    |
++| passport-oauth2               | Allows you to set up your own OAuth 2.0 strategy.                     |
+ | passport-oauth2-refresh       | A library to refresh OAuth 2.0 access tokens using refresh tokens.    |
+ | passport-steam-openid         | OpenID 2.0 Steam plugin.                                              |
+ | patch-package                 | Fix broken node modules ahead of fixes by maintainers.                |
+ | pdfjs-dist                    | PDF parser                                                            |
+ | pug                           | Template engine for Express.                                          |
++| qr                            | Generate and decode QR codes                                          |
+ | sass                          | Sass compiler to generate CSS with superpowers.                       |
+ | stripe                        | Official Stripe API library.                                          |
+ | twilio                        | Twilio API library.                                                   |
+diff --git a/app.js b/app.js
+index eb4f09b..e1ab90e 100644
+--- a/app.js
++++ b/app.js
+@@ -401,7 +401,7 @@ if (process.env.NODE_ENV === 'development') {
+   // only use in development
+   app.use(errorHandler());
+ } else {
+-  app.use((err, req, res) => {
++  app.use((err, req, res, next) => {
+     console.error(err);
+     res.status(500).send('Server Error');
+   });
+diff --git a/config/passport.js b/config/passport.js
+index a89abe7..b3fb59e 100644
+--- a/config/passport.js
++++ b/config/passport.js
+@@ -7,8 +7,8 @@ const { Strategy: TwitchStrategy } = require('twitch-passport');
+ const { Strategy: GitHubStrategy } = require('passport-github2');
+ const { OAuth2Strategy: GoogleStrategy } = require('passport-google-oauth');
+ const { SteamOpenIdStrategy } = require('passport-steam-openid');
+-const { OAuthStrategy } = require('passport-oauth');
+-const { OAuth2Strategy } = require('passport-oauth');
++const OAuthStrategy = require('passport-oauth1');
++const OAuth2Strategy = require('passport-oauth2');
+ const { OAuth } = require('oauth');
+ const validator = require('validator');
+ 
+diff --git a/package-lock.json b/package-lock.json
+index 6f9d1d1..c2a7182 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -15,8 +15,8 @@
+         "@googleapis/sheets": "^13.0.1",
+         "@huggingface/inference": "^4.13.15",
+         "@keyv/mongo": "^3.1.0",
+-        "@langchain/community": "^1.1.24",
+-        "@langchain/core": "^1.1.35",
++        "@langchain/community": "^1.1.25",
++        "@langchain/core": "^1.1.36",
+         "@langchain/groq": "^1.1.5",
+         "@langchain/langgraph": "^1.2.5",
+         "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+@@ -42,7 +42,7 @@
+         "express-session": "^1.19.0",
+         "jquery": "^4.0.0",
+         "keyv": "^5.6.0",
+-        "langchain": "^1.2.36",
++        "langchain": "^1.2.37",
+         "lastfm": "^0.9.4",
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.20",
+@@ -58,7 +58,8 @@
+         "passport-github2": "^0.1.12",
+         "passport-google-oauth": "^2.0.0",
+         "passport-local": "^1.0.0",
+-        "passport-oauth": "^1.0.0",
++        "passport-oauth1": "^1.3.0",
++        "passport-oauth2": "^1.8.0",
+         "passport-oauth2-refresh": "^2.2.0",
+         "passport-steam-openid": "^1.1.9",
+         "patch-package": "^8.0.1",
+@@ -89,7 +90,7 @@
+         "supertest": "^7.2.2"
+       },
+       "engines": {
+-        "node": ">=24.13.0"
++        "node": ">=24.14.1"
+       }
+     },
+     "node_modules/@anthropic-ai/sdk": {
+@@ -627,13 +628,13 @@
+       "license": "MIT"
+     },
+     "node_modules/@langchain/community": {
+-      "version": "1.1.24",
+-      "resolved": "https://registry.npmjs.org/@langchain/community/-/community-1.1.24.tgz",
+-      "integrity": "sha512-8mL4qs49Adi3sYk4s/t84Z3ewPDAnRvUKyAecTe7UvK/3jymfmG4hX2Tac3Bule0KQZvgKiQGUe4BA2ytJlQVQ==",
++      "version": "1.1.25",
++      "resolved": "https://registry.npmjs.org/@langchain/community/-/community-1.1.25.tgz",
++      "integrity": "sha512-RStq+qqN7AqR+SZj8EyM0MknINWXKMFMLZ03m0EgUlB6JLGZjtWcl19AqqQkcM9hgH58FTOn4i+AIYlJ16FUNw==",
+       "license": "MIT",
+       "dependencies": {
+-        "@langchain/classic": "1.0.24",
+-        "@langchain/openai": "1.3.0",
++        "@langchain/classic": "1.0.25",
++        "@langchain/openai": "1.3.1",
+         "binary-extensions": "^2.2.0",
+         "flat": "^5.0.2",
+         "js-yaml": "^4.1.1",
+@@ -671,7 +672,7 @@
+         "@huggingface/transformers": "^3.8.1",
+         "@ibm-cloud/watsonx-ai": "*",
+         "@lancedb/lancedb": "^0.19.1",
+-        "@langchain/core": "^1.1.33",
++        "@langchain/core": "^1.1.36",
+         "@layerup/layerup-security": "^1.5.12",
+         "@libsql/client": "^0.17.0",
+         "@mendable/firecrawl-js": "^4.15.2",
+@@ -1120,12 +1121,12 @@
+       }
+     },
+     "node_modules/@langchain/community/node_modules/@langchain/classic": {
+-      "version": "1.0.24",
+-      "resolved": "https://registry.npmjs.org/@langchain/classic/-/classic-1.0.24.tgz",
+-      "integrity": "sha512-NPG3ZrGKWPH+Fl6y2HVCCHu+yieffNtXo+plJF3Ze9bigVbJyGSqsyxz0LA/I75OWRnQ086INNq5wYiBpyxQsQ==",
++      "version": "1.0.25",
++      "resolved": "https://registry.npmjs.org/@langchain/classic/-/classic-1.0.25.tgz",
++      "integrity": "sha512-h7D5hMtmepSKjnCoKPM0WgY4/LqEAqPwTxwgtmjUUIk1uWxdXXC7itdQBmcLBf1zmShmlvpqog/HB9G+K6QuYA==",
+       "license": "MIT",
+       "dependencies": {
+-        "@langchain/openai": "1.3.0",
++        "@langchain/openai": "1.3.1",
+         "@langchain/textsplitters": "1.0.1",
+         "handlebars": "^4.7.8",
+         "js-yaml": "^4.1.1",
+@@ -1160,9 +1161,9 @@
+       }
+     },
+     "node_modules/@langchain/core": {
+-      "version": "1.1.35",
+-      "resolved": "https://registry.npmjs.org/@langchain/core/-/core-1.1.35.tgz",
+-      "integrity": "sha512-TM0idLSAx17IEMqEIN7F8MDdXpN53p4A4vhhjZxf7LedwShB/8Zx1F5D5Nq1Bbn0zh9QDzSHpWyfCrTtggKf7g==",
++      "version": "1.1.36",
++      "resolved": "https://registry.npmjs.org/@langchain/core/-/core-1.1.36.tgz",
++      "integrity": "sha512-9NWsdzU3uZD13lJwunXK0t6SIwew+UwcbHggW5yUdaiMmzKeNkDpp1lRD6p49N8+D0Vv4qmQBEKB4Ukh2jfnvw==",
+       "license": "MIT",
+       "dependencies": {
+         "@cfworker/json-schema": "^4.0.2",
+@@ -1512,9 +1513,9 @@
+       }
+     },
+     "node_modules/@langchain/openai": {
+-      "version": "1.3.0",
+-      "resolved": "https://registry.npmjs.org/@langchain/openai/-/openai-1.3.0.tgz",
+-      "integrity": "sha512-FDsF6xKCvFduiZcX57fL2Md+DZ+fJubcUN1iwUaEwJOQnq7zFFYj3a/KuQ7EiOFR3hEsnhPilSfxO1VW85wMZw==",
++      "version": "1.3.1",
++      "resolved": "https://registry.npmjs.org/@langchain/openai/-/openai-1.3.1.tgz",
++      "integrity": "sha512-6yN3XFRUKUsGREGk4VtCvnMp5NHh2gWujiuWdn/G7cCeHboYrdKLWnwGqopuFOm7Tivv423gtMN1GQ7EJ3kg+g==",
+       "license": "MIT",
+       "dependencies": {
+         "js-tiktoken": "^1.0.12",
+@@ -1525,7 +1526,7 @@
+         "node": ">=20"
+       },
+       "peerDependencies": {
+-        "@langchain/core": "^1.1.33"
++        "@langchain/core": "^1.1.36"
+       }
+     },
+     "node_modules/@langchain/openai/node_modules/openai": {
+@@ -6347,9 +6348,9 @@
+       }
+     },
+     "node_modules/langchain": {
+-      "version": "1.2.36",
+-      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.2.36.tgz",
+-      "integrity": "sha512-DGMBGbmpdpC5BJDi89XxdOfFg8FOkW7/xDclecUVUDVzPyWm4kiHKKKsBJZbxqJ08/SAziIlFV8PefRM2omV+A==",
++      "version": "1.2.37",
++      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.2.37.tgz",
++      "integrity": "sha512-zjd0TpMfX8V440XJVavRmzLSvojVv5WZ7M9LWNtgYo0MDFTiWlCdnFNdHo1sZlNoI+8aSdLsVl/WXKtucyhwEA==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph": "^1.1.2",
+@@ -6362,7 +6363,7 @@
+         "node": ">=20"
+       },
+       "peerDependencies": {
+-        "@langchain/core": "^1.1.35"
++        "@langchain/core": "^1.1.36"
+       }
+     },
+     "node_modules/langchain/node_modules/uuid": {
+@@ -7573,18 +7574,6 @@
+         "node": ">= 0.4.0"
+       }
+     },
+-    "node_modules/passport-oauth": {
+-      "version": "1.0.0",
+-      "resolved": "https://registry.npmjs.org/passport-oauth/-/passport-oauth-1.0.0.tgz",
+-      "integrity": "sha512-4IZNVsZbN1dkBzmEbBqUxDG8oFOIK81jqdksE3HEb/vI3ib3FMjbiZZ6MTtooyYZzmKu0BfovjvT1pdGgIq+4Q==",
+-      "dependencies": {
+-        "passport-oauth1": "1.x.x",
+-        "passport-oauth2": "1.x.x"
+-      },
+-      "engines": {
+-        "node": ">= 0.4.0"
+-      }
+-    },
+     "node_modules/passport-oauth1": {
+       "version": "1.3.0",
+       "resolved": "https://registry.npmjs.org/passport-oauth1/-/passport-oauth1-1.3.0.tgz",
+diff --git a/package.json b/package.json
+index c29b35f..e8569ad 100644
+--- a/package.json
++++ b/package.json
+@@ -34,8 +34,8 @@
+     "@googleapis/sheets": "^13.0.1",
+     "@huggingface/inference": "^4.13.15",
+     "@keyv/mongo": "^3.1.0",
+-    "@langchain/community": "^1.1.24",
+-    "@langchain/core": "^1.1.35",
++    "@langchain/community": "^1.1.25",
++    "@langchain/core": "^1.1.36",
+     "@langchain/groq": "^1.1.5",
+     "@langchain/langgraph": "^1.2.5",
+     "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+@@ -61,7 +61,7 @@
+     "express-session": "^1.19.0",
+     "jquery": "^4.0.0",
+     "keyv": "^5.6.0",
+-    "langchain": "^1.2.36",
++    "langchain": "^1.2.37",
+     "lastfm": "^0.9.4",
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.20",
+@@ -77,7 +77,8 @@
+     "passport-github2": "^0.1.12",
+     "passport-google-oauth": "^2.0.0",
+     "passport-local": "^1.0.0",
+-    "passport-oauth": "^1.0.0",
++    "passport-oauth1": "^1.3.0",
++    "passport-oauth2": "^1.8.0",
+     "passport-oauth2-refresh": "^2.2.0",
+     "passport-steam-openid": "^1.1.9",
+     "patch-package": "^8.0.1",
+@@ -118,6 +119,6 @@
+     "formdata-node": "@langchain/groq, @langchain/community"
+   },
+   "engines": {
+-    "node": ">=24.13.0"
++    "node": ">=24.14.1"
+   }
+ }
+diff --git a/views/account/profile.pug b/views/account/profile.pug
+index 1a90eb7..e588eff 100644
+--- a/views/account/profile.pug
++++ b/views/account/profile.pug
+@@ -37,7 +37,7 @@ block content
+     .form-group.row
+       label.col-md-3.col-form-label.font-weight-bold.text-right(for='location') Location
+       .col-md-7.mb-2
+-        input#location.form-control(type='text', name='location', value=user.profile.location, autocomplete)
++        input#location.form-control(type='text', name='location', value=user.profile.location, autocomplete='street-address')
+     .form-group.row
+       label.col-md-3.col-form-label.font-weight-bold.text-right(for='website') Website
+       .col-md-7.mb-2
+diff --git a/views/partials/footer.pug b/views/partials/footer.pug
+index eb6975a..ae7d2e6 100644
+--- a/views/partials/footer.pug
++++ b/views/partials/footer.pug
+@@ -1,7 +1,7 @@
+ footer.mt-auto.py-3.bg-light
+   .container.d-flex.justify-content-between
+     span © 2026 Company, Inc. All Rights Reserved
+-    ul.mb-0
++    ul.list-inline.mb-0
+       li.list-inline-item
+         a(href='https://github.com/sahat/hackathon-starter') GitHub Project
+       li.list-inline-item
+-- 
+2.53.0
+

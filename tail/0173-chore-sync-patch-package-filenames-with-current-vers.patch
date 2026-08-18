@@ -1,0 +1,18 @@
+From 15e1bb0de4a7b48deb5cf59ec7e5072fcd3d190a Mon Sep 17 00:00:00 2001
+From: github-actions <github-actions@github.com>
+Date: Tue, 21 Jul 2026 13:39:17 +0000
+Subject: [PATCH 171/200] chore: sync patch-package filenames with current
+ versions
+
+---
+ patches/{c8+11.0.0.patch => c8+12.0.0.patch} | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ rename patches/{c8+11.0.0.patch => c8+12.0.0.patch} (100%)
+
+diff --git a/patches/c8+11.0.0.patch b/patches/c8+12.0.0.patch
+similarity index 100%
+rename from patches/c8+11.0.0.patch
+rename to patches/c8+12.0.0.patch
+-- 
+2.53.0
+

@@ -1,0 +1,103 @@
+From 60e3732eb8a4fa0dd5f078380291f769988c55ed Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <6448697+YasharF@users.noreply.github.com>
+Date: Mon, 23 Mar 2026 01:34:49 -0700
+Subject: [PATCH 041/200] fix: change session revocation regex to prevent
+ unintended deletes (#1584)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Validate `userId` as a Mongo ObjectId and match the exact serialized id value so session cleanup can’t be abused via regex patterns.
+---
+ models/Session.js    | 13 +++++++++++-
+ test/session.test.js | 47 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+), 1 deletion(-)
+ create mode 100644 test/session.test.js
+
+diff --git a/models/Session.js b/models/Session.js
+index d6bcbd7..aac06af 100644
+--- a/models/Session.js
++++ b/models/Session.js
+@@ -1,4 +1,5 @@
+ const mongoose = require('mongoose');
++const validator = require('validator');
+ 
+ const sessionSchema = new mongoose.Schema({
+   session: String,
+@@ -12,9 +13,19 @@ sessionSchema.statics = {
+    * @returns {Promise}
+    */
+   removeSessionByUserId(userId) {
++    // userId comes from Passport's serializeUser => user.id => Mongoose ObjectId.
++    // Validate it so it contains only hex chars; then it is safe to embed into a RegExp
++    // without regex-metacharacter escaping.
++    if (!validator.isMongoId(userId)) {
++      // Treat invalid session state as a no-op to avoid breaking logout flows.
++      return Promise.resolve({ acknowledged: true, deletedCount: 0 });
++    }
++
+     return this.deleteMany({
+       expires: { $gt: new Date() },
+-      session: { $regex: userId },
++      // Match any serialized session blob that contains the exact quoted ObjectId value.
++      // This avoids relying on Passport's internal session object shape.
++      session: { $regex: new RegExp(`"${userId}"`) },
+     });
+   },
+ };
+diff --git a/test/session.test.js b/test/session.test.js
+new file mode 100644
+index 0000000..a6e5b78
+--- /dev/null
++++ b/test/session.test.js
+@@ -0,0 +1,47 @@
++const { expect } = require('chai');
++const sinon = require('sinon');
++const mongoose = require('mongoose');
++
++const Session = require('../models/Session');
++
++describe('Session Model', () => {
++  afterEach(() => {
++    sinon.restore();
++  });
++
++  it('treats invalid userId as a no-op', async () => {
++    const deleteManySpy = sinon.stub(Session, 'deleteMany').rejects(new Error('should not be called'));
++
++    const result = await Session.removeSessionByUserId('not-a-mongo-id');
++    expect(result).to.have.property('deletedCount', 0);
++    expect(deleteManySpy.called).to.equal(false);
++  });
++
++  it('builds a regex that matches the exact quoted ObjectId string', async () => {
++    const idA = new mongoose.Types.ObjectId().toString();
++
++    const deleteManyStub = sinon.stub(Session, 'deleteMany').callsFake(async (filter) => ({
++      acknowledged: true,
++      deletedCount: 123,
++      filter,
++    }));
++
++    const result = await Session.removeSessionByUserId(idA);
++
++    expect(result).to.have.property('deletedCount', 123);
++    expect(deleteManyStub.calledOnce).to.equal(true);
++
++    const [filter] = deleteManyStub.firstCall.args;
++    expect(filter).to.have.property('expires');
++    expect(filter).to.have.property('session');
++
++    const regex = filter.session.$regex;
++    expect(regex).to.be.instanceOf(RegExp);
++
++    // Matches exact quoted value.
++    expect(regex.test(`{"passport":{"user":"${idA}"}}`)).to.equal(true);
++
++    // Does NOT match when the quoted id is not exact.
++    expect(regex.test(`{"passport":{"user":"${idA}X"}}`)).to.equal(false);
++  });
++});
+-- 
+2.53.0
+

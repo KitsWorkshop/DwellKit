@@ -1,0 +1,25 @@
+From 1c953ccd84ef659af21d47ab782de529b9e9799e Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <6448697+YasharF@users.noreply.github.com>
+Date: Mon, 23 Mar 2026 02:22:13 -0700
+Subject: [PATCH 042/200] fix: only save session if modified (#1585)
+
+---
+ app.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/app.js b/app.js
+index 68437a3..eb4f09b 100644
+--- a/app.js
++++ b/app.js
+@@ -137,7 +137,7 @@ app.use(express.urlencoded({ extended: true }));
+ app.use(limiter);
+ app.use(
+   session({
+-    resave: true, // Only save session if modified
++    resave: false, // Only save session if modified
+     saveUninitialized: false, // Do not save sessions until we have something to store
+     secret: process.env.SESSION_SECRET,
+     name: 'startercookie', // change the cookie name for additional security in production
+-- 
+2.53.0
+

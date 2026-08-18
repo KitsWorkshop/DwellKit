@@ -1,0 +1,92 @@
+From 9c0a229abff2cd28f99ca0643abe6dbffaf2ee82 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Mon, 16 Mar 2026 13:43:45 +0000
+Subject: [PATCH 034/200] chore(deps-dev): bump sinon in the patch-updates
+ group (#1576)
+
+Bumps the patch-updates group with 1 update: [sinon](https://github.com/sinonjs/sinon).
+
+
+Updates `sinon` from 21.0.2 to 21.0.3
+- [Release notes](https://github.com/sinonjs/sinon/releases)
+- [Changelog](https://github.com/sinonjs/sinon/blob/main/docs/changelog.md)
+- [Commits](https://github.com/sinonjs/sinon/compare/v21.0.2...v21.0.3)
+
+---
+updated-dependencies:
+- dependency-name: sinon
+  dependency-version: 21.0.3
+  dependency-type: direct:development
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 16 ++++++++--------
+ package.json      |  2 +-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 561cd1e..b956752 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -84,7 +84,7 @@
+         "mocha": "12.0.0-beta-10",
+         "mongodb-memory-server": "^11.0.1",
+         "prettier": "^3.8.1",
+-        "sinon": "^21.0.2",
++        "sinon": "^21.0.3",
+         "supertest": "^7.2.2"
+       },
+       "engines": {
+@@ -2883,9 +2883,9 @@
+       }
+     },
+     "node_modules/@sinonjs/samsam": {
+-      "version": "9.0.2",
+-      "resolved": "https://registry.npmjs.org/@sinonjs/samsam/-/samsam-9.0.2.tgz",
+-      "integrity": "sha512-H/JSxa4GNKZuuU41E3b8Y3tbSEx8y4uq4UH1C56ONQac16HblReJomIvv3Ud7ANQHQmkeSowY49Ij972e/pGxQ==",
++      "version": "9.0.3",
++      "resolved": "https://registry.npmjs.org/@sinonjs/samsam/-/samsam-9.0.3.tgz",
++      "integrity": "sha512-ZgYY7Dc2RW+OUdnZ1DEHg00lhRt+9BjymPKHog4PRFzr1U3MbK57+djmscWyKxzO1qfunHqs4N45WWyKIFKpiQ==",
+       "dev": true,
+       "license": "BSD-3-Clause",
+       "dependencies": {
+@@ -8651,15 +8651,15 @@
+       "license": "MIT"
+     },
+     "node_modules/sinon": {
+-      "version": "21.0.2",
+-      "resolved": "https://registry.npmjs.org/sinon/-/sinon-21.0.2.tgz",
+-      "integrity": "sha512-VHV4UaoxIe5jrMd89Y9duI76T5g3Lp+ET+ctLhLDaZtSznDPah1KKpRElbdBV4RwqWSw2vadFiVs9Del7MbVeQ==",
++      "version": "21.0.3",
++      "resolved": "https://registry.npmjs.org/sinon/-/sinon-21.0.3.tgz",
++      "integrity": "sha512-0x8TQFr8EjADhSME01u1ZK31yv2+bd6Z5NrBCHVM+n4qL1wFqbxftmeyi3bwlr49FbbzRfrqSFOpyHCOh/YmYA==",
+       "dev": true,
+       "license": "BSD-3-Clause",
+       "dependencies": {
+         "@sinonjs/commons": "^3.0.1",
+         "@sinonjs/fake-timers": "^15.1.1",
+-        "@sinonjs/samsam": "^9.0.2",
++        "@sinonjs/samsam": "^9.0.3",
+         "diff": "^8.0.3",
+         "supports-color": "^7.2.0"
+       },
+diff --git a/package.json b/package.json
+index 8e42645..0db2e7c 100644
+--- a/package.json
++++ b/package.json
+@@ -103,7 +103,7 @@
+     "mocha": "12.0.0-beta-10",
+     "mongodb-memory-server": "^11.0.1",
+     "prettier": "^3.8.1",
+-    "sinon": "^21.0.2",
++    "sinon": "^21.0.3",
+     "supertest": "^7.2.2"
+   },
+   "overrides": {
+-- 
+2.53.0
+

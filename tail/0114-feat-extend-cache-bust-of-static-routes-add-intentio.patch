@@ -1,0 +1,290 @@
+From 47ddecc270d6b4711c373a88fad832cdd642e76e Mon Sep 17 00:00:00 2001
+From: Yashar Fakhari <6448697+YasharF@users.noreply.github.com>
+Date: Wed, 3 Jun 2026 21:42:42 -0700
+Subject: [PATCH 113/200] feat: extend cache-bust of static routes; add
+ intentional lib exposure (#1666)
+
+---
+ README.md                           |  1 +
+ app.js                              | 52 +++++++++++++++-------
+ config/cacheBust.js                 | 35 +++++++++++++++
+ test/cacheBust.test.js              | 67 +++++++++++++++++++++++++++++
+ views/account/webauthn-login.pug    |  2 +-
+ views/account/webauthn-register.pug |  2 +-
+ views/api/chart.pug                 |  2 +-
+ views/layout.pug                    |  8 ++--
+ 8 files changed, 147 insertions(+), 22 deletions(-)
+ create mode 100644 config/cacheBust.js
+ create mode 100644 test/cacheBust.test.js
+
+diff --git a/README.md b/README.md
+index d2367c1..5fc56d0 100644
+--- a/README.md
++++ b/README.md
+@@ -541,6 +541,7 @@ The metadata for Open Graph is only set up for the home page (`home.pug`). Updat
+ 
+ | Name                             | Description                                                          |
+ | -------------------------------- | -------------------------------------------------------------------- |
++| **config**/cacheBust.js          | Cache-busting helper for static routed files (css and front-end js)  |
+ | **config**/flash.js              | Flash middleware (replacement for express-flash)                     |
+ | **config**/morgan.js             | Configuration for request logging with morgan.                       |
+ | **config**/nodemailer.js         | Configuration and helper function for sending email with nodemailer. |
+diff --git a/app.js b/app.js
+index df383ea..da0e4fd 100644
+--- a/app.js
++++ b/app.js
+@@ -2,7 +2,6 @@
+  * Module dependencies.
+  */
+ const path = require('node:path');
+-const crypto = require('node:crypto');
+ const fs = require('node:fs');
+ const express = require('express');
+ const compression = require('compression');
+@@ -14,6 +13,7 @@ const mongoose = require('mongoose');
+ const passport = require('passport');
+ const rateLimit = require('express-rate-limit');
+ const { flash } = require('./config/flash');
++const { getFileHash } = require('./config/cacheBust');
+ 
+ /**
+  * Load environment variables from .env file, where API keys and passwords are configured.
+@@ -200,20 +200,42 @@ app.use((req, res, next) => {
+   }
+   next();
+ });
+-app.use('/', express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
+-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/chart.js/dist'), { maxAge: 31557600000 }));
+-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/@popperjs/core/dist/umd'), { maxAge: 31557600000 }));
+-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), { maxAge: 31557600000 }));
+-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/jquery/dist'), { maxAge: 31557600000 }));
+-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/@simplewebauthn/browser/dist/bundle'), { maxAge: 31557600000 }));
+-app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
+-app.use('/image-cache', express.static(path.join(__dirname, 'tmp/image-cache'), { maxAge: 31557600000 }));
+-
+-app.locals.mainJsHash = crypto
+-  .createHash('sha256')
+-  .update(fs.readFileSync(path.join(__dirname, 'public', 'js', 'main.js')))
+-  .digest('hex')
+-  .slice(0, 8);
++
++/**
++ * Creating static routes for files in public/, tmp/image-cache, and front-end libraries
++ *
++ * 4 hr maxAge is the default that some CDNs like Cloudflare hence using it as the default maxAge
++ * You can clear your browser cache or use getFileHash versioning for cache busting
++ * See views/layout.pug for getFileHash usage example
++ */
++app.use('/', express.static(path.join(__dirname, 'public'), { maxAge: '4h' }));
++app.use('/image-cache', express.static(path.join(__dirname, 'tmp/image-cache'), { maxAge: '4h' }));
++
++const libFiles = new Map([
++  // List client side libraries from node_modules (files needed in the web browser). Don't include files that are already in public/ folder.
++  ['/js/lib/chart.umd.min.js', 'node_modules/chart.js/dist/chart.umd.min.js'],
++  ['/js/lib/popper.min.js', 'node_modules/@popperjs/core/dist/umd/popper.min.js'],
++  ['/js/lib/bootstrap.min.js', 'node_modules/bootstrap/dist/js/bootstrap.min.js'],
++  ['/js/lib/jquery.min.js', 'node_modules/jquery/dist/jquery.min.js'],
++  ['/js/lib/webauthn.umd.min.js', 'node_modules/@simplewebauthn/browser/dist/bundle/index.umd.min.js'],
++  ['/webfonts/fa-brands-400.woff2', 'node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2'],
++  ['/webfonts/fa-regular-400.woff2', 'node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2'],
++  ['/webfonts/fa-solid-900.woff2', 'node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2'],
++]);
++
++for (const [fileUrl, filePath] of libFiles) {
++  if (fs.existsSync(path.join(__dirname, 'public', fileUrl.slice(1)))) {
++    throw new Error(`Duplicate mapping issue: the library file is already present at ${fileUrl}`);
++  }
++  const libFileHandler = (req, res) => res.sendFile(path.join(__dirname, filePath), { maxAge: '1y' });
++  app.head(fileUrl, libFileHandler); // to improve caching with some proxies/CDNs
++  app.get(fileUrl, libFileHandler);
++  // Compute and cache libFile hashes so a bad file path or missing library fails fast during startup
++  getFileHash(fileUrl, libFiles, __dirname);
++}
++
++// Set up getFileHash so it can be used in pug templates for cache busting
++app.locals.getFileHash = (fileUrl) => getFileHash(fileUrl, libFiles, __dirname);
+ 
+ /**
+  * Analytics IDs needed thru layout.pug; set as express local so we don't have to pass them with each render call
+diff --git a/config/cacheBust.js b/config/cacheBust.js
+new file mode 100644
+index 0000000..cdab60a
+--- /dev/null
++++ b/config/cacheBust.js
+@@ -0,0 +1,35 @@
++const path = require('node:path');
++const crypto = require('node:crypto');
++const fs = require('node:fs');
++
++/*
++ * getFileHash function for use in pug templates for cache busting of frontend files
++ * Computes a short content hash for a frontend file, used as a cache-busting query parameter (?v=HASH)
++ * It also caches the computed hash on first use, so subsequent calls
++ * for the same file skip the disk read and hash calculation
++ */
++const fileHashCache = new Map();
++
++exports.getFileHash = (fileUrl, libFiles, rootDir) => {
++  if (fileHashCache.has(fileUrl)) return fileHashCache.get(fileUrl);
++
++  let filePath;
++  if (libFiles.has(fileUrl)) {
++    // was the file from public/ folder or from libFiles?
++    filePath = libFiles.get(fileUrl);
++  } else {
++    filePath = path.join('public', fileUrl.slice(1));
++  }
++
++  const hash = crypto
++    .createHash('sha256')
++    .update(fs.readFileSync(path.join(rootDir, filePath)))
++    .digest('hex')
++    .slice(0, 8);
++
++  fileHashCache.set(fileUrl, hash);
++  return hash;
++};
++
++// Reset the in-memory cache (useful in tests)
++exports.clearCache = () => fileHashCache.clear();
+diff --git a/test/cacheBust.test.js b/test/cacheBust.test.js
+new file mode 100644
+index 0000000..2e41967
+--- /dev/null
++++ b/test/cacheBust.test.js
+@@ -0,0 +1,67 @@
++const { expect } = require('chai');
++const sinon = require('sinon');
++const fs = require('node:fs');
++const path = require('node:path');
++
++const { getFileHash, clearCache } = require('../config/cacheBust');
++
++describe('getFileHash', () => {
++  let readFileStub;
++  const rootDir = '/project';
++  const libFiles = new Map([['/js/lib/jquery.min.js', 'node_modules/jquery/dist/jquery.min.js']]);
++
++  beforeEach(() => {
++    clearCache();
++    readFileStub = sinon.stub(fs, 'readFileSync');
++  });
++
++  afterEach(() => {
++    sinon.restore();
++  });
++
++  it('returns an 8-character hex string', () => {
++    readFileStub.returns(Buffer.from('hello'));
++    const hash = getFileHash('/css/main.css', new Map(), rootDir);
++    expect(hash).to.match(/^[0-9a-f]{8}$/);
++  });
++
++  it('returns the same hash for the same file on repeated calls', () => {
++    readFileStub.returns(Buffer.from('hello'));
++    const first = getFileHash('/css/main.css', new Map(), rootDir);
++    const second = getFileHash('/css/main.css', new Map(), rootDir);
++    expect(first).to.equal(second);
++  });
++
++  it('reads the file from disk only once for repeated calls (caching)', () => {
++    readFileStub.returns(Buffer.from('hello'));
++    getFileHash('/css/main.css', new Map(), rootDir);
++    getFileHash('/css/main.css', new Map(), rootDir);
++    getFileHash('/css/main.css', new Map(), rootDir);
++    expect(readFileStub.calledOnce).to.equal(true);
++  });
++
++  it('returns different hashes for different file contents', () => {
++    readFileStub.onFirstCall().returns(Buffer.from('hello'));
++    readFileStub.onSecondCall().returns(Buffer.from('world'));
++    const hashA = getFileHash('/css/a.css', new Map(), rootDir);
++    const hashB = getFileHash('/css/b.css', new Map(), rootDir);
++    expect(hashA).to.not.equal(hashB);
++  });
++
++  it('resolves non-libFiles URLs as a path under public/', () => {
++    readFileStub.returns(Buffer.from('hello'));
++    getFileHash('/css/main.css', new Map(), rootDir);
++    expect(readFileStub.firstCall.args[0]).to.equal(path.join(rootDir, 'public', 'css', 'main.css'));
++  });
++
++  it('resolves libFiles URLs using the libFiles value as the path', () => {
++    readFileStub.returns(Buffer.from('hello'));
++    getFileHash('/js/lib/jquery.min.js', libFiles, rootDir);
++    expect(readFileStub.firstCall.args[0]).to.equal(path.join(rootDir, 'node_modules/jquery/dist/jquery.min.js'));
++  });
++
++  it('throws when the file read fails', () => {
++    readFileStub.throws(new Error('disk failure'));
++    expect(() => getFileHash('/css/missing.css', new Map(), rootDir)).to.throw('disk failure');
++  });
++});
+diff --git a/views/account/webauthn-login.pug b/views/account/webauthn-login.pug
+index 2efd26b..e4f0a3f 100644
+--- a/views/account/webauthn-login.pug
++++ b/views/account/webauthn-login.pug
+@@ -1,7 +1,7 @@
+ extends ../layout
+ 
+ block head
+-  script(src='/js/lib/index.umd.min.js')
++  script(src='/js/lib/webauthn.umd.min.js?v=' + getFileHash('/js/lib/webauthn.umd.min.js'))
+   script#webauthnOptions(type='application/json') !{ publicKey }
+ 
+ block content
+diff --git a/views/account/webauthn-register.pug b/views/account/webauthn-register.pug
+index cf81239..1a4072e 100644
+--- a/views/account/webauthn-register.pug
++++ b/views/account/webauthn-register.pug
+@@ -1,7 +1,7 @@
+ extends ../layout
+ 
+ block head
+-  script(src='/js/lib/index.umd.min.js')
++  script(src='/js/lib/webauthn.umd.min.js?v=' + getFileHash('/js/lib/webauthn.umd.min.js'))
+   script#webauthnOptions(type='application/json') !{ publicKey }
+ 
+ block content
+diff --git a/views/api/chart.pug b/views/api/chart.pug
+index 60e8045..ce00178 100644
+--- a/views/api/chart.pug
++++ b/views/api/chart.pug
+@@ -1,7 +1,7 @@
+ extends ../layout
+ 
+ block head
+-  script(src='/js/lib/chart.umd.js')
++  script(src='/js/lib/chart.umd.min.js?v=' + getFileHash('/js/lib/chart.umd.min.js'))
+ 
+ block content
+   .pb-2.mt-2.mb-4.border-bottom
+diff --git a/views/layout.pug b/views/layout.pug
+index e371772..9ba7211 100644
+--- a/views/layout.pug
++++ b/views/layout.pug
+@@ -11,7 +11,7 @@ html.h-100(lang='en')
+     title #{ title } - Hackathon Starter
+     link(rel='shortcut icon', href='/favicon.ico')
+     //link(rel='stylesheet', href='/css/bootstrap.min.css')
+-    link(rel='stylesheet', href='/css/main.css')
++    link(rel='stylesheet', href='/css/main.css?v=' + getFileHash('/css/main.css'))
+     link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css')
+     block head
+ 
+@@ -25,9 +25,9 @@ html.h-100(lang='en')
+ 
+     include partials/footer
+ 
+-    script(src='/js/lib/jquery.min.js')
+-    script(src='/js/lib/bootstrap.min.js')
+-    script(src='/js/main.js?v=' + mainJsHash)
++    script(src='/js/lib/jquery.min.js?v=' + getFileHash('/js/lib/jquery.min.js'))
++    script(src='/js/lib/bootstrap.min.js?v=' + getFileHash('/js/lib/bootstrap.min.js'))
++    script(src='/js/main.js?v=' + getFileHash('/js/main.js'))
+     script(src='https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js')
+ 
+     script(type='text/javascript').
+-- 
+2.53.0
+

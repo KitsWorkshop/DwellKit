@@ -1,0 +1,162 @@
+From 0905d5e978f3d1579656b77d4ffa63f7500ccd14 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Wed, 8 Apr 2026 13:29:40 +0000
+Subject: [PATCH 064/200] chore(deps): bump the patch-updates group with 3
+ updates (#1607)
+
+Bumps the patch-updates group with 3 updates: [@langchain/langgraph](https://github.com/langchain-ai/langgraphjs/tree/HEAD/libs/langgraph-core), [langchain](https://github.com/langchain-ai/langchainjs) and [nodemailer](https://github.com/nodemailer/nodemailer).
+
+
+Updates `@langchain/langgraph` from 1.2.7 to 1.2.8
+- [Release notes](https://github.com/langchain-ai/langgraphjs/releases)
+- [Changelog](https://github.com/langchain-ai/langgraphjs/blob/main/libs/langgraph-core/CHANGELOG.md)
+- [Commits](https://github.com/langchain-ai/langgraphjs/commits/@langchain/langgraph@1.2.8/libs/langgraph-core)
+
+Updates `langchain` from 1.3.0 to 1.3.1
+- [Release notes](https://github.com/langchain-ai/langchainjs/releases)
+- [Commits](https://github.com/langchain-ai/langchainjs/compare/langchain@1.3.0...langchain@1.3.1)
+
+Updates `nodemailer` from 8.0.4 to 8.0.5
+- [Release notes](https://github.com/nodemailer/nodemailer/releases)
+- [Changelog](https://github.com/nodemailer/nodemailer/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/nodemailer/nodemailer/compare/v8.0.4...v8.0.5)
+
+---
+updated-dependencies:
+- dependency-name: "@langchain/langgraph"
+  dependency-version: 1.2.8
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: langchain
+  dependency-version: 1.3.1
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: nodemailer
+  dependency-version: 8.0.5
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 28 ++++++++++++++--------------
+ package.json      |  6 +++---
+ 2 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 0818659..d176ad9 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -18,7 +18,7 @@
+         "@langchain/community": "^1.1.27",
+         "@langchain/core": "^1.1.39",
+         "@langchain/groq": "^1.2.0",
+-        "@langchain/langgraph": "^1.2.7",
++        "@langchain/langgraph": "^1.2.8",
+         "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+         "@langchain/mongodb": "^1.1.0",
+         "@langchain/textsplitters": "^1.0.1",
+@@ -42,7 +42,7 @@
+         "express-session": "^1.19.0",
+         "jquery": "^4.0.0",
+         "keyv": "^5.6.0",
+-        "langchain": "^1.3.0",
++        "langchain": "^1.3.1",
+         "lastfm": "^0.9.4",
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.20",
+@@ -50,7 +50,7 @@
+         "mongoose": "^9.4.1",
+         "morgan": "^1.10.1",
+         "multer": "^2.1.1",
+-        "nodemailer": "^8.0.4",
++        "nodemailer": "^8.0.5",
+         "oauth": "^0.10.2",
+         "otpauth": "^9.5.0",
+         "passport": "^0.7.0",
+@@ -1211,13 +1211,13 @@
+       }
+     },
+     "node_modules/@langchain/langgraph": {
+-      "version": "1.2.7",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.2.7.tgz",
+-      "integrity": "sha512-Oh3MY/q4YS3xY79JQDOz5r+48KcWDDYfTb8hQ/Y2mD4rCrJ/W4FJDKqbZHvYS4/ohd/YjuCZrcCoeLiJy4d3pQ==",
++      "version": "1.2.8",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.2.8.tgz",
++      "integrity": "sha512-kKkRpC5xFz1e6vPivE7lwRJa5oahLAMaVQvVGZdTa6uJIchIYJDIuM1n93FqGvg8aYVcgYU4FENtKKC5Eh1JYw==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph-checkpoint": "^1.0.1",
+-        "@langchain/langgraph-sdk": "~1.8.5",
++        "@langchain/langgraph-sdk": "~1.8.8",
+         "@standard-schema/spec": "1.1.0",
+         "uuid": "^10.0.0"
+       },
+@@ -6350,12 +6350,12 @@
+       }
+     },
+     "node_modules/langchain": {
+-      "version": "1.3.0",
+-      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.3.0.tgz",
+-      "integrity": "sha512-1JiqaoljBHyY3mHg58CbKskIgHrGvDp4XidlQ0sSd8LaPhIjMLhGGGBPihy2uuVPn6TvyUv9d381jFYTGSyrWA==",
++      "version": "1.3.1",
++      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.3.1.tgz",
++      "integrity": "sha512-tJu8Ibf3NAuDW8pMT7VIBCc96m8TymjSMqRBpQawlG8zeTGPZK5TKA5gBYRNZvrz0YkJA57O2rcjP+mIxrS0+g==",
+       "license": "MIT",
+       "dependencies": {
+-        "@langchain/langgraph": "^1.2.6",
++        "@langchain/langgraph": "^1.2.8",
+         "@langchain/langgraph-checkpoint": "^1.0.1",
+         "langsmith": ">=0.5.0 <1.0.0",
+         "uuid": "^11.1.0",
+@@ -7173,9 +7173,9 @@
+       "optional": true
+     },
+     "node_modules/nodemailer": {
+-      "version": "8.0.4",
+-      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-8.0.4.tgz",
+-      "integrity": "sha512-k+jf6N8PfQJ0Fe8ZhJlgqU5qJU44Lpvp2yvidH3vp1lPnVQMgi4yEEMPXg5eJS1gFIJTVq1NHBk7Ia9ARdSBdQ==",
++      "version": "8.0.5",
++      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-8.0.5.tgz",
++      "integrity": "sha512-0PF8Yb1yZuQfQbq+5/pZJrtF6WQcjTd5/S4JOHs9PGFxuTqoB/icwuB44pOdURHJbRKX1PPoJZtY7R4VUoCC8w==",
+       "license": "MIT-0",
+       "engines": {
+         "node": ">=6.0.0"
+diff --git a/package.json b/package.json
+index a65a003..c85e4da 100644
+--- a/package.json
++++ b/package.json
+@@ -37,7 +37,7 @@
+     "@langchain/community": "^1.1.27",
+     "@langchain/core": "^1.1.39",
+     "@langchain/groq": "^1.2.0",
+-    "@langchain/langgraph": "^1.2.7",
++    "@langchain/langgraph": "^1.2.8",
+     "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+     "@langchain/mongodb": "^1.1.0",
+     "@langchain/textsplitters": "^1.0.1",
+@@ -61,7 +61,7 @@
+     "express-session": "^1.19.0",
+     "jquery": "^4.0.0",
+     "keyv": "^5.6.0",
+-    "langchain": "^1.3.0",
++    "langchain": "^1.3.1",
+     "lastfm": "^0.9.4",
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.20",
+@@ -69,7 +69,7 @@
+     "mongoose": "^9.4.1",
+     "morgan": "^1.10.1",
+     "multer": "^2.1.1",
+-    "nodemailer": "^8.0.4",
++    "nodemailer": "^8.0.5",
+     "oauth": "^0.10.2",
+     "otpauth": "^9.5.0",
+     "passport": "^0.7.0",
+-- 
+2.53.0
+

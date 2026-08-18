@@ -1,0 +1,98 @@
+From 41d3bb6700066f6a4e04764c283b77a3832a22c6 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Fri, 7 Aug 2026 13:29:30 +0000
+Subject: [PATCH 191/200] chore(deps): bump the major-updates group with 2
+ updates (#1737)
+
+Bumps the major-updates group with 2 updates: [@googleapis/drive](https://github.com/googleapis/google-api-nodejs-client) and [@googleapis/sheets](https://github.com/googleapis/google-api-nodejs-client).
+
+
+Updates `@googleapis/drive` from 20.2.0 to 21.0.0
+- [Release notes](https://github.com/googleapis/google-api-nodejs-client/releases)
+- [Commits](https://github.com/googleapis/google-api-nodejs-client/compare/20.2.0...run-v21.0.0)
+
+Updates `@googleapis/sheets` from 13.0.2 to 14.0.0
+- [Release notes](https://github.com/googleapis/google-api-nodejs-client/releases)
+- [Changelog](https://github.com/googleapis/google-api-nodejs-client/blob/14.0.0/CHANGELOG.md)
+- [Commits](https://github.com/googleapis/google-api-nodejs-client/compare/sheets-v13.0.2...14.0.0)
+
+---
+updated-dependencies:
+- dependency-name: "@googleapis/drive"
+  dependency-version: 21.0.0
+  dependency-type: direct:production
+  update-type: version-update:semver-major
+  dependency-group: major-updates
+- dependency-name: "@googleapis/sheets"
+  dependency-version: 14.0.0
+  dependency-type: direct:production
+  update-type: version-update:semver-major
+  dependency-group: major-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 16 ++++++++--------
+ package.json      |  4 ++--
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index c4276c8..9640006 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -11,8 +11,8 @@
+       "license": "MIT",
+       "dependencies": {
+         "@fortawesome/fontawesome-free": "^7.3.1",
+-        "@googleapis/drive": "^20.2.0",
+-        "@googleapis/sheets": "^13.0.2",
++        "@googleapis/drive": "^21.0.0",
++        "@googleapis/sheets": "^14.0.0",
+         "@huggingface/inference": "^4.13.24",
+         "@keyv/mongo": "^3.1.0",
+         "@langchain/core": "^1.2.4",
+@@ -369,9 +369,9 @@
+       }
+     },
+     "node_modules/@googleapis/drive": {
+-      "version": "20.2.0",
+-      "resolved": "https://registry.npmjs.org/@googleapis/drive/-/drive-20.2.0.tgz",
+-      "integrity": "sha512-6xPjqqLl34jBXWYMO34ywLVQsT8FgH948x8YI9o6Tdqs7+n4QRyvkC+BcvVQaAPNc+pyqsvZAXcbdMEcGgDUGw==",
++      "version": "21.0.0",
++      "resolved": "https://registry.npmjs.org/@googleapis/drive/-/drive-21.0.0.tgz",
++      "integrity": "sha512-vebQpAqn+FZcmDWh1TEQTcYdkKftcSaHc7kO2ZxrINBb+ZMcFu1UybD3+maeqdLs60HrRDYwyzJ6TgZ7/Vn2Rg==",
+       "license": "Apache-2.0",
+       "dependencies": {
+         "googleapis-common": "^8.0.0"
+@@ -381,9 +381,9 @@
+       }
+     },
+     "node_modules/@googleapis/sheets": {
+-      "version": "13.0.2",
+-      "resolved": "https://registry.npmjs.org/@googleapis/sheets/-/sheets-13.0.2.tgz",
+-      "integrity": "sha512-b1tBlMcfvNEziM4DZCikLOc9iqSlgCK1e5bMKtNQIADRXr1CQmbkHV3ZBVvTsFsjLErgihqO58Itn/kzCnSZ0A==",
++      "version": "14.0.0",
++      "resolved": "https://registry.npmjs.org/@googleapis/sheets/-/sheets-14.0.0.tgz",
++      "integrity": "sha512-fANEl4RQohsPYUWhcLSYyUyE8A8bRfvw/bp8h0t8VDQqTgdQ3itZBkty4nddtdqCAvNDpA+KM66OejVKDd6aFg==",
+       "license": "Apache-2.0",
+       "dependencies": {
+         "googleapis-common": "^8.0.0"
+diff --git a/package.json b/package.json
+index 3525ab9..6b715bc 100644
+--- a/package.json
++++ b/package.json
+@@ -30,8 +30,8 @@
+   },
+   "dependencies": {
+     "@fortawesome/fontawesome-free": "^7.3.1",
+-    "@googleapis/drive": "^20.2.0",
+-    "@googleapis/sheets": "^13.0.2",
++    "@googleapis/drive": "^21.0.0",
++    "@googleapis/sheets": "^14.0.0",
+     "@huggingface/inference": "^4.13.24",
+     "@keyv/mongo": "^3.1.0",
+     "@langchain/core": "^1.2.4",
+-- 
+2.53.0
+

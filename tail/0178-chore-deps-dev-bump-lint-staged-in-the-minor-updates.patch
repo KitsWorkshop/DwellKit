@@ -1,0 +1,72 @@
+From 22ae763c79f2b6ecb4ba07589113ede5baeb9b84 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Thu, 23 Jul 2026 13:28:20 +0000
+Subject: [PATCH 176/200] chore(deps-dev): bump lint-staged in the
+ minor-updates group (#1721)
+
+Bumps the minor-updates group with 1 update: [lint-staged](https://github.com/lint-staged/lint-staged).
+
+
+Updates `lint-staged` from 17.1.1 to 17.2.0
+- [Release notes](https://github.com/lint-staged/lint-staged/releases)
+- [Changelog](https://github.com/lint-staged/lint-staged/blob/main/CHANGELOG.md)
+- [Commits](https://github.com/lint-staged/lint-staged/compare/v17.1.1...v17.2.0)
+
+---
+updated-dependencies:
+- dependency-name: lint-staged
+  dependency-version: 17.2.0
+  dependency-type: direct:development
+  update-type: version-update:semver-minor
+  dependency-group: minor-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 8 ++++----
+ package.json      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index bf4b10f..56e0244 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -84,7 +84,7 @@
+         "eslint-plugin-chai-friendly": "^1.2.1",
+         "globals": "^17.7.0",
+         "husky": "^9.1.7",
+-        "lint-staged": "^17.1.1",
++        "lint-staged": "^17.2.0",
+         "mocha": "^12.0.0-rc.2",
+         "mongodb-memory-server": "^11.2.0",
+         "nock": "15.0.0-beta.12",
+@@ -5756,9 +5756,9 @@
+       }
+     },
+     "node_modules/lint-staged": {
+-      "version": "17.1.1",
+-      "resolved": "https://registry.npmjs.org/lint-staged/-/lint-staged-17.1.1.tgz",
+-      "integrity": "sha512-FnHWpSe5cPRtrDG+soOuNdBxb4XQb2gN5EqpEWKdweyqyOfpl4QSjbrz3ilcIf0WXmkiNQGZZRQ23R5YtB3TEw==",
++      "version": "17.2.0",
++      "resolved": "https://registry.npmjs.org/lint-staged/-/lint-staged-17.2.0.tgz",
++      "integrity": "sha512-FchGnFe4i4B1C/a35SPU9bNGPEHSC1+1iV0plLjzBmKVe9klZrlRfSgK6Cw4VeHyqOXbJUXP0vON61uRftNQ0A==",
+       "dev": true,
+       "license": "MIT",
+       "dependencies": {
+diff --git a/package.json b/package.json
+index a7db618..a5d20ea 100644
+--- a/package.json
++++ b/package.json
+@@ -103,7 +103,7 @@
+     "eslint-plugin-chai-friendly": "^1.2.1",
+     "globals": "^17.7.0",
+     "husky": "^9.1.7",
+-    "lint-staged": "^17.1.1",
++    "lint-staged": "^17.2.0",
+     "mocha": "^12.0.0-rc.2",
+     "mongodb-memory-server": "^11.2.0",
+     "nock": "15.0.0-beta.12",
+-- 
+2.53.0
+

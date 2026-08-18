@@ -1,0 +1,108 @@
+From a4b6e4e186e97adcae06b272d34a9a978475d7d3 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Fri, 20 Mar 2026 13:28:50 +0000
+Subject: [PATCH 038/200] chore(deps): bump @langchain/langgraph in the
+ patch-updates group (#1580)
+
+Bumps the patch-updates group with 1 update: [@langchain/langgraph](https://github.com/langchain-ai/langgraphjs/tree/HEAD/libs/langgraph-core).
+
+
+Updates `@langchain/langgraph` from 1.2.3 to 1.2.4
+- [Release notes](https://github.com/langchain-ai/langgraphjs/releases)
+- [Changelog](https://github.com/langchain-ai/langgraphjs/blob/main/libs/langgraph-core/CHANGELOG.md)
+- [Commits](https://github.com/langchain-ai/langgraphjs/commits/@langchain/langgraph@1.2.4/libs/langgraph-core)
+
+---
+updated-dependencies:
+- dependency-name: "@langchain/langgraph"
+  dependency-version: 1.2.4
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 20 ++++++++------------
+ package.json      |  2 +-
+ 2 files changed, 9 insertions(+), 13 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 01cfd57..651d856 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -18,7 +18,7 @@
+         "@langchain/community": "^1.1.24",
+         "@langchain/core": "^1.1.34",
+         "@langchain/groq": "^1.1.5",
+-        "@langchain/langgraph": "^1.2.3",
++        "@langchain/langgraph": "^1.2.4",
+         "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+         "@langchain/mongodb": "^1.1.0",
+         "@langchain/textsplitters": "^1.0.1",
+@@ -1197,13 +1197,13 @@
+       }
+     },
+     "node_modules/@langchain/langgraph": {
+-      "version": "1.2.3",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.2.3.tgz",
+-      "integrity": "sha512-wvc7cQ4t6aLmI3PtVvvpN7VTqEmQunrlVnuR6t7z/1l98bj6TnQg8uS+NiJ+gF2TkVC5YXkfqY8Z4EpdD6FlcQ==",
++      "version": "1.2.4",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.2.4.tgz",
++      "integrity": "sha512-opUmulmIkQFwFP/JpsXl8K7vqfzeNjuZObeQ1ASu4ZjUcQdyaY1Vm11g9fxH/pXJFeIWy+6BLVJcLUxQ1DRhcA==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph-checkpoint": "^1.0.1",
+-        "@langchain/langgraph-sdk": "~1.7.3",
++        "@langchain/langgraph-sdk": "~1.7.5",
+         "@standard-schema/spec": "1.1.0",
+         "uuid": "^10.0.0"
+       },
+@@ -1327,9 +1327,9 @@
+       }
+     },
+     "node_modules/@langchain/langgraph-sdk": {
+-      "version": "1.7.4",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph-sdk/-/langgraph-sdk-1.7.4.tgz",
+-      "integrity": "sha512-SuQyFvL9Q/eBJdSAHLaM1mmfKoh5JAmRF4PdIokX9pyVYBvJqUpvsOcUYtkC3zniHOh/65y1eqvojt/WgPvN8Q==",
++      "version": "1.7.5",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph-sdk/-/langgraph-sdk-1.7.5.tgz",
++      "integrity": "sha512-j6MjD5btOfVSj2nVKVTu28YPHA9vzBuDbOFnzzfa5q4F6Tbt2Dwg+EiGhJptUz/3XKmU0OKp/3gCWk0ZTHHD1Q==",
+       "license": "MIT",
+       "dependencies": {
+         "@types/json-schema": "^7.0.15",
+@@ -1338,7 +1338,6 @@
+         "uuid": "^13.0.0"
+       },
+       "peerDependencies": {
+-        "@angular/core": "^18.0.0 || ^19.0.0 || ^20.0.0",
+         "@langchain/core": "^1.1.16",
+         "react": "^18 || ^19",
+         "react-dom": "^18 || ^19",
+@@ -1346,9 +1345,6 @@
+         "vue": "^3.0.0"
+       },
+       "peerDependenciesMeta": {
+-        "@angular/core": {
+-          "optional": true
+-        },
+         "@langchain/core": {
+           "optional": true
+         },
+diff --git a/package.json b/package.json
+index bab12a1..c95adf1 100644
+--- a/package.json
++++ b/package.json
+@@ -37,7 +37,7 @@
+     "@langchain/community": "^1.1.24",
+     "@langchain/core": "^1.1.34",
+     "@langchain/groq": "^1.1.5",
+-    "@langchain/langgraph": "^1.2.3",
++    "@langchain/langgraph": "^1.2.4",
+     "@langchain/langgraph-checkpoint-mongodb": "^1.2.0",
+     "@langchain/mongodb": "^1.1.0",
+     "@langchain/textsplitters": "^1.0.1",
+-- 
+2.53.0
+

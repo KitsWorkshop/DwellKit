@@ -1,0 +1,72 @@
+From 877408d2608be6205a3f8ca18373e9b9ae2b7c32 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Tue, 9 Jun 2026 13:29:46 +0000
+Subject: [PATCH 123/200] chore(deps-dev): bump prettier in the patch-updates
+ group (#1676)
+
+Bumps the patch-updates group with 1 update: [prettier](https://github.com/prettier/prettier).
+
+
+Updates `prettier` from 3.8.3 to 3.8.4
+- [Release notes](https://github.com/prettier/prettier/releases)
+- [Changelog](https://github.com/prettier/prettier/blob/main/CHANGELOG.md)
+- [Commits](https://github.com/prettier/prettier/compare/3.8.3...3.8.4)
+
+---
+updated-dependencies:
+- dependency-name: prettier
+  dependency-version: 3.8.4
+  dependency-type: direct:development
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 8 ++++----
+ package.json      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 5752605..dbba010 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -87,7 +87,7 @@
+         "mocha": "^12.0.0-beta-9.5",
+         "mongodb-memory-server": "^11.2.0",
+         "nock": "15.0.0-beta.12",
+-        "prettier": "^3.8.3",
++        "prettier": "^3.8.4",
+         "sinon": "^22.0.0",
+         "supertest": "^7.2.2"
+       },
+@@ -7189,9 +7189,9 @@
+       }
+     },
+     "node_modules/prettier": {
+-      "version": "3.8.3",
+-      "resolved": "https://registry.npmjs.org/prettier/-/prettier-3.8.3.tgz",
+-      "integrity": "sha512-7igPTM53cGHMW8xWuVTydi2KO233VFiTNyF5hLJqpilHfmn8C8gPf+PS7dUT64YcXFbiMGZxS9pCSxL/Dxm/Jw==",
++      "version": "3.8.4",
++      "resolved": "https://registry.npmjs.org/prettier/-/prettier-3.8.4.tgz",
++      "integrity": "sha512-N2MylSdi48+5N/6S5j+maeHbUSIzzZ5uOcX5Hm4QpV8Dkb1HFjfAKTKX6yNPJQD9AhcT3ifHNB66tWTTJDi11Q==",
+       "dev": true,
+       "license": "MIT",
+       "bin": {
+diff --git a/package.json b/package.json
+index b172fdc..44b4632 100644
+--- a/package.json
++++ b/package.json
+@@ -106,7 +106,7 @@
+     "mocha": "^12.0.0-beta-9.5",
+     "mongodb-memory-server": "^11.2.0",
+     "nock": "15.0.0-beta.12",
+-    "prettier": "^3.8.3",
++    "prettier": "^3.8.4",
+     "sinon": "^22.0.0",
+     "supertest": "^7.2.2"
+   },
+-- 
+2.53.0
+

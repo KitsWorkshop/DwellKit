@@ -1,0 +1,81 @@
+From 3e58e158d9af8d6ffe213ab3a7ae0ab1a326fae8 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Wed, 25 Mar 2026 13:29:42 +0000
+Subject: [PATCH 050/200] chore(deps): bump nodemailer in the patch-updates
+ group (#1591)
+
+Bumps the patch-updates group with 1 update: [nodemailer](https://github.com/nodemailer/nodemailer).
+
+
+Updates `nodemailer` from 8.0.3 to 8.0.4
+- [Release notes](https://github.com/nodemailer/nodemailer/releases)
+- [Changelog](https://github.com/nodemailer/nodemailer/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/nodemailer/nodemailer/compare/v8.0.3...v8.0.4)
+
+---
+updated-dependencies:
+- dependency-name: nodemailer
+  dependency-version: 8.0.4
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 10 +++++-----
+ package.json      |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index c2a7182..4d449e0 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -50,7 +50,7 @@
+         "mongoose": "^9.3.2",
+         "morgan": "^1.10.1",
+         "multer": "^2.1.1",
+-        "nodemailer": "^8.0.3",
++        "nodemailer": "^8.0.4",
+         "oauth": "^0.10.2",
+         "otpauth": "^9.5.0",
+         "passport": "^0.7.0",
+@@ -83,7 +83,7 @@
+         "eslint-plugin-chai-friendly": "^1.1.1",
+         "globals": "^17.4.0",
+         "husky": "^9.1.7",
+-        "mocha": "next",
++        "mocha": "*",
+         "mongodb-memory-server": "^11.0.1",
+         "prettier": "^3.8.1",
+         "sinon": "^21.0.3",
+@@ -7167,9 +7167,9 @@
+       "optional": true
+     },
+     "node_modules/nodemailer": {
+-      "version": "8.0.3",
+-      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-8.0.3.tgz",
+-      "integrity": "sha512-JQNBqvK+bj3NMhUFR3wmCl3SYcOeMotDiwDBvIoCuQdF0PvlIY0BH+FJ2CG7u4cXKPChplE78oowlH/Otsc4ZQ==",
++      "version": "8.0.4",
++      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-8.0.4.tgz",
++      "integrity": "sha512-k+jf6N8PfQJ0Fe8ZhJlgqU5qJU44Lpvp2yvidH3vp1lPnVQMgi4yEEMPXg5eJS1gFIJTVq1NHBk7Ia9ARdSBdQ==",
+       "license": "MIT-0",
+       "engines": {
+         "node": ">=6.0.0"
+diff --git a/package.json b/package.json
+index e8569ad..b5e57de 100644
+--- a/package.json
++++ b/package.json
+@@ -69,7 +69,7 @@
+     "mongoose": "^9.3.2",
+     "morgan": "^1.10.1",
+     "multer": "^2.1.1",
+-    "nodemailer": "^8.0.3",
++    "nodemailer": "^8.0.4",
+     "oauth": "^0.10.2",
+     "otpauth": "^9.5.0",
+     "passport": "^0.7.0",
+-- 
+2.53.0
+

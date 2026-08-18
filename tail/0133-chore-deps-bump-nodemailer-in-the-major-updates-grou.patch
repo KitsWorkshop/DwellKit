@@ -1,0 +1,72 @@
+From 3d2400b54fd193b570a68ac4e76451a0a8d1c101 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Mon, 15 Jun 2026 13:34:29 +0000
+Subject: [PATCH 131/200] chore(deps): bump nodemailer in the major-updates
+ group (#1685)
+
+Bumps the major-updates group with 1 update: [nodemailer](https://github.com/nodemailer/nodemailer).
+
+
+Updates `nodemailer` from 8.0.11 to 9.0.0
+- [Release notes](https://github.com/nodemailer/nodemailer/releases)
+- [Changelog](https://github.com/nodemailer/nodemailer/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/nodemailer/nodemailer/compare/v8.0.11...v9.0.0)
+
+---
+updated-dependencies:
+- dependency-name: nodemailer
+  dependency-version: 9.0.0
+  dependency-type: direct:production
+  update-type: version-update:semver-major
+  dependency-group: major-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 8 ++++----
+ package.json      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 3683452..09248f1 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -50,7 +50,7 @@
+         "mongoose": "^9.7.0",
+         "morgan": "^1.11.0",
+         "multer": "^2.1.1",
+-        "nodemailer": "^8.0.11",
++        "nodemailer": "^9.0.0",
+         "oauth": "^0.10.2",
+         "otpauth": "^9.5.1",
+         "passport": "^0.7.0",
+@@ -6508,9 +6508,9 @@
+       }
+     },
+     "node_modules/nodemailer": {
+-      "version": "8.0.11",
+-      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-8.0.11.tgz",
+-      "integrity": "sha512-nrO/pDAUKl+wXX+lx16tDLbnm0fW6sK/x8mgohaCpg+CdCEl482bD4tCuAZk2DyliruiNTIZxRCoWkDqJEnAiA==",
++      "version": "9.0.0",
++      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-9.0.0.tgz",
++      "integrity": "sha512-tbPTid7d/p9jAA8CRZ3iomvrMaST0o6NYuY7v6JQZHpPRZ61mLFSPKYd7342NtOFuej9/+L48SOIxwfu2uDvtw==",
+       "license": "MIT-0",
+       "engines": {
+         "node": ">=6.0.0"
+diff --git a/package.json b/package.json
+index 2298c95..2211861 100644
+--- a/package.json
++++ b/package.json
+@@ -69,7 +69,7 @@
+     "mongoose": "^9.7.0",
+     "morgan": "^1.11.0",
+     "multer": "^2.1.1",
+-    "nodemailer": "^8.0.11",
++    "nodemailer": "^9.0.0",
+     "oauth": "^0.10.2",
+     "otpauth": "^9.5.1",
+     "passport": "^0.7.0",
+-- 
+2.53.0
+

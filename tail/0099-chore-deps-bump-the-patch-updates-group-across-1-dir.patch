@@ -1,0 +1,588 @@
+From 2fcf8d11872b197326c5eea268f6b7b77700aa18 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Wed, 20 May 2026 20:16:46 +0000
+Subject: [PATCH 098/200] chore(deps): bump the patch-updates group across 1
+ directory with 10 updates (#1649)
+
+Bumps the patch-updates group with 10 updates in the / directory:
+
+| Package | From | To |
+| --- | --- | --- |
+| [@googleapis/sheets](https://github.com/googleapis/google-api-nodejs-client) | `13.0.1` | `13.0.2` |
+| [@huggingface/inference](https://github.com/huggingface/huggingface.js) | `4.13.15` | `4.13.17` |
+| [@langchain/core](https://github.com/langchain-ai/langchainjs) | `1.1.46` | `1.1.47` |
+| [@langchain/groq](https://github.com/langchain-ai/langchainjs) | `1.2.0` | `1.2.1` |
+| [@langchain/langgraph](https://github.com/langchain-ai/langgraphjs/tree/HEAD/libs/langgraph-core) | `1.3.0` | `1.3.2` |
+| [@langchain/langgraph-checkpoint-mongodb](https://github.com/langchain-ai/langgraphjs/tree/HEAD/libs/checkpoint-mongodb) | `1.3.0` | `1.3.1` |
+| [@langchain/mongodb](https://github.com/langchain-ai/langchainjs) | `1.2.0` | `1.2.1` |
+| [express-rate-limit](https://github.com/express-rate-limit/express-rate-limit) | `8.5.1` | `8.5.2` |
+| [langchain](https://github.com/langchain-ai/langchainjs) | `1.4.0` | `1.4.1` |
+| [passport-steam-openid](https://github.com/danocmx/passport-steam-openid) | `1.1.9` | `1.1.10` |
+
+
+
+Updates `@googleapis/sheets` from 13.0.1 to 13.0.2
+- [Release notes](https://github.com/googleapis/google-api-nodejs-client/releases)
+- [Commits](https://github.com/googleapis/google-api-nodejs-client/compare/iam-v13.0.1...sheets-v13.0.2)
+
+Updates `@huggingface/inference` from 4.13.15 to 4.13.17
+- [Release notes](https://github.com/huggingface/huggingface.js/releases)
+- [Commits](https://github.com/huggingface/huggingface.js/compare/inference-v4.13.15...inference-v4.13.17)
+
+Updates `@langchain/core` from 1.1.46 to 1.1.47
+- [Release notes](https://github.com/langchain-ai/langchainjs/releases)
+- [Commits](https://github.com/langchain-ai/langchainjs/compare/@langchain/core@1.1.46...@langchain/core@1.1.47)
+
+Updates `@langchain/groq` from 1.2.0 to 1.2.1
+- [Release notes](https://github.com/langchain-ai/langchainjs/releases)
+- [Commits](https://github.com/langchain-ai/langchainjs/compare/@langchain/groq@1.2.0...@langchain/groq@1.2.1)
+
+Updates `@langchain/langgraph` from 1.3.0 to 1.3.2
+- [Release notes](https://github.com/langchain-ai/langgraphjs/releases)
+- [Changelog](https://github.com/langchain-ai/langgraphjs/blob/main/libs/langgraph-core/CHANGELOG.md)
+- [Commits](https://github.com/langchain-ai/langgraphjs/commits/@langchain/langgraph@1.3.2/libs/langgraph-core)
+
+Updates `@langchain/langgraph-checkpoint-mongodb` from 1.3.0 to 1.3.1
+- [Release notes](https://github.com/langchain-ai/langgraphjs/releases)
+- [Changelog](https://github.com/langchain-ai/langgraphjs/blob/main/libs/checkpoint-mongodb/CHANGELOG.md)
+- [Commits](https://github.com/langchain-ai/langgraphjs/commits/@langchain/langgraph@1.3.1/libs/checkpoint-mongodb)
+
+Updates `@langchain/mongodb` from 1.2.0 to 1.2.1
+- [Release notes](https://github.com/langchain-ai/langchainjs/releases)
+- [Commits](https://github.com/langchain-ai/langchainjs/compare/langchain@1.2.0...@langchain/mongodb@1.2.1)
+
+Updates `express-rate-limit` from 8.5.1 to 8.5.2
+- [Release notes](https://github.com/express-rate-limit/express-rate-limit/releases)
+- [Commits](https://github.com/express-rate-limit/express-rate-limit/compare/v8.5.1...v8.5.2)
+
+Updates `langchain` from 1.4.0 to 1.4.1
+- [Release notes](https://github.com/langchain-ai/langchainjs/releases)
+- [Commits](https://github.com/langchain-ai/langchainjs/compare/@langchain/openai@1.4.0...langchain@1.4.1)
+
+Updates `passport-steam-openid` from 1.1.9 to 1.1.10
+- [Changelog](https://github.com/danocmx/passport-steam-openid/blob/master/release.config.js)
+- [Commits](https://github.com/danocmx/passport-steam-openid/compare/v1.1.9...v1.1.10)
+
+---
+updated-dependencies:
+- dependency-name: "@googleapis/sheets"
+  dependency-version: 13.0.2
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: "@huggingface/inference"
+  dependency-version: 4.13.17
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: "@langchain/core"
+  dependency-version: 1.1.47
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: "@langchain/groq"
+  dependency-version: 1.2.1
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: "@langchain/langgraph"
+  dependency-version: 1.3.2
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: "@langchain/langgraph-checkpoint-mongodb"
+  dependency-version: 1.3.1
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: "@langchain/mongodb"
+  dependency-version: 1.2.1
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: express-rate-limit
+  dependency-version: 8.5.2
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: langchain
+  dependency-version: 1.4.1
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+- dependency-name: passport-steam-openid
+  dependency-version: 1.1.10
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: patch-updates
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ package-lock.json | 155 ++++++++++++++++------------------------------
+ package.json      |  20 +++---
+ 2 files changed, 65 insertions(+), 110 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 5c9c8d9..26b6f43 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -12,15 +12,15 @@
+       "dependencies": {
+         "@fortawesome/fontawesome-free": "^7.2.0",
+         "@googleapis/drive": "^20.1.0",
+-        "@googleapis/sheets": "^13.0.1",
+-        "@huggingface/inference": "^4.13.15",
++        "@googleapis/sheets": "^13.0.2",
++        "@huggingface/inference": "^4.13.17",
+         "@keyv/mongo": "^3.1.0",
+         "@langchain/community": "^1.1.28",
+-        "@langchain/core": "^1.1.46",
+-        "@langchain/groq": "^1.2.0",
+-        "@langchain/langgraph": "^1.3.0",
+-        "@langchain/langgraph-checkpoint-mongodb": "^1.3.0",
+-        "@langchain/mongodb": "^1.2.0",
++        "@langchain/core": "^1.1.47",
++        "@langchain/groq": "^1.2.1",
++        "@langchain/langgraph": "^1.3.2",
++        "@langchain/langgraph-checkpoint-mongodb": "^1.3.1",
++        "@langchain/mongodb": "^1.2.1",
+         "@langchain/textsplitters": "^1.0.1",
+         "@lob/lob-typescript-sdk": "^1.3.6",
+         "@node-rs/bcrypt": "^1.10.7",
+@@ -38,11 +38,11 @@
+         "connect-mongo": "^6.0.0",
+         "errorhandler": "^1.5.2",
+         "express": "^5.2.1",
+-        "express-rate-limit": "^8.5.1",
++        "express-rate-limit": "^8.5.2",
+         "express-session": "^1.19.0",
+         "jquery": "^4.0.0",
+         "keyv": "^5.6.0",
+-        "langchain": "^1.4.0",
++        "langchain": "^1.4.1",
+         "lastfm": "^0.9.4",
+         "lusca": "^1.7.0",
+         "mailchecker": "^6.0.20",
+@@ -61,7 +61,7 @@
+         "passport-oauth1": "^1.3.0",
+         "passport-oauth2": "^1.8.0",
+         "passport-oauth2-refresh": "^2.2.0",
+-        "passport-steam-openid": "^1.1.9",
++        "passport-steam-openid": "^1.1.10",
+         "patch-package": "^8.0.1",
+         "pdfjs-dist": "^5.7.284",
+         "pug": "^3.0.4",
+@@ -453,9 +453,9 @@
+       }
+     },
+     "node_modules/@googleapis/sheets": {
+-      "version": "13.0.1",
+-      "resolved": "https://registry.npmjs.org/@googleapis/sheets/-/sheets-13.0.1.tgz",
+-      "integrity": "sha512-XTYObncN5Rqexc0uITZIN9OWTEyE/ZR2S6c7wAniqHe2oGXW9gcHR9f9hQwPMHFUTHjH7Jkj8SLdt0O0u37y2A==",
++      "version": "13.0.2",
++      "resolved": "https://registry.npmjs.org/@googleapis/sheets/-/sheets-13.0.2.tgz",
++      "integrity": "sha512-b1tBlMcfvNEziM4DZCikLOc9iqSlgCK1e5bMKtNQIADRXr1CQmbkHV3ZBVvTsFsjLErgihqO58Itn/kzCnSZ0A==",
+       "license": "Apache-2.0",
+       "dependencies": {
+         "googleapis-common": "^8.0.0"
+@@ -471,13 +471,13 @@
+       "license": "MIT"
+     },
+     "node_modules/@huggingface/inference": {
+-      "version": "4.13.15",
+-      "resolved": "https://registry.npmjs.org/@huggingface/inference/-/inference-4.13.15.tgz",
+-      "integrity": "sha512-V7B13KFDVhYkQqgx8vpMcmtEG+PoePlh65IUvpphTTItHAq6zRLcsS4torh1QavUaT+6nEwho4wFXzBQNGBwKQ==",
++      "version": "4.13.17",
++      "resolved": "https://registry.npmjs.org/@huggingface/inference/-/inference-4.13.17.tgz",
++      "integrity": "sha512-+qA6wrGjh2L6FfFkE2nJmiA7XcJJV5/9+WEwYzA/Y2kibPypGecvVSgsXTATeb9CmkCP8v+uhtDGVHJTuaAXOg==",
+       "license": "MIT",
+       "dependencies": {
+-        "@huggingface/jinja": "^0.5.5",
+-        "@huggingface/tasks": "^0.19.90"
++        "@huggingface/jinja": "^0.5.9",
++        "@huggingface/tasks": "^0.21.1"
+       },
+       "engines": {
+         "node": ">=18"
+@@ -493,9 +493,9 @@
+       }
+     },
+     "node_modules/@huggingface/tasks": {
+-      "version": "0.19.90",
+-      "resolved": "https://registry.npmjs.org/@huggingface/tasks/-/tasks-0.19.90.tgz",
+-      "integrity": "sha512-nfV9luJbvwGQ/5oKXkKhCV9h4X7mwh1YaGG3ORd6UMLDSwr1OFSSatcBX0O9OtBtmNK19aGSjbLFqqgcIR6+IA==",
++      "version": "0.21.1",
++      "resolved": "https://registry.npmjs.org/@huggingface/tasks/-/tasks-0.21.1.tgz",
++      "integrity": "sha512-EGy9VE8h9d39JgyKY5+Nwl0mcGQOK3el8rlR9Y09KVCZOHsLHAsOP1e7D9M7P781dSObZW9lokdfT+Sm26Iv3g==",
+       "license": "MIT"
+     },
+     "node_modules/@humanfs/core": {
+@@ -1174,9 +1174,9 @@
+       }
+     },
+     "node_modules/@langchain/core": {
+-      "version": "1.1.46",
+-      "resolved": "https://registry.npmjs.org/@langchain/core/-/core-1.1.46.tgz",
+-      "integrity": "sha512-i8rDC83BpItxChCw4Lf+6tAr+k+OUcbirc5ZkrhI9ywYWmvxegUljLGOGYvtJNTbEAIFkhYIODPE5QRqyjF6sA==",
++      "version": "1.1.47",
++      "resolved": "https://registry.npmjs.org/@langchain/core/-/core-1.1.47.tgz",
++      "integrity": "sha512-+fiPu6ZFnJMrZyKeM77OIVPoMPAY6OKWacnPlojHtXTbMMzb2cEOKAJV0U07cDl86NHSCIYYa0i4CyKZzXbHQQ==",
+       "license": "MIT",
+       "dependencies": {
+         "@cfworker/json-schema": "^4.0.2",
+@@ -1192,9 +1192,9 @@
+       }
+     },
+     "node_modules/@langchain/groq": {
+-      "version": "1.2.0",
+-      "resolved": "https://registry.npmjs.org/@langchain/groq/-/groq-1.2.0.tgz",
+-      "integrity": "sha512-OozhcAUNDT4XmvQmzd1+TFinyDCZVU/4WjmjEEOO09aVhG7hBbJuodhF/fuajH52JsdFclBCnYomulA+iqe+1w==",
++      "version": "1.2.1",
++      "resolved": "https://registry.npmjs.org/@langchain/groq/-/groq-1.2.1.tgz",
++      "integrity": "sha512-K3QK3lVTUqxheA9u8upwN0cu04cySyaoKRmnN3vp5fEWQjzm08TYEv6FypyVEcEx0ZzBrHaYKsZIZKZSINN3RQ==",
+       "license": "MIT",
+       "dependencies": {
+         "groq-sdk": "^1.1.2"
+@@ -1207,13 +1207,13 @@
+       }
+     },
+     "node_modules/@langchain/langgraph": {
+-      "version": "1.3.0",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.3.0.tgz",
+-      "integrity": "sha512-QvhTjiyqFPz81A+y6LHs223w6DTjv5+882DT4mup72bd72rRhNjTYo5fhes5um0swnKArvY/arc7KeFInfHHWw==",
++      "version": "1.3.2",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph/-/langgraph-1.3.2.tgz",
++      "integrity": "sha512-SL7Ktsr681R7da+1b2MVOWEbaCoFJOXEJPTGOjg4JIG4C7quWbTYC8DzxhcCxte6D/8cGp0rYDBnbKLXEpNqlA==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph-checkpoint": "^1.0.2",
+-        "@langchain/langgraph-sdk": "~1.9.0",
++        "@langchain/langgraph-sdk": "~1.9.4",
+         "@langchain/protocol": "^0.0.15",
+         "@standard-schema/spec": "1.1.0",
+         "uuid": "^10.0.0"
+@@ -1248,9 +1248,9 @@
+       }
+     },
+     "node_modules/@langchain/langgraph-checkpoint-mongodb": {
+-      "version": "1.3.0",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph-checkpoint-mongodb/-/langgraph-checkpoint-mongodb-1.3.0.tgz",
+-      "integrity": "sha512-/WWMnEva0Y2t5bDdms4kxkgxlVLhPED956yxJeRIaTuc8IbTmL3ToMJ9+E6TOb59UX/0gY4uBHGGmcfOh/sMpg==",
++      "version": "1.3.1",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph-checkpoint-mongodb/-/langgraph-checkpoint-mongodb-1.3.1.tgz",
++      "integrity": "sha512-1XKrSxJMxNAM7uX2kWdUHUeJDpv5m22hItjpP4vJuMhtEFuMTpQXEIk5UbgkRHYomjvxg1294/HAP78VbyP5hA==",
+       "license": "MIT",
+       "dependencies": {
+         "mongodb": "^6.21.0"
+@@ -1259,7 +1259,7 @@
+         "node": ">=18"
+       },
+       "peerDependencies": {
+-        "@langchain/core": "^1.1.40",
++        "@langchain/core": "^1.1.44",
+         "@langchain/langgraph-checkpoint": "^1.0.0"
+       }
+     },
+@@ -1352,12 +1352,11 @@
+       }
+     },
+     "node_modules/@langchain/langgraph-sdk": {
+-      "version": "1.9.2",
+-      "resolved": "https://registry.npmjs.org/@langchain/langgraph-sdk/-/langgraph-sdk-1.9.2.tgz",
+-      "integrity": "sha512-1kDPjR0VH/39q2h8k0Sxi35KxOvEQPModVCepxGLlRkbZmuWUH+zfICuJd3rmD1ByeOKQBZEaB7Y+VCYmSMt1w==",
++      "version": "1.9.4",
++      "resolved": "https://registry.npmjs.org/@langchain/langgraph-sdk/-/langgraph-sdk-1.9.4.tgz",
++      "integrity": "sha512-hhASJGKa2MDJDtDkuIFdWGysMTog/HkYe0r6B6Gn1XqsURWnF7FIFl9diITAPOv1tB8YpyjnbpsBj/NkT5d+jQ==",
+       "license": "MIT",
+       "dependencies": {
+-        "@langchain/core": "^1.1.44",
+         "@langchain/protocol": "^0.0.15",
+         "@types/json-schema": "^7.0.15",
+         "p-queue": "^9.0.1",
+@@ -1365,6 +1364,7 @@
+         "uuid": "^13.0.0"
+       },
+       "peerDependencies": {
++        "@langchain/core": "^1.1.44",
+         "react": "^18 || ^19",
+         "react-dom": "^18 || ^19",
+         "svelte": "^4.0.0 || ^5.0.0",
+@@ -1392,9 +1392,9 @@
+       "license": "MIT"
+     },
+     "node_modules/@langchain/langgraph-sdk/node_modules/p-queue": {
+-      "version": "9.2.0",
+-      "resolved": "https://registry.npmjs.org/p-queue/-/p-queue-9.2.0.tgz",
+-      "integrity": "sha512-dWgLE8AH0HjQ9fe74pUkKkvzzYT18Inp4zra3lKHnnwqGvcfcUBrvF2EAVX+envufDNBOzpPq/IBUONDbI7+3g==",
++      "version": "9.3.0",
++      "resolved": "https://registry.npmjs.org/p-queue/-/p-queue-9.3.0.tgz",
++      "integrity": "sha512-7NED7xhQ74Ngp4JP/2e0VZHp7vSWfJfqeiR92jPgxsz6m0Se4P03YoTKa9dDXyZ3r6P616gUXttrB6nnHYKang==",
+       "license": "MIT",
+       "dependencies": {
+         "eventemitter3": "^5.0.4",
+@@ -1447,9 +1447,9 @@
+       }
+     },
+     "node_modules/@langchain/mongodb": {
+-      "version": "1.2.0",
+-      "resolved": "https://registry.npmjs.org/@langchain/mongodb/-/mongodb-1.2.0.tgz",
+-      "integrity": "sha512-zBSy9yYnQ9SVupmu8BB0GEoUlsYjiILbGaN02OVOik/YopFTWLWOigtpKBTyTmERqrKjqw+RUu74dr21h9P+mA==",
++      "version": "1.2.1",
++      "resolved": "https://registry.npmjs.org/@langchain/mongodb/-/mongodb-1.2.1.tgz",
++      "integrity": "sha512-e00+qg94YuvGR0mv7PxG7hfbcSxqu4LpHx2QnoX3Uu9URF/wspfheGgZflOOYKbOhoQVAiPevQLck9mGfxVLwQ==",
+       "license": "MIT",
+       "dependencies": {
+         "mongodb": "^6.20.0"
+@@ -1740,9 +1740,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1763,9 +1760,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1786,9 +1780,6 @@
+       "cpu": [
+         "riscv64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1809,9 +1800,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1832,9 +1820,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -2044,9 +2029,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -2063,9 +2045,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -2082,9 +2061,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -2101,9 +2077,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -2479,9 +2452,6 @@
+       "cpu": [
+         "arm"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -2502,9 +2472,6 @@
+       "cpu": [
+         "arm"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -2525,9 +2492,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -2548,9 +2512,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -2571,9 +2532,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -2594,9 +2552,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -4925,9 +4880,9 @@
+       }
+     },
+     "node_modules/express-rate-limit": {
+-      "version": "8.5.1",
+-      "resolved": "https://registry.npmjs.org/express-rate-limit/-/express-rate-limit-8.5.1.tgz",
+-      "integrity": "sha512-5O6KYmyJEpuPJV5hNTXKbAHWRqrzyu+OI3vUnSd2kXFubIVpG7ezpgxQy76Zo5GQZtrQBg86hF+CM/NX+cioiQ==",
++      "version": "8.5.2",
++      "resolved": "https://registry.npmjs.org/express-rate-limit/-/express-rate-limit-8.5.2.tgz",
++      "integrity": "sha512-5Kb34ipNX694DH48vN9irak1Qx30nb0PLYHXfJgw4YEjiC3ZEmZJhwOp+VfiCYwFzvFTdB9QkArYS5kXa2cx2A==",
+       "license": "MIT",
+       "dependencies": {
+         "ip-address": "^10.2.0"
+@@ -6524,9 +6479,9 @@
+       }
+     },
+     "node_modules/langchain": {
+-      "version": "1.4.0",
+-      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.4.0.tgz",
+-      "integrity": "sha512-p3H5U1vfO0T4ri/xxqI6jccRP3LYmOW6KGxaJcwI5mIGVR/G6eNhZyjSZB9d7me6J7an4Pc6zA8tH8Qa6/7xwA==",
++      "version": "1.4.1",
++      "resolved": "https://registry.npmjs.org/langchain/-/langchain-1.4.1.tgz",
++      "integrity": "sha512-LHGdj0OQV5pgyZgC2WWiEvNg5g16dg+c3j7pw7Iuw7tJXEvltNLVl6DjC6egxSsWT03FJN0eUJxJ13Dxhz2bBA==",
+       "license": "MIT",
+       "dependencies": {
+         "@langchain/langgraph": "^1.3.0",
+@@ -6538,7 +6493,7 @@
+         "node": ">=20"
+       },
+       "peerDependencies": {
+-        "@langchain/core": "^1.1.44"
++        "@langchain/core": "^1.1.47"
+       }
+     },
+     "node_modules/langsmith": {
+@@ -7781,9 +7736,9 @@
+       }
+     },
+     "node_modules/passport-steam-openid": {
+-      "version": "1.1.9",
+-      "resolved": "https://registry.npmjs.org/passport-steam-openid/-/passport-steam-openid-1.1.9.tgz",
+-      "integrity": "sha512-E3J8Hf0xR1Ay13wM4topr8phq9FYF4NWm0Tg3z0oGa3LMUuwdK3c6KU6CZH7YP3Zv88577/NONFvQj/wF7TUqg==",
++      "version": "1.1.10",
++      "resolved": "https://registry.npmjs.org/passport-steam-openid/-/passport-steam-openid-1.1.10.tgz",
++      "integrity": "sha512-FuQuzA4czQjG2NOaCIZ4B/ZJHs1DZLhw95jHNkbr0FcP7HMjIc4YvC+HSXJmMa2gMyPBNGY0VWfdvXFDiE+8dA==",
+       "license": "MIT",
+       "dependencies": {
+         "passport": "^0.6.0"
+diff --git a/package.json b/package.json
+index 7819829..9e86ab4 100644
+--- a/package.json
++++ b/package.json
+@@ -31,15 +31,15 @@
+   "dependencies": {
+     "@fortawesome/fontawesome-free": "^7.2.0",
+     "@googleapis/drive": "^20.1.0",
+-    "@googleapis/sheets": "^13.0.1",
+-    "@huggingface/inference": "^4.13.15",
++    "@googleapis/sheets": "^13.0.2",
++    "@huggingface/inference": "^4.13.17",
+     "@keyv/mongo": "^3.1.0",
+     "@langchain/community": "^1.1.28",
+-    "@langchain/core": "^1.1.46",
+-    "@langchain/groq": "^1.2.0",
+-    "@langchain/langgraph": "^1.3.0",
+-    "@langchain/langgraph-checkpoint-mongodb": "^1.3.0",
+-    "@langchain/mongodb": "^1.2.0",
++    "@langchain/core": "^1.1.47",
++    "@langchain/groq": "^1.2.1",
++    "@langchain/langgraph": "^1.3.2",
++    "@langchain/langgraph-checkpoint-mongodb": "^1.3.1",
++    "@langchain/mongodb": "^1.2.1",
+     "@langchain/textsplitters": "^1.0.1",
+     "@lob/lob-typescript-sdk": "^1.3.6",
+     "@node-rs/bcrypt": "^1.10.7",
+@@ -57,11 +57,11 @@
+     "connect-mongo": "^6.0.0",
+     "errorhandler": "^1.5.2",
+     "express": "^5.2.1",
+-    "express-rate-limit": "^8.5.1",
++    "express-rate-limit": "^8.5.2",
+     "express-session": "^1.19.0",
+     "jquery": "^4.0.0",
+     "keyv": "^5.6.0",
+-    "langchain": "^1.4.0",
++    "langchain": "^1.4.1",
+     "lastfm": "^0.9.4",
+     "lusca": "^1.7.0",
+     "mailchecker": "^6.0.20",
+@@ -80,7 +80,7 @@
+     "passport-oauth1": "^1.3.0",
+     "passport-oauth2": "^1.8.0",
+     "passport-oauth2-refresh": "^2.2.0",
+-    "passport-steam-openid": "^1.1.9",
++    "passport-steam-openid": "^1.1.10",
+     "patch-package": "^8.0.1",
+     "pdfjs-dist": "^5.7.284",
+     "pug": "^3.0.4",
+-- 
+2.53.0
+
