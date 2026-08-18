@@ -16,7 +16,7 @@ Everything below was executed against a real built repository. The outputs are r
 
 ## Beat 1: Arrival
 
-The student clones their repository and looks around. What they find is an ordinary, busy Node.js project — 3,059 commits, six months of recent activity, dependency bumps, bugfixes, real contributors.
+The student clones their repository and looks around. What they find is an ordinary, busy Node.js project — 3,060 commits, six months of recent activity, dependency bumps, bugfixes, real contributors.
 
 ```
 $ git log --oneline -5

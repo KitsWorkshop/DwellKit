@@ -131,7 +131,7 @@ It's also a term they will meet again in incident response — worth planting ea
 
 ## Beat 1–2: Arrival and the find
 
-Student clones an ordinary, busy Node.js project — **3,059 commits**, six months of recent activity, real contributors.
+Student clones an ordinary, busy Node.js project — **3,060 commits**, six months of recent activity, real contributors.
 
 CI is **already red**.
 
@@ -357,7 +357,7 @@ That second half is the valuable part — every mechanism has gaps.
 | **3. Plant/scrub** | 3 of those commits | The exercise |
 | **4. Secret + workflow** | Actions secret + CI | Makes rotation *real* |
 
-**Total: 3,059 commits per student repo.**
+**Total: 3,060 commits per student repo.**
 
 ---
 

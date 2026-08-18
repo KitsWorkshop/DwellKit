@@ -342,4 +342,4 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 | `PROGRESS.md` | Short status summary suitable for reporting. |
 | `agent-spec.md` | The original build specification. Useful for understanding intent; note that several of its assumptions were revised during the build, and where they conflict, `TECHNICAL-NOTES.md` is authoritative. |
 
-A built student repository contains **3,059 commits**: 2,855 floor + 203 tail + 1 workflow commit added at build time.
+A built student repository contains **3,060 commits**: 2,855 floor + 203 tail + 1 workflow commit added at build time.

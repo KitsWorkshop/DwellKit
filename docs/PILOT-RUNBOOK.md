@@ -171,7 +171,7 @@ That last check is the important one. It confirms the plant and the scrub are st
 
 ## §6 — What to tell participants
 
-⚠️ **The real student brief does not exist yet** (`TODO.md` §3.1). Until it does, use this. Read it aloud or paste it — do not improvise, because the wording determines what you learn.
+**The brief is already in their repository** — `templates/student-README.md` is installed as the README at build time, so they will read it on arrival. Say this much out loud to frame the session, then let the README do the work. Do not improvise beyond it: the wording is what you are testing.
 
 > You have inherited a repository. It is a working Node.js application with real history and many contributors.
 >

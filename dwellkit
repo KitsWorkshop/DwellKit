@@ -84,7 +84,7 @@ cmd_build() {
   # (does not exist yet; this is plain `git clone` against a bundle file,
   # which is exactly what that task needs to wrap.)
   # -------------------------------------------------------------------------
-  echo "==> [1/7] Unpacking floor bundle"
+  echo "==> [1/8] Unpacking floor bundle"
   git clone --quiet "$SCRIPT_DIR/floor.bundle" "$WORKDIR/repo"
   cd "$WORKDIR/repo"
   git checkout --quiet -b main origin/floor
@@ -97,7 +97,7 @@ cmd_build() {
   # Substitutes the __KIT_SECRET__ placeholder for the real credential value
   # as each patch is applied, so no working credential is ever stored on disk.
   # -------------------------------------------------------------------------
-  echo "==> [2/7] Applying tail patch series"
+  echo "==> [2/8] Applying tail patch series"
   local patch
   for patch in "$SCRIPT_DIR"/tail/*.patch; do
     sed "s/__KIT_SECRET__/${CREDENTIAL_VALUE}/g" "$patch" > "$WORKDIR/patch.tmp"
@@ -115,14 +115,14 @@ cmd_build() {
   # The description is student-visible on the repo page: it must not hint
   # that this is a constructed exercise.
   # -------------------------------------------------------------------------
-  echo "==> [3/7] Creating private repo $GH_ORG/$REPO_NAME"
+  echo "==> [3/8] Creating private repo $GH_ORG/$REPO_NAME"
   gh repo create "$GH_ORG/$REPO_NAME" --private --description "Hackathon starter application" >/dev/null
 
   # -------------------------------------------------------------------------
   # Step 4 — push floor + tail.
   # Eventual kitscript task: git-push (generic, likely already exists)
   # -------------------------------------------------------------------------
-  echo "==> [4/7] Pushing floor + tail"
+  echo "==> [4/8] Pushing floor + tail"
   # Auth via a per-invocation header rather than embedding the token in the
   # remote URL — an embedded-token URL gets echoed back by things like
   # `git remote -v`, .git/config, and tool notices (e.g. git-filter-repo's
@@ -141,7 +141,7 @@ cmd_build() {
   # performs that encryption locally before transmitting. This replaced ~19
   # lines of PyNaCl and one dependency with the line below.
   # -------------------------------------------------------------------------
-  echo "==> [5/7] Setting STAGING_API_KEY repo secret"
+  echo "==> [5/8] Setting STAGING_API_KEY repo secret"
   gh secret set STAGING_API_KEY --body "$CREDENTIAL_VALUE" --repo "${GH_ORG}/${REPO_NAME}"
 
   # -------------------------------------------------------------------------
@@ -151,7 +151,7 @@ cmd_build() {
   # than a separate task. Written here as a second commit + push for clarity
   # of what changed and when.
   # -------------------------------------------------------------------------
-  echo "==> [6/7] Adding staging-deploy workflow"
+  echo "==> [6/8] Adding staging-deploy workflow"
   mkdir -p .github/workflows
   # Compare a hash of the known-leaked value, not the raw value itself — the
   # workflow file is a tracked, permanent part of the repo, so embedding the
@@ -182,14 +182,31 @@ EOF
   GIT_AUTHOR_NAME="Priya Natarajan" GIT_AUTHOR_EMAIL="pnatarajan@users.noreply.github.com" \
   GIT_COMMITTER_NAME="Priya Natarajan" GIT_COMMITTER_EMAIL="pnatarajan@users.noreply.github.com" \
     git commit --quiet -m "ci: add staging deploy workflow"
+
+  # -------------------------------------------------------------------------
+  # Step 7 — replace the upstream README with the student brief.
+  #
+  # The upstream README is ~1,570 lines of boilerplate marketing (testimonials,
+  # Product Hunt quotes) — too long to read, and it undercuts the premise that
+  # this is an internal application the student has inherited. The replacement
+  # carries the exercise brief plus a short, genuine "how to run it" section.
+  #
+  # Edit templates/student-README.md to change the brief; no need to touch this
+  # script. It deliberately does NOT mention rotation, history search, or that
+  # the history was tampered with — working those out is the exercise.
+  # -------------------------------------------------------------------------
+  echo "==> [7/8] Installing student README + brief"
+  cp "$SCRIPT_DIR/templates/student-README.md" README.md
+  git add README.md
+  git commit --quiet -m "docs: replace README with project overview and task brief"
   git -c http.extraheader="$AUTH_HEADER" push --quiet origin main
 
   # -------------------------------------------------------------------------
-  # Step 7 — confirm branch protection is off, report the result.
+  # Step 8 — confirm branch protection is off, report the result.
   # Students must be able to force-push; protection here would block the
   # history rewrite the exercise depends on.
   # -------------------------------------------------------------------------
-  echo "==> [7/7] Confirming branch protection is off"
+  echo "==> [8/8] Confirming branch protection is off"
   if gh api "repos/${GH_ORG}/${REPO_NAME}/branches/main/protection" >/dev/null 2>&1; then
     echo "    WARNING: branch protection is ON for main (expected off)"
   else
@@ -206,7 +223,7 @@ EOF
 #
 # Direct API fan-out with outside-collaborator invitations. Deliberately does
 # NOT use GitHub Classroom template assignments — those provision repos with a
-# single commit, which would destroy this kit's 3,059-commit history.
+# single commit, which would destroy this kit's 3,060-commit history.
 # See docs/FANOUT-DESIGN.md.
 #
 # Roster format (header required):

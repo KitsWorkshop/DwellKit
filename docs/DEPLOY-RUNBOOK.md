@@ -189,7 +189,7 @@ git log --oneline -20 | grep -c "staging config" # expect: 1 (only the live copy
 Give the student:
 
 1. **The repository URL** — `https://github.com/<org>/hackathon-starter-<student>`
-2. **The brief** — ⚠️ **does not exist yet.** See `TODO.md` §3.1. It must state that marking is on *order of operations*, not on whether the history rewrite succeeded.
+2. **The brief** — already in the repository. `templates/student-README.md` is installed as the README at build time, so it is the first thing they read. Review it before handing over; edit that template, not the script.
 3. **A prerequisite note** — they need `git-filter-repo` installed, and a GitHub account with access accepted.
 
 ---

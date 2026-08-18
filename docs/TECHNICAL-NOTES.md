@@ -22,7 +22,7 @@ Answers to the four required questions:
 FarmData2 isn't available, so — with the operator's explicit sign-off — the floor is built from **[sahat/hackathon-starter](https://github.com/sahat/hackathon-starter)** instead:
 
 - MIT licensed (redistribution permitted)
-- 3,055 commits, 229 contributors — far more history than needed (not to be confused with the 3,059 commits of a *built student repo*: 2,855 floor + 203 tail + 1 workflow)
+- 3,055 commits, 229 contributors — far more history than needed (not to be confused with the 3,060 commits of a *built student repo*: 2,855 floor + 203 tail + 1 workflow)
 - Real `config/` directory and `.env.example` — a natural, unforced place for a credential to live
 - An actively deployed Node.js starter app, not a library — the "config/deploy script" shape the spec asked for
 

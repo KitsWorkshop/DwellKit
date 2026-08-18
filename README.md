@@ -18,7 +18,8 @@ Students receive a private repository with a real, plausible commit history. Som
 |---|---|
 | Understand the kit from zero — concepts, design decisions, infrastructure | [INSTRUCTOR-GUIDE.md](docs/INSTRUCTOR-GUIDE.md) |
 | Deploy to one student | [DEPLOY-RUNBOOK.md](docs/DEPLOY-RUNBOOK.md) |
-| Deploy to a whole class | [FANOUT-DESIGN.md](docs/FANOUT-DESIGN.md) |
+| Deploy to a whole class | [Deploying to a class](#deploying-to-a-class), below |
+| Understand the class-scale constraints (billing, GitHub Classroom) | [FANOUT-DESIGN.md](docs/FANOUT-DESIGN.md) |
 | Trial it with colleagues before a real cohort | [PILOT-RUNBOOK.md](docs/PILOT-RUNBOOK.md) |
 | Know what students actually experience, and how to mark it | [STUDENT-EXPERIENCE.md](docs/STUDENT-EXPERIENCE.md) |
 | Brief colleagues or stakeholders | [SLIDES.md](docs/SLIDES.md) (Marp) |
@@ -40,17 +41,120 @@ export GH_ORG=your-org
 ./dwellkit build alice      # → your-org/hackathon-starter-alice
 ```
 
-**A whole class:**
+**A whole class:** see [Deploying to a class](#deploying-to-a-class) below — there are two things
+(paid seats, and invitation acceptance) that will bite you if you skip straight to the commands.
+
+---
+
+## Deploying to a class
+
+Roughly 20 minutes of work for 20 students, spread across two weeks. The commands are fast;
+the waiting is not.
+
+### Before you commit to a date
+
+- [ ] **Apply for [GitHub Education](https://education.github.com/) verification.** Collaborators on
+      **private** repos consume paid seats — 20 students needs 21. Education grants the same Team
+      plan free with unlimited users. It has external lead time, so start it first.
+      *(Being on Team is what creates the cost; it is not something to upgrade away from.)*
+- [ ] **Get a token scoped to the teaching org** — a fine-grained PAT or a GitHub App install,
+      with `repo` + `workflow`. Not a personal classic PAT: those reach every repo the issuing
+      account can see.
+- [ ] **Run one build in the real teaching org** — `./dwellkit build pilot1`. This single action
+      checks push protection, token permissions, and org policy at once. Delete it afterwards.
+- [ ] **Run a group pilot** — [PILOT-RUNBOOK.md](docs/PILOT-RUNBOOK.md). Optional, but it closes
+      the one genuinely untested question: whether a write-level collaborator can rotate the
+      Actions secret and force-push.
+- [ ] **Review the student brief.** It ships in `templates/student-README.md` and is installed as
+      the repository's README at build time, so every student reads it on arrival. It already
+      states that marking is on *order of operations* and asks for an ordered log. Read it once
+      and adjust the wording to your cohort. The **rubric and debrief** are still unwritten
+      ([TODO.md](docs/TODO.md) §3.1).
+
+### Two to three days before
+
+**1. Build the roster.** One row per student. `student_id` becomes the repo suffix, so keep it
+short and lowercase.
 
 ```bash
-cp roster.example.csv roster.csv     # student_id,github_username
-export KIT_SALT=...                  # per-cohort secret; makes credentials reproducible
-./dwellkit class roster.csv --dry-run     # validate the roster, create nothing
-./dwellkit class roster.csv               # build, invite, report to dwellkit-results-<ts>.csv
-./dwellkit status dwellkit-results-*.csv --remind
+cp roster.example.csv roster.csv
 ```
 
-Both are re-runnable — an existing repo is skipped, and invitations are idempotent.
+```csv
+student_id,github_username
+amara,amara-gh
+devin,devin-codes
+```
+
+Usernames must be exact. `dwellkit class` validates every one against GitHub and **refuses to
+create anything if any row is bad**, so one typo blocks the whole run — which is the behaviour
+you want, but it means getting them right matters.
+
+**2. Set the environment.**
+
+```bash
+export GH_TOKEN=<org-scoped token: repo + workflow>
+export GH_ORG=<teaching org>
+export KIT_SALT=<any secret string — write it down and keep it>
+```
+
+`KIT_SALT` makes each student's credential reproducible. Keep it and you can re-derive any
+value later without having recorded twenty of them:
+
+```bash
+printf 'sk_staging_%s\n' "$(printf '%s' "${STUDENT_ID}${KIT_SALT}" | sha256sum | cut -c1-40)"
+```
+
+**3. Validate, then deploy.**
+
+```bash
+./dwellkit class roster.csv --dry-run   # checks every username, creates nothing
+./dwellkit class roster.csv             # builds, invites, writes dwellkit-results-<ts>.csv
+```
+
+⏱ About 15–50 seconds per repo, 5 at a time — roughly 3 minutes for 20 students.
+
+Re-runnable: if anything fails, run the identical command again. Existing repos are skipped and
+invitations are re-sent.
+
+> The results CSV contains **live credential values**. It is gitignored. Don't commit or paste it.
+
+### The week before — chase acceptance
+
+This is the step that actually bites. An unaccepted invitation means a student sits down to a
+repository they cannot clone.
+
+```bash
+./dwellkit status dwellkit-results-*.csv            # who's accepted, who hasn't
+./dwellkit status dwellkit-results-*.csv --remind   # re-send the pending ones
+```
+
+Run it daily. **Do not start class with anyone still `PENDING`.**
+
+Students who are already members of the org get access instantly with nothing to accept — so if
+you tested with colleagues who are org members, you have not actually exercised this path.
+
+### On the day
+
+Hand each student their repository URL and the brief. Expect CI to be **red on arrival** — that
+is correct, not a fault, but decide in advance how you frame it, because it can read as
+"the exercise is broken."
+
+Keep [STUDENT-EXPERIENCE.md](docs/STUDENT-EXPERIENCE.md) open for yourself: model solution,
+common wrong turns, and marking guidance. Fast finishers have no built extension yet
+([TODO.md](docs/TODO.md) §3.2), so have something ready.
+
+### Afterwards
+
+There is **no reset path** — a rotated and rewritten repo cannot be returned to its starting
+state. To re-run, rebuild with fresh ids.
+
+```bash
+gh repo list "$GH_ORG" --limit 100 --json name --jq '.[].name' | grep '^hackathon-starter-'
+```
+
+Delete them (needs `delete_repo` scope — the build token lacks it), remove students as
+collaborators so they stop consuming seats, and delete the results CSV and any build logs.
 
 ---
 
@@ -63,7 +167,7 @@ Two phases. **Upstream is never contacted at build time**, so builds are offline
 
 The credential exists only as the literal `__KIT_SECRET__` in the patch files; the real value is substituted as each patch is applied, so no working credential is ever stored in this repository. It is written to the student's repo *and* set as an Actions secret, and CI fails while the two still match — comparing SHA-256 hashes, never the raw value.
 
-Total: 3,059 commits. The plant and scrub sit far enough back that `git log` will not surface them, which is what forces students to learn pickaxe search (`git log -S`).
+Total: 3,060 commits. The plant and scrub sit far enough back that `git log` will not surface them, which is what forces students to learn pickaxe search (`git log -S`).
 
 ## Layout
 
@@ -72,10 +176,11 @@ dwellkit              The only script — build / class / status
 floor.bundle          The authentic 2,855-commit history, serialised
 tail/*.patch          The 203-patch series applied on top
 roster.example.csv    Roster format
+templates/            student-README.md — the brief students see. Edit this, not the script.
 docs/                 Everything written; see the table above
 ```
 
-`dwellkit` is meant to be read: `build` is seven numbered, commented steps.
+`dwellkit` is meant to be read: `build` is eight numbered, commented steps.
 Run it from the repository root — it locates `floor.bundle` and `tail/` relative to itself.
 
 `roster.csv`, `dwellkit-results-*.csv`, and build logs are gitignored — they contain student identities and live credential values.
