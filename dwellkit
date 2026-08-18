@@ -96,22 +96,28 @@ credential_for() {
 cmd_build() {
   [ $# -ge 1 ] || die "dwellkit build — build one student repository" \
                        "" \
-                       "  usage: ./dwellkit build <student-id>" \
+                       "  usage: ./dwellkit build <repo-suffix> [credential-seed]" \
                        "" \
-                       "  example: ./dwellkit build amara" \
-                       "           -> \$GH_ORG/${KIT_PREFIX}amara"
+                       "  example: ./dwellkit build amara-gh" \
+                       "           -> \$GH_ORG/${KIT_PREFIX}amara-gh" \
+                       "" \
+                       "  The optional second argument seeds the credential. It defaults" \
+                       "  to the repo suffix. 'class' passes the student_id here so that" \
+                       "  credentials stay derivable from the roster even though repos" \
+                       "  are named by GitHub username."
   local SUFFIX="$1"
+  local SEED="${2:-$1}"
   require_env
 
   case "$SUFFIX" in
     *[!A-Za-z0-9._-]*|-*|.*|"")
-      die "Invalid student id: '$SUFFIX'" \
+      die "Invalid repo suffix: '$SUFFIX'" \
           "" \
           "  It becomes part of a GitHub repository name, so it may contain only" \
           "  letters, digits, dot, dash and underscore, and may not start with" \
           "  a dash or a dot." \
           "" \
-          "  example: ./dwellkit build amara" ;;
+          "  example: ./dwellkit build amara-gh" ;;
   esac
 
   local REPO_NAME; REPO_NAME="$(repo_name_for "$SUFFIX")"
@@ -131,7 +137,7 @@ cmd_build() {
   WORKDIR="$(mktemp -d)"
   trap 'rm -rf "${WORKDIR:-}"' EXIT
 
-  local CREDENTIAL_VALUE; CREDENTIAL_VALUE="$(credential_for "$SUFFIX")"
+  local CREDENTIAL_VALUE; CREDENTIAL_VALUE="$(credential_for "$SEED")"
 
   echo "==> Building $REPO_NAME in org $GH_ORG"
 
@@ -475,7 +481,7 @@ cmd_class() {
   # A typo caught here costs seconds; caught on the day it costs a student
   # their session. This is why validation is a separate phase.
   echo "==> [2/4] Validating roster"
-  local ROWS=() INVALID=0 SEEN_IDS="" LINE_NO=0
+  local ROWS=() INVALID=0 SEEN_IDS="" SEEN_USERS="" LINE_NO=0
   local student_id github_username _rest
   while IFS=, read -r student_id github_username _rest; do
     LINE_NO=$((LINE_NO+1))
@@ -492,6 +498,14 @@ cmd_class() {
       echo "    INVALID line $LINE_NO: duplicate student_id '$student_id'"; INVALID=$((INVALID+1)); continue ;;
     esac
     SEEN_IDS="$SEEN_IDS $student_id"
+
+    # Repos are named by username, so a repeat means two students would share
+    # one repository — the second would silently inherit the first's.
+    case " $SEEN_USERS " in *" $(printf '%s' "$github_username" | tr '[:upper:]' '[:lower:]') "*)
+      echo "    INVALID line $LINE_NO: duplicate github_username '$github_username' (would collide on one repo)"
+      INVALID=$((INVALID+1)); continue ;;
+    esac
+    SEEN_USERS="$SEEN_USERS $(printf '%s' "$github_username" | tr '[:upper:]' '[:lower:]')"
 
     if gh api "users/${github_username}" --jq '.login' >/dev/null 2>&1; then
       ROWS+=("${student_id},${github_username}")
@@ -579,14 +593,17 @@ cmd_class() {
 # ---------------------------------------------------------------------------
 cmd_deploy_one() {
   local STUDENT_ID="$1" GH_USER="$2" OUTDIR="$3"
-  local REPO_NAME; REPO_NAME="$(repo_name_for "$STUDENT_ID")"
+  # Repos are named by GitHub username: it is the identity the student
+  # recognises, and GitHub already guarantees it is unique. The credential is
+  # still seeded from student_id, so re-derivation from the roster is unchanged.
+  local REPO_NAME; REPO_NAME="$(repo_name_for "$GH_USER")"
   local STATUS="ok" NOTE=""
   local CREDENTIAL; CREDENTIAL="$(credential_for "$STUDENT_ID")"
 
   if gh api "repos/${GH_ORG}/${REPO_NAME}" >/dev/null 2>&1; then
     NOTE="repo already existed; build skipped"
   else
-    if ! "$SCRIPT_DIR/dwellkit" build "$STUDENT_ID" >"$OUTDIR/$STUDENT_ID.build.log" 2>&1; then
+    if ! "$SCRIPT_DIR/dwellkit" build "$GH_USER" "$STUDENT_ID" >"$OUTDIR/$STUDENT_ID.build.log" 2>&1; then
       # Record the basename, not the temp path: logs are copied into the
       # working directory on failure, and $OUTDIR is deleted on exit.
       printf '%s,%s,%s,,build-failed,none,see %s\n' \

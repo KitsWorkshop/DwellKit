@@ -62,16 +62,24 @@ cd /path/to/DwellKit
 cp roster.example.csv pilot-roster.csv
 ```
 
-One row per participant. `participant_id` becomes the repo suffix, so keep it short and lowercase:
+One row per participant. The **GitHub username** becomes the repository name; `student_id` is your own label, used to seed the credential and to identify the row afterwards:
 
 ```csv
 student_id,github_username
-pilot-amara,amara-gh
-pilot-devin,devin-codes
-pilot-sam,samwise-42
+amara,amara-gh
+devin,devin-codes
+sam,samwise-42
 ```
 
-Prefixing every id with `pilot-` makes teardown unambiguous later.
+Set a distinct **`KIT_PREFIX`** for the pilot so teardown is unambiguous later — repositories are
+named `<KIT_PREFIX><github_username>`, so a pilot prefix separates them cleanly from anything a
+real cohort creates:
+
+```bash
+export KIT_PREFIX=pilot-      # → pilot-amara-gh, pilot-devin-codes, …
+```
+
+Use the same `KIT_PREFIX` for every later command in this runbook, or they will not find the repos.
 
 > Any file matching `*roster*.csv` is gitignored (except `roster.example.csv`), so `pilot-roster.csv` is safe to leave in the working directory.
 
@@ -147,7 +155,7 @@ Everyone should read `✓ accepted`. Anyone `… PENDING` cannot clone yet:
 Then spot-check **one** repo properly:
 
 ```bash
-REPO=hackathon-starter-pilot-amara
+REPO=pilot-amara-gh          # <KIT_PREFIX><github_username>
 
 # CI must be RED. This is correct, not a fault.
 gh run list --repo "$GH_ORG/$REPO" --limit 1
@@ -251,16 +259,17 @@ Write these down while they are fresh. They unblock items in `TODO.md`:
 **There is no reset path.** A repo that has been rotated and rewritten cannot be returned to its starting state — rebuild instead.
 
 ```bash
-# List everything the pilot created
-gh repo list "$GH_ORG" --limit 100 --json name --jq '.[].name' | grep '^hackathon-starter-pilot-'
+# List everything the pilot created (KIT_PREFIX is why this is unambiguous)
+gh repo list "$GH_ORG" --limit 100 --json name --jq '.[].name' | grep "^${KIT_PREFIX}"
 
 # Delete them — requires a token with delete_repo scope, which the build token lacks
 gh repo list "$GH_ORG" --limit 100 --json name --jq '.[].name' \
-  | grep '^hackathon-starter-pilot-' \
+  | grep "^${KIT_PREFIX}" \
   | xargs -I{} gh repo delete "$GH_ORG/{}" --yes
 ```
 
-If your token lacks `delete_repo`, delete via the web UI — this is why every pilot id is prefixed `pilot-`.
+If your token lacks `delete_repo`, delete via the web UI — the distinct `KIT_PREFIX` is what makes
+the pilot's repositories easy to pick out.
 
 **Then:**
 
@@ -268,7 +277,7 @@ If your token lacks `delete_repo`, delete via the web UI — this is why every p
 - [ ] Delete `dwellkit-results-*.csv` and any `*.build.log` — they contain live credential values
 - [ ] Revoke the PAT if it was created just for this
 
-To run again with the same people, rebuild with fresh ids (`pilot2-amara`).
+To run again with the same people, rebuild under a fresh prefix (`KIT_PREFIX=pilot2-`).
 
 ---
 

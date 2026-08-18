@@ -86,7 +86,7 @@ Send the URLs through your own channel too; don't rely on either GitHub path alo
 <summary><strong>Building a single repository</strong> — rarely needed, two cases</summary>
 
 ```bash
-./dwellkit build alice     # → $GH_ORG/hackathon-starter-alice
+./dwellkit build amara-gh     # → $GH_ORG/hackathon-starter-amara-gh
 ```
 
 `class` calls this once per roster row, so it is not a separate workflow. You would run it
@@ -157,7 +157,9 @@ notification email).
 ```bash
 ./dwellkit build pilot1
 ```
-Builds a single repository. Use this once in a new organisation before any fan-out — it is the
+Builds a single repository named `$KIT_PREFIX` + the argument. An optional second argument seeds
+the credential separately (`./dwellkit build amara-gh mike`); `class` uses it to name repos by
+GitHub username while still deriving credentials from `student_id`. Use this once in a new organisation before any fan-out — it is the
 only way to discover whether push protection blocks the credential format, which would fail
 every student identically.
 
@@ -238,8 +240,11 @@ fast; the waiting is not.
 
 ### Two to three days before
 
-**1. Build the roster.** One row per student. `student_id` becomes the repo suffix, so keep it
-short and lowercase.
+**1. Build the roster.** One row per student.
+
+`github_username` becomes the repository name (`hackathon-starter-<username>`) — it is the identity
+the student recognises, and GitHub already guarantees it is unique. `student_id` is your own
+label: it seeds the credential and identifies the row for marking, and never appears on GitHub.
 
 ```bash
 cp roster.example.csv roster.csv

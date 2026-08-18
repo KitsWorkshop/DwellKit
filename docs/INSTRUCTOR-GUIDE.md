@@ -193,7 +193,7 @@ Everything in this kit is parameterised by `GH_ORG`; nothing is hardcoded to any
 This part explains what `class` does per student, because `dwellkit build` is the thing it calls once per row:
 
 ```bash
-./dwellkit build alice     # → $GH_ORG/hackathon-starter-alice
+./dwellkit build amara-gh     # → $GH_ORG/hackathon-starter-amara-gh
 ```
 
 Roughly 15–50 seconds per repository. The variance is GitHub API latency, not local work — applying all 203 patches locally accounts for only about 5 seconds of it. It prints the credential value at the end.
