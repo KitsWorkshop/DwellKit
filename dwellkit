@@ -74,6 +74,31 @@ require_env() {
 
 repo_name_for() { printf '%s%s' "$KIT_PREFIX" "$1"; }
 
+# Does CI actually run for this repo? Echoes: ok | disabled | no-run
+#
+# Every other step can succeed while the exercise is silently void. If the org
+# allows Actions only for SELECTED repositories, a repo created seconds ago is
+# not on that allowlist, so staging-deploy never runs and the student clones a
+# repository with nothing wrong with it. Org-level preflight cannot catch this:
+# "selected" is a legitimate-looking setting there.
+#
+# Shared by `build` and the fan-out deliberately — two copies of this logic is
+# exactly how KIT_PREFIX drifted apart in the previous two-script layout.
+ci_status_for() {
+  local repo="$1" enabled runs i
+  enabled="$(gh api "repos/${GH_ORG}/${repo}/actions/permissions" --jq '.enabled' 2>/dev/null || true)"
+  [ "$enabled" = "false" ] && { printf 'disabled'; return; }
+  # The run is queued by the final push and takes a few seconds to appear. A
+  # slow queue is not a failure, so this reports rather than exits non-zero.
+  for i in 1 2 3 4 5; do
+    runs="$(gh api "repos/${GH_ORG}/${repo}/actions/runs" --jq '.total_count' 2>/dev/null || true)"
+    case "$runs" in ''|*[!0-9]*) runs=0 ;; esac
+    [ "$runs" -gt 0 ] && { printf 'ok'; return; }
+    sleep 2
+  done
+  printf 'no-run'
+}
+
 # WARNING: this credential format is UNVALIDATED against GitHub push
 # protection. No format testing was possible (the build org has no secret
 # scanning — see docs/TECHNICAL-NOTES.md Phase 3). If you deploy to an org that HAS
@@ -147,7 +172,7 @@ cmd_build() {
   # (does not exist yet; this is plain `git clone` against a bundle file,
   # which is exactly what that task needs to wrap.)
   # -------------------------------------------------------------------------
-  echo "==> [1/8] Unpacking floor bundle"
+  echo "==> [1/9] Unpacking floor bundle"
   git clone --quiet "$SCRIPT_DIR/floor.bundle" "$WORKDIR/repo"
   cd "$WORKDIR/repo"
   git checkout --quiet -b main origin/floor
@@ -160,7 +185,7 @@ cmd_build() {
   # Substitutes the __KIT_SECRET__ placeholder for the real credential value
   # as each patch is applied, so no working credential is ever stored on disk.
   # -------------------------------------------------------------------------
-  echo "==> [2/8] Applying tail patch series"
+  echo "==> [2/9] Applying tail patch series"
   local patch
   for patch in "$SCRIPT_DIR"/tail/*.patch; do
     sed "s/__KIT_SECRET__/${CREDENTIAL_VALUE}/g" "$patch" > "$WORKDIR/patch.tmp"
@@ -178,14 +203,14 @@ cmd_build() {
   # The description is student-visible on the repo page: it must not hint
   # that this is a constructed exercise.
   # -------------------------------------------------------------------------
-  echo "==> [3/8] Creating private repo $GH_ORG/$REPO_NAME"
+  echo "==> [3/9] Creating private repo $GH_ORG/$REPO_NAME"
   gh repo create "$GH_ORG/$REPO_NAME" --private --description "Internal member portal — accounts, sign-in, and third-party integrations" >/dev/null
 
   # -------------------------------------------------------------------------
   # Step 4 — push floor + tail.
   # Eventual kitscript task: git-push (generic, likely already exists)
   # -------------------------------------------------------------------------
-  echo "==> [4/8] Pushing floor + tail"
+  echo "==> [4/9] Pushing floor + tail"
   # Auth via a per-invocation header rather than embedding the token in the
   # remote URL — an embedded-token URL gets echoed back by things like
   # `git remote -v`, .git/config, and tool notices (e.g. git-filter-repo's
@@ -240,7 +265,7 @@ cmd_build() {
   # performs that encryption locally before transmitting. This replaced ~19
   # lines of PyNaCl and one dependency with the line below.
   # -------------------------------------------------------------------------
-  echo "==> [5/8] Setting STAGING_API_KEY repo secret"
+  echo "==> [5/9] Setting STAGING_API_KEY repo secret"
   gh secret set STAGING_API_KEY --body "$CREDENTIAL_VALUE" --repo "${GH_ORG}/${REPO_NAME}"
 
   # -------------------------------------------------------------------------
@@ -250,7 +275,7 @@ cmd_build() {
   # than a separate task. Written here as a second commit + push for clarity
   # of what changed and when.
   # -------------------------------------------------------------------------
-  echo "==> [6/8] Adding staging-deploy workflow"
+  echo "==> [6/9] Adding staging-deploy workflow"
   mkdir -p .github/workflows
   # Compare a hash of the known-leaked value, not the raw value itself — the
   # workflow file is a tracked, permanent part of the repo, so embedding the
@@ -309,7 +334,7 @@ EOF
   # script. It deliberately does NOT mention rotation, history search, or that
   # the history was tampered with — working those out is the exercise.
   # -------------------------------------------------------------------------
-  echo "==> [7/8] Installing student README + brief"
+  echo "==> [7/9] Installing student README + brief"
   cp "$SCRIPT_DIR/templates/student-README.md" README.md
   git add README.md
   git commit --quiet -m "docs: replace README with project overview and task brief"
@@ -320,12 +345,36 @@ EOF
   # Students must be able to force-push; protection here would block the
   # history rewrite the exercise depends on.
   # -------------------------------------------------------------------------
-  echo "==> [8/8] Confirming branch protection is off"
+  echo "==> [8/9] Confirming branch protection is off"
   if gh api "repos/${GH_ORG}/${REPO_NAME}/branches/main/protection" >/dev/null 2>&1; then
     echo "    WARNING: branch protection is ON for main (expected off)"
   else
     echo "    OK: no branch protection on main"
   fi
+
+  # -------------------------------------------------------------------------
+  # Step 9 — confirm CI actually runs.
+  #
+  # The last thing that can silently void the exercise. Everything above can
+  # report success on a repo whose Actions are switched off, in which case the
+  # student inherits a repository where genuinely nothing is wrong.
+  # -------------------------------------------------------------------------
+  echo "==> [9/9] Confirming CI is enabled and a run was queued"
+  case "$(ci_status_for "$REPO_NAME")" in
+    ok)
+      echo "    OK: staging-deploy queued" ;;
+    disabled)
+      echo "    WARNING: GitHub Actions is DISABLED for this repository."
+      echo "             staging-deploy will never run, so there is no failing"
+      echo "             check and the exercise has no entry point."
+      echo "             Usual cause: the org allows Actions for selected repos only."
+      echo "             Fix: repo Settings -> Actions -> General -> allow actions." ;;
+    no-run)
+      echo "    WARNING: no workflow run appeared within 10s."
+      echo "             It may simply be a slow queue. Confirm a red check exists at"
+      echo "             https://github.com/${GH_ORG}/${REPO_NAME}/actions"
+      echo "             before handing this repo to a student." ;;
+  esac
 
   cd "$SCRIPT_DIR"
   echo "==> Done: https://github.com/${GH_ORG}/${REPO_NAME}"
@@ -465,7 +514,18 @@ cmd_class() {
   local ACT
   ACT="$(gh api "orgs/${GH_ORG}/actions/permissions" --jq '.enabled_repositories' 2>/dev/null || true)"
   case "$ACT" in
-    all|selected) echo "    ✓ Actions enabled for org repositories ($ACT)" ;;
+    all)      echo "    ✓ Actions enabled for all org repositories" ;;
+    # NOT a pass. "selected" means Actions runs only for an explicitly
+    # enumerated list of repositories — and a repo created by this run is not
+    # on it. Every build would report success while its CI stayed switched off.
+    # Reported rather than fatal because an instructor can legitimately add the
+    # repos to the allowlist afterwards; the per-repo check at build time is
+    # what actually catches it.
+    selected) echo "    ⚠ Actions is enabled only for SELECTED repositories in $GH_ORG."
+              echo "      New student repos will NOT be on that allowlist, so their CI"
+              echo "      will not run and there is nothing for students to find."
+              echo "      Fix: Settings -> Actions -> General -> 'All repositories',"
+              echo "      or add each repo to the allowlist after building." ;;
     none)         die "GitHub Actions is disabled for organisation '$GH_ORG'." \
                       "" \
                       "  The exercise depends on a failing CI check. Without Actions" \
@@ -565,6 +625,18 @@ cmd_class() {
   echo
   echo "==> Wrote $RESULTS  (ok: $OK, failed: $FAILED)"
   echo "    This file contains credential values — it is gitignored. Do not commit or share it."
+
+  # Called out on its own line rather than left in the note column, which is
+  # last and is the first thing the 140-column trim discards. A repo whose CI
+  # never runs counts as "ok" everywhere else while being useless as an
+  # exercise, so it needs to be impossible to miss here.
+  local CI_BAD; CI_BAD=$(grep -c 'CI DISABLED\|CI no run seen' "$RESULTS" || true)
+  if [ "$CI_BAD" -gt 0 ]; then
+    echo
+    echo "    ⚠ $CI_BAD repo(s) have NO WORKING CI — see the note column in $RESULTS."
+    echo "      Those students would clone a repository with nothing wrong with it."
+    echo "      Check Settings -> Actions -> General for $GH_ORG, then re-run."
+  fi
   if [ "$FAILED" -gt 0 ]; then
     cp "$OUTDIR"/*.log . 2>/dev/null || true
     echo "    Failure logs copied to the current directory."
@@ -611,6 +683,17 @@ cmd_deploy_one() {
       return 0
     fi
   fi
+
+  # Does this repo's CI actually run? Checked here as well as inside `build`
+  # because a successful build's log is discarded — only failures are copied
+  # out — so a CI warning printed during the build would never be seen during a
+  # fan-out. This also covers the "repo already existed" path above, which
+  # skips the build and therefore skips its step 9 entirely.
+  local CI; CI="$(ci_status_for "$REPO_NAME")"
+  case "$CI" in
+    disabled) NOTE="${NOTE:+$NOTE; }CI DISABLED - no failing check for the student" ;;
+    no-run)   NOTE="${NOTE:+$NOTE; }CI no run seen - verify before handing over" ;;
+  esac
 
   # PUT is idempotent: re-running does not create duplicate invitations.
   # The response distinguishes the two cases and they behave very differently:

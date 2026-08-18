@@ -214,6 +214,7 @@ The script is deliberately plain, linear shell with a commented step for each ph
 6. Adds the staging-deploy workflow
 7. Replaces the upstream README with the student brief (`templates/student-README.md`), then pushes both
 8. Pins the default branch to `main` and confirms branch protection is off (students must be able to force-push)
+9. Confirms GitHub Actions is enabled for the new repository and that a `staging-deploy` run was actually queued — without a failing check the exercise has no entry point
 
 **Safety properties worth knowing:**
 
