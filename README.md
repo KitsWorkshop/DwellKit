@@ -41,15 +41,52 @@ export GH_ORG=your-org
 ./dwellkit build alice      # → your-org/hackathon-starter-alice
 ```
 
-**A whole class:** see [Deploying to a class](#deploying-to-a-class) below — there are two things
-(paid seats, and invitation acceptance) that will bite you if you skip straight to the commands.
+**A whole class:**
+
+```bash
+# 1. Environment. Keep KIT_SALT — it re-derives any student's credential later.
+export GH_TOKEN=...        # repo + workflow scope on the target org
+export GH_ORG=your-org
+export KIT_SALT=...        # any secret string, one per cohort
+
+# 2. First time in this org? Build one throwaway repo and delete it.
+#    This is the only way to test push protection, which fails ALL students at once.
+#    (delete needs delete_repo scope; otherwise remove it in the web UI)
+./dwellkit build pilot1
+gh repo delete "$GH_ORG/hackathon-starter-pilot1" --yes
+
+# 3. Roster: one row per student, "student_id,github_username", header required.
+cp roster.example.csv roster.csv && $EDITOR roster.csv
+
+# 4. Validate the roster. Creates nothing. Refuses the whole run on one bad username.
+./dwellkit class roster.csv --dry-run
+
+# 5. Deploy. ~3 minutes for 20 students. Re-run freely — existing repos are skipped.
+./dwellkit class roster.csv
+
+# 6. Chase invitations daily until everyone shows "accepted".
+#    An unaccepted invitation means a student cannot clone. This is the step that bites.
+./dwellkit status dwellkit-results-$GH_ORG-*.csv
+./dwellkit status dwellkit-results-$GH_ORG-*.csv --remind
+```
+
+Two things this sequence assumes you have already dealt with — both covered in
+[Deploying to a class](#deploying-to-a-class):
+
+- **Paid seats.** 20 students needs 21 on Team. Sort GitHub Education verification first; it has
+  external lead time.
+- **The student brief.** It ships in `templates/student-README.md` and is installed into every
+  student repo automatically — but read it once before a cohort does.
 
 ---
 
 ## Deploying to a class
 
-Roughly 20 minutes of work for 20 students, spread across two weeks. The commands are fast;
-the waiting is not.
+The commands are in [Quick start](#quick-start) above. This section is the surrounding
+work — what to do weeks ahead, what to check before handover, and what to clean up after.
+
+Roughly 20 minutes of hands-on work for 20 students, spread across two weeks. The commands are
+fast; the waiting is not.
 
 ### Before you commit to a date
 
