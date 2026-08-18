@@ -164,6 +164,28 @@ The kit uses an **invented vendor format**: `sk_staging_` followed by 40 hex cha
 
 ---
 
+## Part 3.5 — Deploying into an organisation you have not used before
+
+Everything in this kit is parameterised by `GH_ORG`; nothing is hardcoded to any organisation. Moving to a new org is a configuration change, not a code change. What *does* change is the environment, and five org-level settings can each break the exercise in a different way.
+
+`dwellkit class` probes for them during preflight. Several require the `admin:org` scope to read, which a build token legitimately may not have — so anything unreadable is reported as **"could not verify"**, never as a failure. Only two conditions are hard errors:
+
+| Checked | Behaviour |
+|---|---|
+| **SAML SSO not authorised** | **Hard fail.** The token is valid and the org is visible, but every write returns 403 until the token is authorised for the org. Detected from the `x-github-sso` response header, because otherwise the first symptom is a build dying mid-fan-out. |
+| **Actions disabled org-wide** | **Hard fail.** No CI means no red build and no exercise. |
+| Org membership and role | Warning — a non-member cannot create repositories. |
+| Outside-collaborator policy | Warning. `class` distributes *entirely* through the collaborators endpoint; an org that forbids outside collaborators will build every repo successfully and deliver none of them. |
+| Private-repo creation permission | Warning. |
+
+**Push protection is deliberately not probed.** There is no API that answers "would this specific string be blocked", so the only honest check is an actual push. Run `./dwellkit build pilot1` once in the new org before any fan-out — it exercises repo creation, token permissions, push protection, secret setting, Actions, and branch protection in about a minute. Then delete it.
+
+### Default branch
+
+`build` pins the default branch to `main` with an explicit API call after the first push, rather than relying on GitHub adopting the first branch pushed. Organisations can configure a different default branch name; if that happened, `HEAD` would point at a branch that was never created and students would clone with nothing checked out. The call is idempotent and harmless when `main` is already the default.
+
+---
+
 ## Part 4 — Building a repository
 
 ```bash

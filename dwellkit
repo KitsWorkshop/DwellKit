@@ -132,6 +132,14 @@ cmd_build() {
   git remote add origin "https://github.com/${GH_ORG}/${REPO_NAME}.git"
   git -c http.extraheader="$AUTH_HEADER" push --quiet origin main
 
+  # Pin the default branch explicitly rather than relying on GitHub adopting
+  # the first pushed branch. An org can configure a different default branch
+  # name; if that happens, HEAD points at a branch that was never created and
+  # students clone with nothing checked out ("remote HEAD refers to nonexistent
+  # ref"). Harmless and idempotent when main is already the default.
+  gh api -X PATCH "repos/${GH_ORG}/${REPO_NAME}" -f default_branch=main >/dev/null 2>&1 \
+    || echo "    note: could not set default branch (main was pushed regardless)"
+
   # -------------------------------------------------------------------------
   # Step 5 — set the Actions repo secret.
   # Eventual kitscript task: github-repo-secret-set.
@@ -264,10 +272,30 @@ cmd_class() {
   echo "==> Fan-out: org=$GH_ORG prefix=$KIT_PREFIX concurrency=$CONCURRENCY"
 
   # ---- Phase 1: preflight -------------------------------------------------
+  #
+  # These probes exist for deploying into an org you have not used before.
+  # Several org settings need the `admin:org` scope to read, which a build
+  # token legitimately may not have — so anything unreadable is reported as
+  # "could not verify", never as a failure. Only two things are hard errors:
+  # an unreachable org, and a token that SAML has not authorised.
   echo "==> [1/4] Preflight"
+
+  local HDRS
+  HDRS="$(curl -sI -H "Authorization: token $GH_TOKEN" \
+          "https://api.github.com/orgs/${GH_ORG}" | tr -d '\r')"
+
+  # SAML SSO: the token is valid and the org is visible, but every write 403s
+  # until the token is authorised for the org. Detected by a response header,
+  # because the failure is otherwise invisible until the first build dies.
+  if printf '%s' "$HDRS" | grep -qi '^x-github-sso:'; then
+    echo "    FAIL: '$GH_ORG' enforces SAML SSO and this token is not authorised for it." >&2
+    echo "          Authorise it at https://github.com/settings/tokens (SSO button next to the token)." >&2
+    exit 1
+  fi
+
   gh api "orgs/${GH_ORG}" --jq '.login' >/dev/null 2>&1 \
     || { echo "    FAIL: cannot reach org '$GH_ORG' with this token" >&2; exit 1; }
-  echo "    org reachable: $GH_ORG"
+  echo "    ✓ org reachable: $GH_ORG"
 
   local SCOPES
   SCOPES="$(curl -sI -H "Authorization: token $GH_TOKEN" https://api.github.com/user \
@@ -275,8 +303,44 @@ cmd_class() {
   echo "    token scopes: ${SCOPES:-<none reported>}"
   case "$SCOPES" in
     *repo*) ;;
-    *) echo "    WARNING: token does not report the 'repo' scope; repo creation will likely fail" >&2 ;;
+    *) echo "    ⚠ token does not report the 'repo' scope; repo creation will likely fail" >&2 ;;
   esac
+
+  # Role in the org — owner or member both work, but a non-member cannot create.
+  local ME ROLE
+  ME="$(gh api user --jq '.login' 2>/dev/null || true)"
+  ROLE="$(gh api "orgs/${GH_ORG}/memberships/${ME}" --jq '.role' 2>/dev/null || true)"
+  case "$ROLE" in
+    admin|member) echo "    ✓ org membership: $ME ($ROLE)" ;;
+    *)            echo "    ⚠ could not confirm org membership for '$ME' — repo creation may be refused" ;;
+  esac
+
+  # Outside-collaborator policy. `class` distributes entirely through the
+  # collaborators endpoint; if the org forbids outside collaborators, nothing
+  # reaches the students even though every build succeeds.
+  local OC
+  OC="$(gh api "orgs/${GH_ORG}" --jq '.members_can_create_private_repositories' 2>/dev/null || true)"
+  if [ "$OC" = "false" ]; then
+    echo "    ⚠ members cannot create private repositories in this org — you may need owner rights"
+  fi
+  if gh api "orgs/${GH_ORG}/outside_collaborators?per_page=1" >/dev/null 2>&1; then
+    echo "    ✓ outside collaborators readable"
+  else
+    echo "    ⚠ could not verify outside-collaborator policy (needs admin:org) — confirm manually"
+    echo "      that this org permits outside collaborators, or students cannot be invited"
+  fi
+
+  # Actions must be on, or CI never runs and there is no exercise.
+  local ACT
+  ACT="$(gh api "orgs/${GH_ORG}/actions/permissions" --jq '.enabled_repositories' 2>/dev/null || true)"
+  case "$ACT" in
+    all|selected) echo "    ✓ Actions enabled for org repositories ($ACT)" ;;
+    none)         echo "    FAIL: GitHub Actions is disabled for this org. CI cannot run." >&2; exit 1 ;;
+    *)            echo "    ⚠ could not verify Actions policy (needs admin:org) — confirm CI runs on a test build" ;;
+  esac
+
+  echo "    NOTE: push protection against the credential format is NOT checked here."
+  echo "          Run './dwellkit build pilot1' once in this org before a real fan-out."
 
   # ---- Phase 2: validate the roster before creating anything --------------
   # A typo caught here costs seconds; caught on the day it costs a student
@@ -334,15 +398,25 @@ cmd_class() {
 
   # ---- Phase 4: report ----------------------------------------------------
   echo "==> [4/4] Results"
-  local RESULTS; RESULTS="dwellkit-results-$(date +%Y%m%d-%H%M%S).csv"
-  echo "student_id,github_username,repo,credential,status,note" > "$RESULTS"
+  # Name and stamp the file with the org. Running two orgs in one afternoon
+  # otherwise produces files distinguishable only by clock time, and `status`
+  # takes the org from the environment — so a mismatched pair silently reports
+  # every student as missing rather than erroring.
+  local RESULTS; RESULTS="dwellkit-results-${GH_ORG}-$(date +%Y%m%d-%H%M%S).csv"
+  {
+    echo "# dwellkit results"
+    echo "# org=${GH_ORG}"
+    echo "# prefix=${KIT_PREFIX}"
+    echo "# generated=$(date -Iseconds)"
+    echo "student_id,github_username,repo,credential,status,note"
+  } > "$RESULTS"
   cat "$OUTDIR"/*.row 2>/dev/null | sort >> "$RESULTS" || true
 
   local OK FAILED
   OK=$(grep -c ',ok,' "$RESULTS" || true)
   FAILED=$(grep -cE ',(build-failed|invite-failed),' "$RESULTS" || true)
 
-  column -s, -t "$RESULTS" | sed 's/^/    /' | cut -c1-140
+  grep -v '^#' "$RESULTS" | column -s, -t | sed 's/^/    /' | cut -c1-140
   echo
   echo "==> Wrote $RESULTS  (ok: $OK, failed: $FAILED)"
   echo "    This file contains credential values — it is gitignored. Do not commit or share it."
@@ -403,11 +477,24 @@ cmd_status() {
   local PENDING_LIST=()
   local student_id github_username repo credential status note
 
+  # The file records which org it was built against. Checking a results file
+  # from org A while GH_ORG points at org B would otherwise report every
+  # student as REPO MISSING, which reads like a catastrophe rather than a typo.
+  local FILE_ORG
+  FILE_ORG="$(sed -n 's/^# org=//p' "$RESULTS" | head -1)"
+  if [ -n "$FILE_ORG" ] && [ "$FILE_ORG" != "$GH_ORG" ]; then
+    echo "FAIL: this results file was built against org '$FILE_ORG', but GH_ORG is '$GH_ORG'." >&2
+    echo "      Set GH_ORG=$FILE_ORG, or pass the results file for $GH_ORG." >&2
+    exit 1
+  fi
+
   echo "==> Checking invitations against $RESULTS"
+  [ -n "$FILE_ORG" ] && echo "    org: $FILE_ORG"
   echo
 
   while IFS=, read -r student_id github_username repo credential status note; do
-    [ "$student_id" = "student_id" ] && continue     # header
+    case "$student_id" in \#*) continue ;; esac   # provenance comments
+    [ "$student_id" = "student_id" ] && continue   # column header
     [ -z "${repo:-}" ] && continue
 
     if ! gh api "repos/${GH_ORG}/${repo}" >/dev/null 2>&1; then

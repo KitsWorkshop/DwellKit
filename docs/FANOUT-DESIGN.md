@@ -126,8 +126,8 @@ export KIT_SALT=<per-cohort secret string — keep it>
 
 ./dwellkit class roster.csv --dry-run     # validate roster, create nothing
 ./dwellkit class roster.csv               # build + invite
-./dwellkit status dwellkit-results-*.csv           # who hasn't accepted
-./dwellkit status dwellkit-results-*.csv --remind  # re-send pending
+./dwellkit status dwellkit-results-$ORG-*.csv           # who hasn't accepted
+./dwellkit status dwellkit-results-$ORG-*.csv --remind  # re-send pending
 ```
 
 ### What it does
@@ -138,7 +138,7 @@ export KIT_SALT=<per-cohort secret string — keep it>
 
 **Phase 3 — Build and invite,** at a default concurrency of 5. Capped deliberately: GitHub's *secondary* rate limits trigger on burst concurrency rather than total volume and are invisible in the standard headers.
 
-**Phase 4 — Report,** written to a timestamped `dwellkit-results-*.csv` with each student's repo, credential, and status.
+**Phase 4 — Report,** written to `dwellkit-results-<org>-<timestamp>.csv` with each student's repo, credential, and status. The file carries `# org=` / `# prefix=` / `# generated=` provenance lines above the CSV header; `dwellkit status` reads the org back out and refuses to run against a file built for a different org.
 
 ### Design decisions
 

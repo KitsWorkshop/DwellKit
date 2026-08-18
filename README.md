@@ -109,7 +109,7 @@ printf 'sk_staging_%s\n' "$(printf '%s' "${STUDENT_ID}${KIT_SALT}" | sha256sum |
 
 ```bash
 ./dwellkit class roster.csv --dry-run   # checks every username, creates nothing
-./dwellkit class roster.csv             # builds, invites, writes dwellkit-results-<ts>.csv
+./dwellkit class roster.csv             # builds, invites, writes dwellkit-results-<org>-<ts>.csv
 ```
 
 ⏱ About 15–50 seconds per repo, 5 at a time — roughly 3 minutes for 20 students.
@@ -125,8 +125,8 @@ This is the step that actually bites. An unaccepted invitation means a student s
 repository they cannot clone.
 
 ```bash
-./dwellkit status dwellkit-results-*.csv            # who's accepted, who hasn't
-./dwellkit status dwellkit-results-*.csv --remind   # re-send the pending ones
+./dwellkit status dwellkit-results-$GH_ORG-*.csv            # who's accepted, who hasn't
+./dwellkit status dwellkit-results-$GH_ORG-*.csv --remind   # re-send the pending ones
 ```
 
 Run it daily. **Do not start class with anyone still `PENDING`.**

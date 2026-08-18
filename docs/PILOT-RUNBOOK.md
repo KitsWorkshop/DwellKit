@@ -122,7 +122,7 @@ Any `INVALID` line stops the run. Fix and repeat until clean.
 
 ⏱ Roughly 15–50 seconds per repo, 5 at a time. A group of 5 lands in about a minute.
 
-Writes `dwellkit-results-<timestamp>.csv` containing **live credential values**. It is gitignored. Do not commit it, do not paste it into chat.
+Writes `dwellkit-results-<org>-<timestamp>.csv` containing **live credential values**. It is gitignored. Do not commit it, do not paste it into chat.
 
 Re-runnable: if anything fails, run the identical command again. Existing repos are skipped, invitations are re-sent.
 
@@ -133,7 +133,7 @@ Re-runnable: if anything fails, run the identical command again. Existing repos 
 Do this **before** anyone touches anything. Ten minutes here saves the session.
 
 ```bash
-RESULTS=dwellkit-results-<timestamp>.csv
+RESULTS=dwellkit-results-<org>-<timestamp>.csv
 ./dwellkit status "$RESULTS"
 ```
 

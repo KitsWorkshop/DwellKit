@@ -87,7 +87,8 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
   This is the most likely way a real 30-student fan-out goes wrong.
 - [ ] **Dry-run the full fan-out at real class size** (~30 min) — `dwellkit class` is verified at 2 students; 30 concurrent has not been run
   Rate limits look comfortable on paper (~180 API calls for 30 students against 5,000/hour) but a 30-repo burst has never actually been run. Watch for secondary rate limits, which are triggered by burst *concurrency* rather than total volume and are not visible in the standard rate-limit headers.
-- [x] ~~**Decide how instructors receive the credential values**~~ → written to a gitignored `dwellkit-results-*.csv`, and re-derivable from `student_id` + `KIT_SALT` at any time.
+- [x] ~~**Decide how instructors receive the credential values**~~ → written to a gitignored `dwellkit-results-<org>-<timestamp>.csv`, and re-derivable from `student_id` + `KIT_SALT` at any time.
+- [x] ~~**Make the tooling safe to run against more than one org**~~ → results files are named and stamped with the org (`# org=` provenance line); `dwellkit status` refuses a results file built for a different org than `GH_ORG`; preflight probes SAML authorisation, org role, outside-collaborator policy and Actions availability; `build` pins the default branch to `main` explicitly. See `INSTRUCTOR-GUIDE.md` Part 3.5.
 
 ---
 
