@@ -116,7 +116,19 @@ Ran as a student would, against `secretkit-spike-demo2` (used for this destructi
 3. **Recover the just-deleted copy.** One command: `git show HEAD~1:config/staging.env`. Instant.
 4. **Recover the older planted-then-scrubbed copy.** `git log -p --all -S'sk_staging_' -- config/staging.env`. Surfaces the full timeline — add (PLANT), remove (SCRUB), add (REINTRODUCE), remove (student's step 2) — in one command. This is the actual "aha": a student who only checked `git show HEAD~1` (step 3) would still miss that the same value was committed and removed months earlier, further back, exactly as the Background section describes.
 5. **Rotate.** New secret value sealed-box-encrypted and set via the API; pushed a trivial commit to trigger a new workflow run (secret changes alone don't trigger `on: push`). Workflow went **green** (`success`).
-6. **History rewrite + force-push.** `git filter-repo --path config/staging.env --invert-paths --force`, force-pushed. Fresh clone from the remote afterward: `grep -r` found nothing, `git log --all -S'sk_staging_'` found nothing. Confirmed gone from the remote.
+6. **History rewrite + force-push.** `git filter-repo --path config/staging.env --invert-paths --force`, force-pushed. Fresh clone from the remote afterward: `grep -r` found nothing, `git log --all -S'sk_staging_'` found nothing.
+
+**Correction to an earlier claim in this document.** This was originally recorded as "the credential is no longer recoverable from the remote." That is **only true for clones.** Re-tested explicitly afterwards: GitHub retains the orphaned commits and still serves them by SHA. Against a repo where the rewrite had succeeded and a fresh clone was verifiably clean:
+
+```
+$ gh api repos/<org>/<repo>/commits/d7491058a717e8300df78b4e7f6f11473beb609c \
+    --jq '.files[] | select(.filename=="config/staging.env") | .patch'
++STAGING_API_KEY=sk_staging_23066a9c39d6929d2442b066700a3da4e174ed50
+```
+
+The full credential comes back. Anyone who cloned before the rewrite knows that SHA. Purging it requires contacting GitHub Support to force garbage collection — nothing the student (or instructor) can do from the CLI removes it.
+
+**This is a gift to the exercise, not a defect.** It is the most concrete possible demonstration of the actual lesson: rotation was the only step that reduced risk, and even a technically perfect history rewrite does not un-publish a secret. It is written up as the optional "capstone" beat in `STUDENT-EXPERIENCE.md`.
 
 **Assessment of whether the reveal lands:** yes, and it lands *because* of step 4, not step 3. Deleting the visible file and recovering it from `HEAD~1` (step 3) is the "trap" — undo the delete, remove the credential, done. It's step 4 (searching *all* history, not just the immediate parent) that reveals the credential was compromised months earlier too, which is what should push a thoughtful student toward "rotate first" instead of "clean up history first." If anything felt flat: the gap between steps 3 and 4 might be too easy to miss for a student who stops as soon as `HEAD~1` "solves" the puzzle — the debrief materials (out of scope here) will need to make sure students are pushed to search *all* history, not just the last commit, before they're allowed to feel done.
 

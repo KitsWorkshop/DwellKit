@@ -78,9 +78,9 @@ Crucially, **this does not make the exercise slower for a student who uses the r
 **Why the messages matter:** no commit message contains the words *secret*, *credential*, *key*, *kit*, or *exercise*. The three that matter are disguised as routine config housekeeping.
 
 > **Design decision — invented author identities for the three exercise commits.**
-> The original specification called for authors drawn from the project's real contributor list. That was deliberately not done. Attributing a credential leak to a real, identifiable person by name and email — work they did not do and a mistake they did not make — is not a good thing to manufacture, even in a private teaching repo. The three exercise commits use an invented identity instead.
+> The original specification called for authors drawn from the project's real contributor list. That was deliberately not done. Attributing a credential leak to a real, identifiable person by name and email — work they did not do and a mistake they did not make — is not a good thing to manufacture, even in a private teaching repo. The three exercise commits use invented identities instead (two names: one authors the plant and the scrub, another the reintroduction).
 >
-> **The trade-off:** those three commits now sit among 200 by the project's four real contributors, so a student who cross-references authors could notice one name that appears only three times, always around the staging config. That is an acceptable price. If a student does spot it that way, they have done real forensic work and deserve the find.
+> **The trade-off:** those three commits now sit among 200 by the project's four real contributors, so a student who cross-references authors could notice two names that appear only around the staging config and nowhere else. That is an acceptable price. If a student does spot it that way, they have done real forensic work and deserve the find.
 
 ### Layer 3 — The plant and the scrub
 
@@ -110,6 +110,11 @@ The repository has an Actions secret, `STAGING_API_KEY`, set to the same credent
 **Why this exists:** without it, "rotate the credential" is a hypothetical instruction with nothing to rotate and no way to verify. The secret makes rotation a real, concrete action with visible consequences: a red CI badge that only turns green when the student does the right thing.
 
 **How it checks:** the workflow compares a **SHA-256 hash** of the secret against a hash of the known-leaked value — it does not contain the credential itself.
+
+> **Worth knowing before you teach this — the rewrite does not fully clean GitHub.**
+> After a successful `git filter-repo` and force-push, a fresh clone is genuinely clean. But GitHub retains the orphaned commits and **still serves them by SHA** — verified live against a real repo, the full credential comes back from `gh api repos/<org>/<repo>/commits/<old-sha>`. Purging requires contacting GitHub Support.
+>
+> This is the single best teaching moment in the kit. Spring it *after* students have declared victory: it proves, concretely, that rotation was the only step that reduced risk. It is written up as the optional capstone in `STUDENT-EXPERIENCE.md`.
 
 > **Design decision — why hashed, and a bug this caught.**
 > The first version of the build script embedded the plaintext credential directly in the workflow file for comparison. That file is tracked and permanent, so the credential would have sat in the working tree of every commit forever — visible to `grep` even after the student "successfully" deleted the config file and rewrote history. It would have silently destroyed the exercise's central premise. This was caught by the verification step that greps a fresh clone, and fixed by comparing hashes. The verification step earned its keep.
@@ -323,6 +328,10 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 | `floor.bundle` | The 2,855-commit authentic history, serialised (16 MB). |
 | `tail/*.patch` | 203 numbered patches applied on top of the floor: 200 genuine upstream commits, plus the 3 exercise commits (plant at 41, scrub at 122, reintroduce at 198). The three exercise patches contain only the `__KIT_SECRET__` placeholder, never a real value. |
 | `INSTRUCTOR-GUIDE.md` | This document. |
+| `STUDENT-EXPERIENCE.md` | **Instructor-only.** Beat-by-beat walkthrough of what students experience, the model solution path, common wrong turns, and marking guidance. Contains all the answers — do not distribute. |
+| `SLIDES.md` | Marp-format deck covering the whole kit — pedagogy, student journey, delivery, architecture, findings, readiness. **Spoils the exercise**; for instructor briefings and stakeholder demos, not for a cohort. |
+| `DEPLOY-RUNBOOK.md` | Operational checklist for getting a repo into one student's hands: pre-flight, build, access, verification, troubleshooting. |
+| `FANOUT-DESIGN.md` | Scaling to a class: access models, the GitHub Education/billing constraint, why Classroom's template flow can't deliver this kit, and what to build. |
 | `TODO.md` | Remaining work before classroom-ready, ordered by what blocks what. |
 | `SPIKE-FINDINGS.md` | Full technical report — what was tested, what broke, timings, open questions. |
 | `PROGRESS.md` | Short status summary suitable for reporting. |

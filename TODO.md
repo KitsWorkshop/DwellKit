@@ -32,6 +32,8 @@ Everything below is easier to scope once this is done — in particular, item 2 
 > **Note:** it is worth testing this end-to-end with a real second account rather than assuming. A student who cannot rotate the secret cannot complete the exercise's central action.
 
 ### 1.2 Per-student fan-out
+
+> **See `FANOUT-DESIGN.md` for the full analysis.** Two constraints found since this list was written: (a) GitHub Classroom's template flow **starts repos with a single commit**, so it cannot provision this kit's 3,059-commit history; (b) private-repo collaborators **consume paid seats** on Team — 30 students needs 31 seats — which is removed entirely by GitHub Education verification. **Start the Education application first; it has an external lead time.**
 - [ ] **Switch the credential from random to deterministic** (~10 min)
   Currently `spike.sh` generates a random value each run. Change to `sha256(student_id + salt)`, truncated to 40 hex characters, so a repo can be rebuilt identically if something goes wrong and so the instructor can derive any student's value without having recorded it.
 - [ ] **Add the roster loop** (~30 min)
