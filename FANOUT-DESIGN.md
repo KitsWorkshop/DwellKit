@@ -99,49 +99,73 @@ Use GitHub Classroom purely to establish the student → username mapping (stude
 
 For a first real class of ~30:
 
-1. **Apply for GitHub Education verification now** — removes billing, unlimited seats and private repos. External lead time.
-2. **Use Option A** (outside collaborators + direct API fan-out). It is the smallest change to what already works, and it sidesteps Classroom's template limitation entirely.
+1. **Apply for GitHub Education verification now** — removes billing, unlimited seats and private repos. External lead time, so start it first. **This is now the main blocker for a real cohort.**
+2. ~~Use Option A~~ → **Option A is implemented.** See below.
 3. **Solve identity with a warm-up task**, not a spreadsheet. Have students do something trivial that proves their username — accept an org invitation, or comment on a tracking issue — a week ahead. This gives you a *verified* roster instead of a transcribed one, and surfaces the students who don't have accounts while there's still time.
 4. **Revisit Classroom** only if you run this repeatedly and roster collection proves to be the bottleneck.
 
 ---
 
-## What to build
+## Implementation status — Option A is built ✅
 
-Roughly **2–3 hours** of engineering, assuming the Education verification is in flight.
+Implemented and verified live. Three files:
 
-### 1. Roster file (~15 min)
-```csv
-student_id,github_username
-alice,alice-gh
-bob,bobcodes
-```
-Validate every username exists **before** building anything:
+| File | Purpose |
+|---|---|
+| `fanout.sh` | Validate roster → build repos → invite students → report. Concurrent, re-runnable. |
+| `check-invites.sh` | Who hasn't accepted yet. Optionally re-sends invitations. |
+| `roster.example.csv` | Roster format. |
+
+### Usage
+
 ```bash
-gh api "users/$GH_USER" --jq '.login' || echo "INVALID: $GH_USER"
+export GH_TOKEN=<classic PAT: repo + workflow>
+export GH_ORG=<your teaching org>
+export KIT_SALT=<per-cohort secret string — keep it>
+
+./fanout.sh roster.csv --dry-run     # validate roster, create nothing
+./fanout.sh roster.csv               # build + invite
+./check-invites.sh fanout-results-*.csv           # who hasn't accepted
+./check-invites.sh fanout-results-*.csv --remind  # re-send pending
 ```
-A typo caught here costs seconds; caught on the day it costs a student their session.
 
-### 2. Deterministic credentials (~10 min)
-Replace the random per-run value in `spike.sh` with `sha256(student_id + salt)`, truncated to 40 hex characters. Lets you rebuild a repo identically, and derive any student's value for marking without having recorded 30 of them.
+### What it does
 
-### 3. The loop + invite (~45 min)
-Per student: build, invite, record. The builder is already fully self-contained per invocation, so this genuinely is a loop.
+**Phase 1 — Preflight.** Verifies the org is reachable and reports token scopes, warning if `repo` is absent.
 
-### 4. Concurrency and retry (~45 min)
-`xargs -P 5` or equivalent. Must handle partial failure — with 30 repos, something will fail. Currently a failed build leaves a half-made repo with no cleanup or resume.
+**Phase 2 — Roster validation, before creating anything.** Every username is checked to exist via the API; blank usernames and duplicate student IDs are rejected. **If any row is invalid, nothing is created.** A typo caught here costs seconds; caught on the day it costs a student their session.
 
-### 5. Acceptance monitoring (~20 min)
-A script that reports who still hasn't accepted:
-```bash
-gh api "repos/$ORG/secretkit-$STUDENT/invitations" --jq '.[] | .invitee.login'
-```
-Run it daily in the week before class. **This is the step that saves the session**, because unaccepted invitations are the most likely cause of a student being unable to start.
+**Phase 3 — Build and invite,** at a default concurrency of 5. Capped deliberately: GitHub's *secondary* rate limits trigger on burst concurrency rather than total volume and are invisible in the standard headers.
 
-### 6. Teardown (~15 min)
-Bulk delete after the exercise. Needs a token with `delete_repo` scope, which the build token does not have.
+**Phase 4 — Report,** written to a timestamped `fanout-results-*.csv` with each student's repo, credential, and status.
 
----
+### Design decisions
+
+**Deterministic credentials.** `spike.sh` now derives the credential from `sha256(student_id + KIT_SALT)` when `KIT_SALT` is set, and stays random when it isn't (correct for one-off builds). This means a repo can be rebuilt identically after a failure, and any student's value can be re-derived for marking without having recorded thirty of them.
+
+> **Keep `KIT_SALT` safe and unchanged for the cohort.** Losing it means losing the ability to re-derive credentials. Changing it mid-cohort means new repos get different values from existing ones.
+
+**Idempotent re-runs.** A student whose repo already exists is skipped; the invitation is re-sent regardless, because `PUT` on the collaborators endpoint is idempotent. After a partial failure, re-run the identical command. Verified: a re-run of a completed 2-student fan-out took **1.5s** versus 20.5s for the original.
+
+**Results are gitignored.** `roster.csv` holds student data and `fanout-results-*.csv` holds credential values. Both are in `.gitignore`. Do not commit or share them.
+
+### Verified live
+
+| Check | Result |
+|---|---|
+| Roster validation rejects bad rows | ✅ caught missing username, nonexistent user, duplicate ID |
+| Dry run creates nothing | ✅ |
+| Build + invite, 2 students, concurrency 2 | ✅ 20.5s total |
+| Credentials match independent derivation | ✅ exact match |
+| Built repo contains the derived credential | ✅ |
+| `check-invites.sh` reports status correctly | ✅ |
+| Re-run skips existing repos | ✅ 1.5s |
+| Results CSV well-formed | ✅ every row exactly 6 fields |
+
+### Not yet built
+
+- **Teardown.** Bulk deletion after the exercise needs a token with `delete_repo` scope, which the build token does not have.
+- **Retry with backoff.** A failed student is reported and can be retried by re-running, but there is no automatic backoff on secondary rate limits.
 
 ## Operational realities
 

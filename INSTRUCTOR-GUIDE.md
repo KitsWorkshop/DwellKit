@@ -178,6 +178,8 @@ This produces a private repository named `<KIT_PREFIX>alice`, and takes roughly 
 
 The script is deliberately plain, linear shell with a commented step for each phase. It is meant to be read.
 
+> **For a whole class, use `fanout.sh` instead** — it wraps this builder with roster validation, per-student invitations, concurrency, and a results report. See `FANOUT-DESIGN.md`. `spike.sh` remains the right tool for one-off builds and for the push-protection pre-flight check.
+
 **What it does, in order:**
 
 1. Unpacks the floor bundle into a working directory
@@ -297,8 +299,9 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 
 | Gap | Severity | Notes |
 |---|---|---|
-| **Students cannot access the repos** | **Blocking** | Repos are private and no one is invited to them. Needs a collaborator-invite step (which requires a roster mapping student → GitHub username) or GitHub Classroom integration. Nothing works without this. |
-| **No per-student fan-out** | **Blocking for real use** | The builder produces one repo per invocation. A roster loop is estimated at 30–60 minutes of work; the credential would also switch from random-per-run to `sha256(student_id + salt)` so it is deterministic and reproducible. Currently deferred. |
+| ~~Students cannot access the repos~~ | ✅ **Done** | `fanout.sh` invites each student as a collaborator at `permission=push`. |
+| ~~No per-student fan-out~~ | ✅ **Done** | `fanout.sh` builds a repo per student from a roster, concurrently, with deterministic credentials and idempotent re-runs. |
+| **GitHub Education verification** | **Blocking for a real cohort** | Private-repo collaborators consume paid seats — 30 students needs 31, versus the 1 a bare Team org has. Education verification gives free Team with unlimited users. External lead time; start it early. See `FANOUT-DESIGN.md`. |
 | **Push protection format unvalidated** | **High risk** | See Part 3. Could cause every repo to fail to build in an org that enforces scanning. Cheapest mitigation: build one repo in your real target org and see if it pushes. |
 | **No student-facing brief** | Required | Was explicitly out of scope for the build. You need one, and it must state that marking is on ordering. |
 | **No prevention artifact** | Needed for the full lesson | Step 3 of the three-step lesson (rotate → rewrite → prevent) has no built component — no pre-commit hook, scanner config, or equivalent. Also the designated extension for fast finishers. |
@@ -308,10 +311,10 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 ### Recommended next steps, in order
 
 1. **Build one repo in your real target organisation.** This single action validates the push protection question, the token permissions, and the org configuration all at once. Highest information per unit effort by a wide margin.
-2. **Decide the access mechanism** — collaborator invites versus GitHub Classroom. This is the true blocker and it's a design decision, not an engineering problem.
-3. **Write the student brief**, stating the marking basis explicitly.
-4. **Add the fan-out loop** once access is settled (~1 hour).
-5. **Design the prevention extension** for fast finishers.
+2. **Apply for GitHub Education verification.** External lead time, and it removes the per-seat cost of a class. Now the main non-content blocker.
+3. **Write the student brief**, stating the marking basis explicitly. The largest remaining piece of work.
+4. **Design the prevention extension** for fast finishers.
+5. **Test a write-level collaborator end to end** with a second account — confirm they can rotate the secret and force-push.
 
 ### Housekeeping
 
@@ -325,6 +328,9 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 | File | Purpose |
 |---|---|
 | `spike.sh` | The builder. Produces one complete student repo. Plain, linear, commented — meant to be read. |
+| `fanout.sh` | Class-scale deployment: roster validation → build → invite → report. Concurrent, idempotent. |
+| `check-invites.sh` | Reports who hasn't accepted their invitation; `--remind` re-sends. |
+| `roster.example.csv` | Roster format (`student_id,github_username`). |
 | `floor.bundle` | The 2,855-commit authentic history, serialised (16 MB). |
 | `tail/*.patch` | 203 numbered patches applied on top of the floor: 200 genuine upstream commits, plus the 3 exercise commits (plant at 41, scrub at 122, reintroduce at 198). The three exercise patches contain only the `__KIT_SECRET__` placeholder, never a real value. |
 | `INSTRUCTOR-GUIDE.md` | This document. |

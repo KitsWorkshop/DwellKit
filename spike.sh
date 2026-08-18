@@ -42,7 +42,16 @@ trap 'rm -rf "$WORKDIR"' EXIT
 # SPIKE-FINDINGS.md Phase 3). If you deploy to an org that HAS push
 # protection enabled, verify this format is not blocked before running a
 # fan-out, or every student repo will fail to push at once.
-CREDENTIAL_VALUE="sk_staging_$(python3 -c 'import secrets; print(secrets.token_hex(20))')"
+# If KIT_SALT is set, the credential is derived deterministically from
+# sha256(suffix + salt). This means a repo can be rebuilt identically after a
+# failure, and an instructor can re-derive any student's value for marking
+# without having recorded thirty of them. Used by fanout.sh.
+# If KIT_SALT is unset, the value is random — correct for one-off builds.
+if [ -n "${KIT_SALT:-}" ]; then
+  CREDENTIAL_VALUE="sk_staging_$(printf '%s' "${SUFFIX}${KIT_SALT}" | sha256sum | cut -c1-40)"
+else
+  CREDENTIAL_VALUE="sk_staging_$(python3 -c 'import secrets; print(secrets.token_hex(20))')"
+fi
 
 echo "==> Building $REPO_NAME in org $GH_ORG"
 

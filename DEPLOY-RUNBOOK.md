@@ -4,7 +4,7 @@ Operational checklist for getting a working repository into one student's hands.
 
 For *why* any of this works the way it does, see `INSTRUCTOR-GUIDE.md`. This document assumes you have read it, or don't need to.
 
-**Scope:** one student. There is no fan-out loop yet — see `TODO.md` §1.2.
+**Scope:** one student. **For a whole class, use `fanout.sh`** — it wraps this same flow with roster validation, per-student invitations, concurrency, and a results report. See `FANOUT-DESIGN.md`. This runbook remains the right reference for a single build, for the push-protection pre-flight, and for understanding what `fanout.sh` does per student.
 
 ---
 
@@ -214,7 +214,7 @@ gh repo delete "$GH_ORG/secretkit-$STUDENT" --yes   # needs delete_repo scope
 | `refusing: computed repo name ... does not start with KIT_PREFIX` | Prefix guard tripped | Check `KIT_PREFIX` and the suffix argument |
 | `Resource not accessible by integration` | Wrong token type (app token, not a PAT) | Use a classic/fine-grained PAT with `repo` + `workflow` |
 | Push rejected, mentions **push protection** / **GH013** | Org scanning recognises the credential format | **Stop.** Change the format in `spike.sh`, re-test. Affects every student. |
-| `Name already exists on this account` | Repo suffix reused | Pick a new suffix; the script is not idempotent |
+| `Name already exists on this account` | Repo suffix reused | Pick a new suffix. `spike.sh` is not idempotent; `fanout.sh` is (it skips existing repos) |
 | Build fails partway, repo left half-made | No cleanup/resume logic | Delete the partial repo manually, re-run |
 | Student: `Repository not found` on clone | Invitation not accepted, or never sent | Check §4.1 |
 | Student cannot rotate the secret | Granted `pull` instead of `push` | Re-run §3 with `-f permission=push` |
@@ -230,4 +230,4 @@ Honest limits, so you don't discover them in front of a class:
 - **§3 is not verified end to end.** The endpoint, parameters, and token permissions are confirmed working, and GitHub's documentation confirms write-level access is sufficient to manage Actions secrets. What has *not* been tested with a real second account is a write-level collaborator actually rotating the secret and force-pushing. **Test this once with a colleague or throwaway account before a real class** — it is the difference between the exercise working and being impossible.
 - **No student brief exists.** §5 has nothing to hand over yet.
 - **No prevention artifact exists** for the third phase of the lesson, or for fast finishers.
-- **One student only.** No roster, no loop, no concurrency.
+- **GitHub Education verification** is the outstanding blocker for a real cohort: private-repo collaborators consume paid seats (30 students needs 31). See `FANOUT-DESIGN.md`.

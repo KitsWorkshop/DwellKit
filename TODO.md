@@ -1,6 +1,6 @@
 # TODO — Remaining work before classroom-ready
 
-Current status: **demo-ready, not classroom-ready.** The core mechanic is built and proven end to end against real GitHub. What remains is access, scale, and the surrounding teaching materials.
+Current status: **deployment machinery complete; not yet classroom-ready.** The exercise and the tooling to hand it to a class are both built and verified against real GitHub. What remains is org setup (GitHub Education), one validation step, and the teaching materials — which are the larger half.
 
 Ordered by what blocks what. Effort estimates assume familiarity with the codebase.
 
@@ -19,27 +19,28 @@ Everything below is easier to scope once this is done — in particular, item 2 
 
 ## 1. Blockers — students cannot use this without these
 
-### 1.1 Student access to repositories
-- [ ] **Decide the access mechanism** (design decision, ~30 min of thinking)
-  Repositories are private and currently nobody is invited to them. Options:
-  - **Collaborator invites** — cheapest. `PUT /repos/{org}/{repo}/collaborators/{username}` with `permission: push`. Requires a roster mapping each student to their GitHub username.
-  - **GitHub Classroom** — heavier lift, but handles roster linking, accepts assignments, and integrates with an LMS. Worth it if you will run this repeatedly or alongside other assignments.
-- [ ] **Build the roster mechanism** (~30 min for the collaborator path)
-  A CSV of `student_id,github_username` and a loop that invites each student to their own repo.
+### 1.1 Student access to repositories — ✅ DONE (Option A)
+Implemented in `fanout.sh`: per-repo outside-collaborator invitations at `permission=push`. See `FANOUT-DESIGN.md`.
+- [x] ~~**Decide the access mechanism**~~ → **Option A: outside-collaborator invitations** at `permission=push`.
+  **GitHub Classroom was ruled out on a hard technical constraint**, not preference: its assignment flow provisions repos from a *template*, and templates start with a single commit. That would erase the 3,059-commit history the exercise depends on. Classroom remains usable for roster/identity only.
+- [x] ~~**Build the roster mechanism**~~ → `roster.csv` + `fanout.sh`, with pre-flight validation that every username actually exists before anything is created.
 - [ ] **Confirm invited students can perform every required action** (~15 min, needs a second GitHub account to test properly)
   Verified from documentation already: **write access is sufficient** to manage Actions secrets, so students can rotate. Still worth confirming live that a write-level collaborator can also force-push (branch protection is off, so this should hold).
 
 > **Note:** it is worth testing this end-to-end with a real second account rather than assuming. A student who cannot rotate the secret cannot complete the exercise's central action.
 
-### 1.2 Per-student fan-out
+### 1.2 Per-student fan-out — ✅ DONE
 
 > **See `FANOUT-DESIGN.md` for the full analysis.** Two constraints found since this list was written: (a) GitHub Classroom's template flow **starts repos with a single commit**, so it cannot provision this kit's 3,059-commit history; (b) private-repo collaborators **consume paid seats** on Team — 30 students needs 31 seats — which is removed entirely by GitHub Education verification. **Start the Education application first; it has an external lead time.**
-- [ ] **Switch the credential from random to deterministic** (~10 min)
-  Currently `spike.sh` generates a random value each run. Change to `sha256(student_id + salt)`, truncated to 40 hex characters, so a repo can be rebuilt identically if something goes wrong and so the instructor can derive any student's value without having recorded it.
-- [ ] **Add the roster loop** (~30 min)
-  Iterate the roster, call the existing build path per student. The builder is already fully self-contained per invocation, so this is genuinely just a loop.
-- [ ] **Add modest concurrency** (~15 min)
-  `xargs -P 5` or equivalent. At the slower observed timing (48s/repo) thirty students is ~24 minutes serially, under 5 minutes at 5-wide.
+- [x] ~~**Deterministic credentials**~~ → `sha256(student_id + KIT_SALT)` when `KIT_SALT` is set; random otherwise.
+- [x] ~~**Roster loop**~~ → `fanout.sh`, idempotent (re-run skips existing repos).
+- [x] ~~**Concurrency**~~ → `xargs -P`, default 5, `CONCURRENCY` overridable.
+- [x] ~~**Acceptance monitoring**~~ → `check-invites.sh`, with `--remind` to re-send.
+
+**Still open in this area:**
+- [ ] **Teardown script** (~15 min) — bulk delete after the exercise. Needs `delete_repo` scope, which the build token lacks.
+- [ ] **Retry with backoff** (~30 min) — failures are reported and retryable by re-running, but there is no automatic backoff on secondary rate limits.
+- [ ] **⚠️ GitHub Education verification** (external, days) — private-repo collaborators consume paid seats; 30 students needs 31. Education gives free Team with unlimited users. **Now the main blocker for a real cohort.** See `FANOUT-DESIGN.md`.
 
 ---
 
@@ -76,10 +77,9 @@ Everything below is easier to scope once this is done — in particular, item 2 
 - [ ] **Add partial-failure handling to the builder** (~30 min)
   Currently a mid-run failure leaves a half-built repo with no cleanup or resume. Tolerable for one repo, genuinely annoying at thirty. Either make it idempotent (detect and resume) or add a `--cleanup` path.
   Note the build token needs `delete_repo` scope for cleanup to work — it does not have it by default.
-- [ ] **Dry-run the full fan-out at real class size** (~30 min)
+- [ ] **Dry-run the full fan-out at real class size** (~30 min) — `fanout.sh` is verified at 2 students; 30 concurrent has not been run
   Rate limits look comfortable on paper (~180 API calls for 30 students against 5,000/hour) but a 30-repo burst has never actually been run. Watch for secondary rate limits, which are triggered by burst *concurrency* rather than total volume and are not visible in the standard rate-limit headers.
-- [ ] **Decide how instructors receive the credential values** (~15 min)
-  The builder currently prints the value to stdout. At thirty students that is thirty values in terminal scrollback. Write them to a file, or (better) make them derivable from the student ID via item 1.2's deterministic hash, so they never need to be recorded at all.
+- [x] ~~**Decide how instructors receive the credential values**~~ → written to a gitignored `fanout-results-*.csv`, and re-derivable from `student_id` + `KIT_SALT` at any time.
 
 ---
 
@@ -121,11 +121,14 @@ Recorded so the reasoning is not lost, not because they need doing:
 
 | Category | Estimated effort |
 |---|---|
-| Blockers (access + fan-out) | ~2 hours |
-| Format validation | ~15 min |
+| ~~Access + fan-out~~ | ✅ **done** |
+| GitHub Education verification | external, days — **start this first** |
+| Format validation (one repo in the real org) | ~15 min |
 | Teaching materials (brief, rubric, debrief, prevention) | ~3–4 hours |
-| Operational hardening | ~1.5 hours |
+| Operational hardening (teardown, retry, scale dry-run) | ~1.5 hours |
 | Polish + housekeeping | ~1 hour |
-| **Total to classroom-ready** | **~8–9 hours** |
+| **Total remaining** | **~6 hours + Education lead time** |
+
+**The engineering is essentially done.** What remains is teaching materials and org setup — and the brief is the piece the exercise most depends on.
 
 The engineering is the small half. The teaching materials are the larger and more important half, and they cannot be shortcut — the exercise's value depends entirely on the brief making the marking basis explicit.

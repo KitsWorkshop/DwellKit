@@ -505,38 +505,56 @@ Several things are missing — none of them the core mechanic.
 
 | Gap | Severity |
 |---|---|
-| **Students can't access the repos** | 🔴 Blocking |
-| **No per-student fan-out** | 🔴 Blocking |
+| ~~Students can't access the repos~~ | ✅ Built |
+| ~~No per-student fan-out~~ | ✅ Built |
+| **GitHub Education verification** | 🔴 Blocking (billing) |
 | Push protection format unvalidated | 🟠 High risk |
-| No student-facing brief | 🟠 Required |
+| **No student-facing brief** | 🟠 Required |
 | No prevention artifact | 🟡 Needed for full lesson |
-| No partial-failure handling | 🟡 Operational |
 
 ---
 
-## The real blocker
+## Two constraints worth knowing
 
-Repos are **private** and **nobody is invited to them.**
+**1. GitHub Classroom can't deliver this kit**
+Its template flow starts repos with a **single commit**. Our credential is 163 commits back. Templates would erase the entire exercise.
 
-Needs either:
-- **Collaborator invites** — cheap, needs a roster of GitHub usernames
-- **GitHub Classroom** — heavier, handles rosters and LMS linking
+**2. Private-repo collaborators cost seats**
+30 students = 31 seats on Team.
+→ **GitHub Education gives free Team, unlimited users.**
 
-**This is a design decision, not an engineering problem.**
+---
 
-*(Verified: write access is sufficient for students to rotate secrets.)*
+## Fan-out is built ✅
+
+```bash
+./fanout.sh roster.csv --dry-run   # validate, create nothing
+./fanout.sh roster.csv             # build + invite everyone
+./check-invites.sh results.csv     # who hasn't accepted
+```
+
+- Roster validated **before** anything is created
+- Deterministic credentials — `sha256(student_id + salt)`
+- Concurrent, and **idempotent**: re-run to retry failures
+- Results written to a gitignored CSV
+
+<!--
+Verified live: 2 students in 20.5s, re-run in 1.5s, credentials match
+independent derivation, validation catches missing/nonexistent/duplicate rows.
+-->
 
 ---
 
 ## Next steps, in order
 
 1. **Build one repo in your real target org** ← highest value, 10 min
-2. **Decide the access mechanism** — invites vs Classroom
+2. **Apply for GitHub Education** — external lead time, removes per-seat cost
 3. **Write the student brief** — state the marking basis explicitly
-4. Add the fan-out loop (~1 hour)
-5. Design the prevention extension
+4. Design the prevention extension
 
-**Estimated to classroom-ready: ~8–9 hours** — and the *teaching materials* are the larger half, not the engineering.
+**The engineering is essentially done.**
+
+What's left is teaching materials and org setup — and the brief is the piece the exercise most depends on.
 
 ---
 
@@ -561,5 +579,9 @@ Needs either:
 |---|---|
 | `INSTRUCTOR-GUIDE.md` | Full guide, zero knowledge assumed |
 | `STUDENT-EXPERIENCE.md` | Walkthrough + model solution ⚠️ instructor-only |
+| `DEPLOY-RUNBOOK.md` | One-student deployment checklist |
+| `FANOUT-DESIGN.md` | Class-scale deployment + constraints |
 | `SPIKE-FINDINGS.md` | Technical report |
 | `TODO.md` | Remaining work |
+
+**Scripts:** `spike.sh` (one repo) · `fanout.sh` (a class) · `check-invites.sh`

@@ -1,0 +1,5 @@
+# Student data and credential values — never commit these.
+roster.csv
+fanout-results-*.csv
+*.build.log
+*.invite.log

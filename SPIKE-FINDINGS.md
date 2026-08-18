@@ -1,5 +1,7 @@
 # Spike Findings — The Secret You Can't Delete
 
+> **This is a point-in-time report of the original spike.** Work has continued since: the tail was rebuilt for proper burial, and class-scale fan-out (`fanout.sh`, `check-invites.sh`) has been built and verified. For current status see `TODO.md`; for deployment see `DEPLOY-RUNBOOK.md` and `FANOUT-DESIGN.md`.
+
 Status: **spike complete**. All phases run against real GitHub (`KitsWorkshop` org). One phase (3, push-protection format testing) is unresolved on paper rather than empirically — see below, that's a real gap, not a formality.
 
 ---
