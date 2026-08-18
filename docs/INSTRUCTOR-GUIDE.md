@@ -406,7 +406,7 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 | `GH_TOKEN is not set` | Env var missing | `export GH_TOKEN=...` — the script refuses to guess |
 | `refusing: computed repo name ... does not start with KIT_PREFIX` | Prefix guard tripped | Check `KIT_PREFIX` and the suffix argument |
 | `Resource not accessible by integration` | Wrong token type (app token, not a PAT) | Use a classic/fine-grained PAT with `repo` + `workflow` |
-| Push rejected, mentions **push protection** / **GH013** | Org scanning recognises the credential format | **Stop.** Change the format in `dwellkit build`, re-test. Affects every student. |
+| Push rejected, mentions **push protection** / **GH013** | Org scanning recognises the credential format | The script detects this and explains it. **Stop.** Change the format in `credential_for()`, delete the empty repo, re-test. Affects every student. |
 | `Name already exists on this account` | Repo suffix reused | Pick a new suffix. `dwellkit build` is not idempotent; `dwellkit class` is (it skips existing repos) |
 | Build fails partway, repo left half-made | ⚠️ `class` treats an existing repo as done and will **skip** it — see `TODO.md` §4 | Delete the partial repo manually, then re-run |
 | Student: `Repository not found` on clone | Invitation not accepted, or never sent | `./dwellkit status <results.csv> --remind` |

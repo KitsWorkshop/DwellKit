@@ -109,6 +109,9 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
 ## 6. Housekeeping
 
 - [x] ~~**Fix the temp-directory leak on failed builds**~~ → the `EXIT` trap referenced a `local` variable that was out of scope by the time the trap ran, so under `set -u` every failed build printed `WORKDIR: unbound variable` and left a ~40 MB checkout in `/tmp`. Same bug in `class`.
+- [x] ~~**Fix failure-log paths in the results CSV**~~ → rows pointed at `$OUTDIR/<id>.build.log`, a path inside the temp directory that is deleted on exit. Logs are copied into the working directory on failure, so the CSV now records the basename that actually survives.
+- [x] ~~**Translate a push-protection rejection**~~ → a blocked push (`GH013` / "push cannot contain secrets") now explains what happened, warns that it affects every student identically, and names the fix. Previously it surfaced as raw git output mid-build.
+- [x] ~~**Check for required tools up front**~~ → `git`, `gh`, `curl`, `sha256sum` are checked before any work, instead of failing as "command not found" partway through.
 - [x] ~~**Validate the student id**~~ → the prefix guard passed anything that merely *started* with the prefix, so `build ../evil` did 30 seconds of local work before GitHub rejected the name. Ids are now checked against `[A-Za-z0-9._-]` before any work begins.
 
 - [ ] **Revoke the development PATs — both of them**

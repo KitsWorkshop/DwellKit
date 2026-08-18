@@ -36,7 +36,24 @@ usage() { sed -n '3,20p' "$0" | sed 's/^# \?//'; }
 
 die() { echo >&2; printf '%s\n' "$@" >&2; echo >&2; exit 1; }
 
+# Every subcommand shells out to these. Without a check the first failure is
+# "command not found", several lines into output that looks like it is working.
+require_tools() {
+  local missing=() t
+  for t in git gh curl sha256sum; do
+    command -v "$t" >/dev/null 2>&1 || missing+=("$t")
+  done
+  if [ "${#missing[@]}" -gt 0 ]; then
+    die "Missing required tool(s): ${missing[*]}" \
+        "" \
+        "  git   https://git-scm.com/downloads" \
+        "  gh    https://cli.github.com  — then run: gh auth login" \
+        "  curl, sha256sum are usually preinstalled (coreutils)"
+  fi
+}
+
 require_env() {
+  require_tools
   local missing=()
   [ -z "${GH_TOKEN:-}" ] && missing+=("GH_TOKEN")
   [ -z "${GH_ORG:-}" ]   && missing+=("GH_ORG")
@@ -168,9 +185,37 @@ cmd_build() {
   # `git remote -v`, .git/config, and tool notices (e.g. git-filter-repo's
   # "removing origin remote" message), which is a needless leak surface.
   local AUTH_HEADER
+  local PUSH_ERR
   AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
   git remote add origin "https://github.com/${GH_ORG}/${REPO_NAME}.git"
-  git -c http.extraheader="$AUTH_HEADER" push --quiet origin main
+
+  # This push carries the planted credential, so it is where GitHub secret
+  # scanning would reject it. That failure is the one that takes out an entire
+  # cohort at once, and raw git output does not say so — hence the translation.
+  if ! PUSH_ERR="$(git -c http.extraheader="$AUTH_HEADER" push origin main 2>&1)"; then
+    case "$PUSH_ERR" in
+      *GH013*|*"push protection"*|*"secret scanning"*|*"Push cannot contain secrets"*)
+        die "Push BLOCKED by GitHub secret scanning (push protection)." \
+            "" \
+            "  The planted credential format was recognised and refused." \
+            "" \
+            "  ⚠ This affects EVERY student repository identically — do not" \
+            "    start a fan-out until it is resolved." \
+            "" \
+            "  Fix: change the credential format in credential_for() near the top" \
+            "  of this script (currently 'sk_staging_' + 40 hex), then rebuild and" \
+            "  re-test. Repository '$REPO_NAME' has been created but is empty;" \
+            "  delete it before retrying." \
+            "" \
+            "  --- git said ---" \
+            "$PUSH_ERR" ;;
+      *)
+        die "Push failed for '$REPO_NAME'." \
+            "" \
+            "  --- git said ---" \
+            "$PUSH_ERR" ;;
+    esac
+  fi
 
   # Pin the default branch explicitly rather than relying on GitHub adopting
   # the first pushed branch. An org can configure a different default branch
@@ -323,8 +368,15 @@ cmd_class() {
       echo "          The real run will refuse without it."
       KIT_SALT=""
     else
-      echo "KIT_SALT is not set. Pick a per-cohort secret string and keep it: it is what makes credentials reproducible." >&2
-      exit 1
+      die "KIT_SALT is not set." \
+          "" \
+          "  It is a per-cohort secret string of your choosing. It makes each" \
+          "  student's credential reproducible, so a repo can be rebuilt after a" \
+          "  failure and any value re-derived for marking." \
+          "" \
+          "  export KIT_SALT=<any secret string — write it down and keep it>" \
+          "" \
+          "  Not needed for --dry-run."
     fi
   fi
 
@@ -535,8 +587,10 @@ cmd_deploy_one() {
     NOTE="repo already existed; build skipped"
   else
     if ! "$SCRIPT_DIR/dwellkit" build "$STUDENT_ID" >"$OUTDIR/$STUDENT_ID.build.log" 2>&1; then
+      # Record the basename, not the temp path: logs are copied into the
+      # working directory on failure, and $OUTDIR is deleted on exit.
       printf '%s,%s,%s,,build-failed,none,see %s\n' \
-        "$STUDENT_ID" "$GH_USER" "$REPO_NAME" "$OUTDIR/$STUDENT_ID.build.log" > "$OUTDIR/$STUDENT_ID.row"
+        "$STUDENT_ID" "$GH_USER" "$REPO_NAME" "$STUDENT_ID.build.log" > "$OUTDIR/$STUDENT_ID.row"
       return 0
     fi
   fi
@@ -556,7 +610,7 @@ cmd_deploy_one() {
     fi
   else
     STATUS="invite-failed"
-    NOTE="see $OUTDIR/$STUDENT_ID.invite.log"
+    NOTE="see $STUDENT_ID.invite.log"
     NOTIFIED="none"
   fi
 
@@ -724,5 +778,16 @@ case "${1:-help}" in
   status)      shift; cmd_status "$@" ;;
   _deploy-one) shift; cmd_deploy_one "$@" ;;
   help|-h|--help) usage ;;
-  *) echo "unknown subcommand: $1" >&2; echo >&2; usage >&2; exit 1 ;;
+  *)
+    echo >&2
+    echo "Unknown subcommand: '$1'" >&2
+    case "$1" in
+      dry*|validate*|check*) echo "Did you mean:  ./dwellkit class <roster.csv> --dry-run" >&2 ;;
+      deploy*|fanout*|run*)  echo "Did you mean:  ./dwellkit class <roster.csv>" >&2 ;;
+      invite*|remind*|chase*)echo "Did you mean:  ./dwellkit status <results.csv> --remind" >&2 ;;
+      create*|new*|make*)    echo "Did you mean:  ./dwellkit build <student-id>" >&2 ;;
+    esac
+    echo >&2
+    usage >&2
+    exit 1 ;;
 esac
