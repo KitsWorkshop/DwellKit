@@ -138,6 +138,8 @@ export KIT_SALT=<per-cohort secret string — keep it>
 
 **Phase 3 — Build and invite,** at a default concurrency of 5. Capped deliberately: GitHub's *secondary* rate limits trigger on burst concurrency rather than total volume and are invisible in the standard headers.
 
+**Notification.** Each repo gets an issue assigned to its student, filed as an inherited ticket. This is the only notification an *org member* receives — `PUT .../collaborators` returns `204` and adds them silently, versus `201` plus an invitation email for an outside collaborator. The results CSV records which happened per student in a `notified` column (`invited` / `added-silently` / `none`), and the run prints the silent list.
+
 **Phase 4 — Report,** written to `dwellkit-results-<org>-<timestamp>.csv` with each student's repo, credential, and status. The file carries `# org=` / `# prefix=` / `# generated=` provenance lines above the CSV header; `dwellkit status` reads the org back out and refuses to run against a file built for a different org.
 
 ### Design decisions

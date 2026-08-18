@@ -40,6 +40,7 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
 - [x] ~~**Roster loop**~~ → `dwellkit class`, idempotent (re-run skips existing repos).
 - [x] ~~**Concurrency**~~ → `xargs -P`, default 5, `CONCURRENCY` overridable.
 - [x] ~~**Acceptance monitoring**~~ → `dwellkit status`, with `--remind` to re-send.
+- [x] ~~**Notify students that a repo exists**~~ → an issue assigned to each student, from `templates/student-issue.md`, filed in their repo. Closes the org-member gap, where `PUT .../collaborators` returns `204` and notifies nobody. The `notified` column of the results CSV records `invited` / `added-silently` / `none` per student, and the run prints the silent list.
 
 **Still open in this area:**
 - [ ] **Teardown subcommand** (~15 min) — bulk delete after the exercise. Working commands exist in `PILOT-RUNBOOK.md` §10 (list by prefix, pipe to `gh repo delete`); this item is now only about folding them into `dwellkit` as a subcommand. Needs `delete_repo` scope, which the build token lacks.

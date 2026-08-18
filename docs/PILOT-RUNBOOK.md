@@ -16,6 +16,7 @@ Four things are currently unproven, and **three of them a pilot closes in one si
 | Does the credential format survive **push protection** in the target org? | ✅ Yes, if the pilot runs in that org |
 | Does a **multi-repo build** hold up (timings, rate limits, partial failures)? | ✅ Partially — at 3–8, not at 30 |
 | Do students **accept invitations** reliably? | ❌ **No** — see the warning below |
+| Does the **assigned issue** notify them? | ✅ Yes — and org members are the case it exists for |
 
 > ### ⚠️ A pilot with colleagues does *not* test the invitation flow
 >
@@ -238,6 +239,7 @@ Write these down while they are fresh. They unblock items in `TODO.md`:
 - [ ] **Push protection did not block the credential format** — in the real teaching org (`TODO.md` §2)
 - [ ] **Build timings** at this group size, and any failures or rate limiting (`TODO.md` §4)
 - [ ] **Invitation acceptance** — only meaningful if you included a non-org-member
+- [ ] **Did the assigned issue actually reach them?** Ask each participant how they first learned the repo existed — email, the issue, or you telling them. That answer decides how much you can rely on GitHub for a real cohort.
 - [ ] **How many rotated before rewriting** — the baseline the exercise exists to move
 - [ ] **Brief wording that misled or under-specified** (`TODO.md` §3.1)
 - [ ] **Whether the pre-red CI read as "broken" rather than "a problem to solve"** (`TODO.md` §5)

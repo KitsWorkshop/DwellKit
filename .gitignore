@@ -5,3 +5,4 @@ dwellkit-results-*.csv
 fanout-results-*.csv
 *.build.log
 *.invite.log
+*.issue.md

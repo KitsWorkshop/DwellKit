@@ -230,6 +230,27 @@ Note that deleting requires a `delete_repo` scope that the standard build token 
 
 ---
 
+### How students are told they have a repository
+
+Two mechanisms, because neither covers everyone on its own:
+
+| Student is… | Collaborator call does | Assigned issue does |
+|---|---|---|
+| **Not an org member** | Creates an invitation — GitHub emails them (`201`) | Created, but **unassigned** — GitHub requires push access to be assignable and drops the assignee silently. They cannot be notified about a private repo they cannot yet see. |
+| **Already an org member** | Adds them silently — **no notification at all** (`204`) | Notifies them immediately |
+
+The issue exists mainly to close that second row. An org member who is quietly granted access has no way of knowing unless somebody tells them, and that is easy to discover on the morning of the session rather than the week before.
+
+It also does a second job. The ticket is written in-fiction — *"Priya's last day was Friday, and `staging-deploy` has been red ever since"* — so the work arrives the way it actually arrives in a job: as something you inherited, not an exercise you were handed. Edit `templates/student-issue.md` to change the wording; `__STUDENT__` is replaced with their GitHub username.
+
+`class` prints anyone who was added silently, and records the outcome per student in the `notified` column of the results CSV.
+
+> **Re-run `class` once everyone has accepted.** Nothing back-fills an assignment — GitHub sends no retroactive notification for events that predate your access, and the dropped assignee is not reapplied. A re-run finds the existing issue, sees it has no assignee, and assigns it. The `note` column will say `issue assigned on re-run`, or `issue unassigned (student has not accepted yet)` for anyone still pending. Re-running is safe: repos are skipped and no duplicate issue is opened.
+
+> **Send the URLs yourself as well.** GitHub notification email lands in Promotions, gets filtered, and is muted outright by plenty of students. Neither channel is reliable enough to be the only one for something a session depends on — use your LMS.
+
+---
+
 ### What students need installed
 
 Tell them in advance — neither is a default install, and discovering it at the start of a session costs you twenty minutes:

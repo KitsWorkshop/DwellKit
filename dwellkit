@@ -408,7 +408,7 @@ cmd_class() {
     echo "# org=${GH_ORG}"
     echo "# prefix=${KIT_PREFIX}"
     echo "# generated=$(date -Iseconds)"
-    echo "student_id,github_username,repo,credential,status,note"
+    echo "student_id,github_username,repo,credential,status,notified,note"
   } > "$RESULTS"
   cat "$OUTDIR"/*.row 2>/dev/null | sort >> "$RESULTS" || true
 
@@ -425,6 +425,19 @@ cmd_class() {
     echo "    Failure logs copied to the current directory."
     echo "    Re-run the same command to retry — existing repos are skipped."
   fi
+  # Who did GitHub actually tell? Org members are added silently, so without
+  # this line an instructor has no way to know which students were never
+  # contacted by anything.
+  local SILENT
+  SILENT=$(grep -c ',added-silently,' "$RESULTS" || true)
+  if [ "$SILENT" -gt 0 ]; then
+    echo
+    echo "    ⚠ $SILENT student(s) were added SILENTLY (already org members — GitHub sent them nothing)."
+    grep ',added-silently,' "$RESULTS" | cut -d, -f1,2 | sed 's/^/        /'
+    echo "      They each have an assigned issue in their repo, which does notify."
+    echo "      Send them the URL yourself as well — do not rely on either channel alone."
+  fi
+
   echo
   echo "    NEXT: students must ACCEPT their invitations before they can clone."
   echo "          Run ./dwellkit status $RESULTS daily until everyone has."
@@ -443,21 +456,82 @@ cmd_deploy_one() {
     NOTE="repo already existed; build skipped"
   else
     if ! "$SCRIPT_DIR/dwellkit" build "$STUDENT_ID" >"$OUTDIR/$STUDENT_ID.build.log" 2>&1; then
-      printf '%s,%s,%s,,build-failed,see %s\n' \
+      printf '%s,%s,%s,,build-failed,none,see %s\n' \
         "$STUDENT_ID" "$GH_USER" "$REPO_NAME" "$OUTDIR/$STUDENT_ID.build.log" > "$OUTDIR/$STUDENT_ID.row"
       return 0
     fi
   fi
 
   # PUT is idempotent: re-running does not create duplicate invitations.
-  if ! gh api -X PUT "repos/${GH_ORG}/${REPO_NAME}/collaborators/${GH_USER}" \
-        -f permission=push >"$OUTDIR/$STUDENT_ID.invite.log" 2>&1; then
+  # The response distinguishes the two cases and they behave very differently:
+  #   201 + an invitation object -> outside collaborator; GitHub emails them.
+  #   204 No Content             -> already an org member; added silently, NO
+  #                                 notification of any kind is sent.
+  local INVITE_OUT NOTIFIED
+  if INVITE_OUT="$(gh api -X PUT "repos/${GH_ORG}/${REPO_NAME}/collaborators/${GH_USER}" \
+        -f permission=push 2>"$OUTDIR/$STUDENT_ID.invite.log")"; then
+    if printf '%s' "$INVITE_OUT" | grep -q '"invitee"'; then
+      NOTIFIED="invited"          # GitHub sent an invitation email
+    else
+      NOTIFIED="added-silently"   # org member: access granted, nobody told
+    fi
+  else
     STATUS="invite-failed"
     NOTE="see $OUTDIR/$STUDENT_ID.invite.log"
+    NOTIFIED="none"
   fi
 
-  printf '%s,%s,%s,%s,%s,%s\n' \
-    "$STUDENT_ID" "$GH_USER" "$REPO_NAME" "$CREDENTIAL" "$STATUS" "$NOTE" > "$OUTDIR/$STUDENT_ID.row"
+  # File a ticket in the repo, assigned to the student.
+  #
+  # Two jobs. It notifies org members, who receive nothing from the collaborator
+  # call above. And it frames the work the way it actually arrives in a job: as
+  # a ticket you inherited, not an exercise you were handed.
+  #
+  # Assignment only sticks once the student can see the repo, so for a pending
+  # invitation GitHub silently drops the assignee — the issue is still created
+  # and is waiting for them when they accept. Their invitation email is the
+  # notification in that case, so nobody is left uncontacted either way.
+  if [ "$STATUS" = "ok" ] && [ -f "$SCRIPT_DIR/templates/student-issue.md" ]; then
+    local ISSUE_TITLE="Staging deploys are failing"
+    local EXISTING ISSUE_NUM ASSIGNEES
+    EXISTING="$(gh issue list --repo "${GH_ORG}/${REPO_NAME}" --state all \
+                  --json number,title,assignees \
+                  --jq ".[] | select(.title == \"$ISSUE_TITLE\") | \"\(.number) \(.assignees | length)\"" \
+                2>/dev/null | head -1)"
+
+    if [ -z "$EXISTING" ]; then
+      # Idempotent: only ever open one copy.
+      sed "s/__STUDENT__/${GH_USER}/g" "$SCRIPT_DIR/templates/student-issue.md" \
+        > "$OUTDIR/$STUDENT_ID.issue.md"
+      gh issue create --repo "${GH_ORG}/${REPO_NAME}" \
+        --title "$ISSUE_TITLE" \
+        --body-file "$OUTDIR/$STUDENT_ID.issue.md" \
+        --assignee "$GH_USER" >/dev/null 2>&1 \
+      || gh issue create --repo "${GH_ORG}/${REPO_NAME}" \
+           --title "$ISSUE_TITLE" \
+           --body-file "$OUTDIR/$STUDENT_ID.issue.md" >/dev/null 2>&1 \
+      || NOTE="${NOTE:+$NOTE; }issue not created"
+    else
+      # The issue exists. If it has no assignee, the student had not accepted
+      # their invitation when it was filed — GitHub requires push access to be
+      # assignable and drops the assignee silently, and nothing back-fills it
+      # later. Re-running after acceptance repairs that; until then the
+      # invitation email is what reaches them.
+      ISSUE_NUM="${EXISTING%% *}"
+      ASSIGNEES="${EXISTING##* }"
+      if [ "$ASSIGNEES" = "0" ]; then
+        if gh issue edit "$ISSUE_NUM" --repo "${GH_ORG}/${REPO_NAME}" \
+             --add-assignee "$GH_USER" >/dev/null 2>&1; then
+          NOTE="${NOTE:+$NOTE; }issue assigned on re-run"
+        else
+          NOTE="${NOTE:+$NOTE; }issue unassigned (student has not accepted yet)"
+        fi
+      fi
+    fi
+  fi
+
+  printf '%s,%s,%s,%s,%s,%s,%s\n' \
+    "$STUDENT_ID" "$GH_USER" "$REPO_NAME" "$CREDENTIAL" "$STATUS" "${NOTIFIED:-unknown}" "$NOTE" > "$OUTDIR/$STUDENT_ID.row"
 }
 
 # ===========================================================================
@@ -492,7 +566,7 @@ cmd_status() {
   [ -n "$FILE_ORG" ] && echo "    org: $FILE_ORG"
   echo
 
-  while IFS=, read -r student_id github_username repo credential status note; do
+  while IFS=, read -r student_id github_username repo credential status notified note; do
     case "$student_id" in \#*) continue ;; esac   # provenance comments
     [ "$student_id" = "student_id" ] && continue   # column header
     [ -z "${repo:-}" ] && continue

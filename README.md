@@ -69,6 +69,19 @@ Two things this sequence assumes you have already dealt with — both covered in
 - **The student brief.** It ships in `templates/student-README.md` and is installed into every
   student repo automatically — but read it once before a cohort does.
 
+**How students find out they have a repo.** `class` files an issue in each repo assigned to the
+student — *"Staging deploys are failing"*, written as a ticket they inherited.
+
+- **Org members** get **nothing** from the collaborator call (GitHub adds existing members
+  silently), so the assigned issue is their only notification. The run prints who these are.
+- **Everyone else** gets GitHub's invitation email, but their issue is created *unassigned* —
+  an assignee needs push access, which a pending invitee doesn't have yet.
+
+**Re-run `./dwellkit class roster.csv` once everyone has accepted** to assign those issues. It is
+safe to re-run: repos are skipped, no duplicate issues are opened.
+
+Send the URLs through your own channel too; don't rely on either GitHub path alone.
+
 <details>
 <summary><strong>Building a single repository</strong> — rarely needed, two cases</summary>
 
@@ -323,7 +336,9 @@ dwellkit              The only script — build / class / status
 floor.bundle          The authentic 2,855-commit history, serialised
 tail/*.patch          The 203-patch series applied on top
 roster.example.csv    Roster format
-templates/            student-README.md — the brief students see. Edit this, not the script.
+templates/            student-README.md — the brief students see
+                      student-issue.md  — the ticket filed in each repo
+                      Edit these, not the script.
 docs/                 Everything written; see the table above
 ```
 

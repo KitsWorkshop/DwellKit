@@ -10,6 +10,7 @@ Status as of 2026-08-18: **working; deployment machinery complete.** The exercis
 - **`floor.bundle`** — the real project history, captured once, reused every run (no network needed to rebuild).
 - **`dwellkit class`** — class-scale deployment: validates a roster, builds a repo per student, invites each as a collaborator, reports results. Concurrent and re-runnable.
 - **`dwellkit status`** — reports who hasn't accepted their invitation yet; `--remind` re-sends.
+- **`templates/student-issue.md`** — a ticket filed in each student's repo and assigned to them: notification plus in-fiction framing. It is the *only* notification an existing org member gets, since GitHub adds members to a repo silently.
 - **`templates/student-README.md`** — the student brief, installed as each repo's README at build time. Replaces the 1,568-line upstream README, states the three completion conditions, and requires an ordered log (which is what makes order-of-operations markable).
 - **A CI failure that doesn't spoil itself** — the workflow fails as a plain `401 Unauthorized` from the staging API. Nothing student-visible mentions git history or rotation, including the job name, step name, and the `run:` block Actions echoes into the log.
 - **Multi-org safety** — results files are named and stamped with the org and `dwellkit status` refuses a mismatched pair; preflight probes SAML authorisation, org role, outside-collaborator policy and Actions availability; `build` pins the default branch explicitly.
