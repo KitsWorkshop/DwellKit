@@ -1,5 +1,6 @@
 # Student data and credential values — never commit these.
 roster.csv
+dwellkit-results-*.csv
 fanout-results-*.csv
 *.build.log
 *.invite.log

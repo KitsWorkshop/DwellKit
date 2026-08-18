@@ -108,13 +108,14 @@ For a first real class of ~30:
 
 ## Implementation status — Option A is built ✅
 
-Implemented and verified live. Three files:
+Implemented and verified live, as two subcommands of the `dwellkit` script:
 
-| File | Purpose |
+| Command | Purpose |
 |---|---|
-| `fanout.sh` | Validate roster → build repos → invite students → report. Concurrent, re-runnable. |
-| `check-invites.sh` | Who hasn't accepted yet. Optionally re-sends invitations. |
-| `roster.example.csv` | Roster format. |
+| `dwellkit class <roster.csv>` | Validate roster → build repos → invite students → report. Concurrent, re-runnable. |
+| `dwellkit status <results.csv>` | Who hasn't accepted yet. `--remind` re-sends invitations. |
+
+Plus `roster.example.csv`, which documents the roster format.
 
 ### Usage
 
@@ -123,10 +124,10 @@ export GH_TOKEN=<classic PAT: repo + workflow>
 export GH_ORG=<your teaching org>
 export KIT_SALT=<per-cohort secret string — keep it>
 
-./fanout.sh roster.csv --dry-run     # validate roster, create nothing
-./fanout.sh roster.csv               # build + invite
-./check-invites.sh fanout-results-*.csv           # who hasn't accepted
-./check-invites.sh fanout-results-*.csv --remind  # re-send pending
+./dwellkit class roster.csv --dry-run     # validate roster, create nothing
+./dwellkit class roster.csv               # build + invite
+./dwellkit status dwellkit-results-*.csv           # who hasn't accepted
+./dwellkit status dwellkit-results-*.csv --remind  # re-send pending
 ```
 
 ### What it does
@@ -137,17 +138,17 @@ export KIT_SALT=<per-cohort secret string — keep it>
 
 **Phase 3 — Build and invite,** at a default concurrency of 5. Capped deliberately: GitHub's *secondary* rate limits trigger on burst concurrency rather than total volume and are invisible in the standard headers.
 
-**Phase 4 — Report,** written to a timestamped `fanout-results-*.csv` with each student's repo, credential, and status.
+**Phase 4 — Report,** written to a timestamped `dwellkit-results-*.csv` with each student's repo, credential, and status.
 
 ### Design decisions
 
-**Deterministic credentials.** `build-repo.sh` now derives the credential from `sha256(student_id + KIT_SALT)` when `KIT_SALT` is set, and stays random when it isn't (correct for one-off builds). This means a repo can be rebuilt identically after a failure, and any student's value can be re-derived for marking without having recorded thirty of them.
+**Deterministic credentials.** `dwellkit build` now derives the credential from `sha256(student_id + KIT_SALT)` when `KIT_SALT` is set, and stays random when it isn't (correct for one-off builds). This means a repo can be rebuilt identically after a failure, and any student's value can be re-derived for marking without having recorded thirty of them.
 
 > **Keep `KIT_SALT` safe and unchanged for the cohort.** Losing it means losing the ability to re-derive credentials. Changing it mid-cohort means new repos get different values from existing ones.
 
 **Idempotent re-runs.** A student whose repo already exists is skipped; the invitation is re-sent regardless, because `PUT` on the collaborators endpoint is idempotent. After a partial failure, re-run the identical command. Verified: a re-run of a completed 2-student fan-out took **1.5s** versus 20.5s for the original.
 
-**Results are gitignored.** `roster.csv` holds student data and `fanout-results-*.csv` holds credential values. Both are in `.gitignore`. Do not commit or share them.
+**Results are gitignored.** `roster.csv` holds student data and `dwellkit-results-*.csv` holds credential values. Both are in `.gitignore`. Do not commit or share them.
 
 ### Verified live
 
@@ -158,7 +159,7 @@ export KIT_SALT=<per-cohort secret string — keep it>
 | Build + invite, 2 students, concurrency 2 | ✅ 20.5s total |
 | Credentials match independent derivation | ✅ exact match |
 | Built repo contains the derived credential | ✅ |
-| `check-invites.sh` reports status correctly | ✅ |
+| `dwellkit status` reports status correctly | ✅ |
 | Re-run skips existing repos | ✅ 1.5s |
 | Results CSV well-formed | ✅ every row exactly 6 fields |
 

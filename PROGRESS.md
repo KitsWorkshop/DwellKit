@@ -5,11 +5,11 @@ Status as of 2026-08-18: **working; deployment machinery complete.** The exercis
 ## What's built
 
 - **A real demo repo**: [KitsWorkshop/secretkit-spike-demo7](https://github.com/KitsWorkshop/secretkit-spike-demo7) (private) — clean, unrotated, ready to walk through live.
-- **`build-repo.sh`** — one command builds a complete student repo from scratch: real project history (2,855 commits) + 203 more on top (200 real upstream commits with 3 exercise commits buried among them) + a GitHub Actions workflow that goes red/green on rotation. Re-runnable, ~15–50 seconds per repo.
-- **`tail/`** — 203 numbered patch files: 200 genuine upstream commits plus the 3 exercise commits (plant at ~163 back from HEAD, scrub at ~82, live copy at ~6), reusable across every repo `build-repo.sh` builds.
+- **`dwellkit build`** — one command builds a complete student repo from scratch: real project history (2,855 commits) + 203 more on top (200 real upstream commits with 3 exercise commits buried among them) + a GitHub Actions workflow that goes red/green on rotation. Re-runnable, ~15–50 seconds per repo.
+- **`tail/`** — 203 numbered patch files: 200 genuine upstream commits plus the 3 exercise commits (plant at ~163 back from HEAD, scrub at ~82, live copy at ~6), reusable across every repo `dwellkit build` builds.
 - **`floor.bundle`** — the real project history, captured once, reused every run (no network needed to rebuild).
-- **`fanout.sh`** — class-scale deployment: validates a roster, builds a repo per student, invites each as a collaborator, reports results. Concurrent and re-runnable.
-- **`check-invites.sh`** — reports who hasn't accepted their invitation yet; `--remind` re-sends.
+- **`dwellkit class`** — class-scale deployment: validates a roster, builds a repo per student, invites each as a collaborator, reports results. Concurrent and re-runnable.
+- **`dwellkit status`** — reports who hasn't accepted their invitation yet; `--remind` re-sends.
 - **`TECHNICAL-NOTES.md`** — full phase-by-phase report: what was tested, what broke, timings, open questions.
 
 ## Verified working, live, on real GitHub

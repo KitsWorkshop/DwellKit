@@ -9,7 +9,7 @@ Ordered by what blocks what. Effort estimates assume familiarity with the codeba
 ## 0. Do this first — highest information per unit effort
 
 - [ ] **Build one repo in the real target organisation** (~10 min)
-  Run `./build-repo.sh pilot1` against the organisation you will actually teach from, not the development sandbox.
+  Run `./dwellkit build pilot1` against the organisation you will actually teach from, not the development sandbox.
   **This single action validates three separate unknowns at once:** whether push protection blocks the credential format, whether your token has sufficient permissions, and whether org policy (default branch protection, Actions restrictions, required workflows) interferes.
   *Acceptance: repo builds, push succeeds, workflow runs and reports red.*
 
@@ -20,10 +20,10 @@ Everything below is easier to scope once this is done — in particular, item 2 
 ## 1. Blockers — students cannot use this without these
 
 ### 1.1 Student access to repositories — ✅ DONE (Option A)
-Implemented in `fanout.sh`: per-repo outside-collaborator invitations at `permission=push`. See `FANOUT-DESIGN.md`.
+Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `permission=push`. See `FANOUT-DESIGN.md`.
 - [x] ~~**Decide the access mechanism**~~ → **Option A: outside-collaborator invitations** at `permission=push`.
   **GitHub Classroom was ruled out on a hard technical constraint**, not preference: its assignment flow provisions repos from a *template*, and templates start with a single commit. That would erase the 3,059-commit history the exercise depends on. Classroom remains usable for roster/identity only.
-- [x] ~~**Build the roster mechanism**~~ → `roster.csv` + `fanout.sh`, with pre-flight validation that every username actually exists before anything is created.
+- [x] ~~**Build the roster mechanism**~~ → `roster.csv` + `dwellkit class`, with pre-flight validation that every username actually exists before anything is created.
 - [ ] **Confirm invited students can perform every required action** (~15 min, needs a second GitHub account to test properly)
   Verified from documentation already: **write access is sufficient** to manage Actions secrets, so students can rotate. Still worth confirming live that a write-level collaborator can also force-push (branch protection is off, so this should hold).
 
@@ -33,9 +33,9 @@ Implemented in `fanout.sh`: per-repo outside-collaborator invitations at `permis
 
 > **See `FANOUT-DESIGN.md` for the full analysis.** Two constraints found since this list was written: (a) GitHub Classroom's template flow **starts repos with a single commit**, so it cannot provision this kit's 3,059-commit history; (b) private-repo collaborators **consume paid seats** on Team — 30 students needs 31 seats — which is removed entirely by GitHub Education verification. **Start the Education application first; it has an external lead time.**
 - [x] ~~**Deterministic credentials**~~ → `sha256(student_id + KIT_SALT)` when `KIT_SALT` is set; random otherwise.
-- [x] ~~**Roster loop**~~ → `fanout.sh`, idempotent (re-run skips existing repos).
+- [x] ~~**Roster loop**~~ → `dwellkit class`, idempotent (re-run skips existing repos).
 - [x] ~~**Concurrency**~~ → `xargs -P`, default 5, `CONCURRENCY` overridable.
-- [x] ~~**Acceptance monitoring**~~ → `check-invites.sh`, with `--remind` to re-send.
+- [x] ~~**Acceptance monitoring**~~ → `dwellkit status`, with `--remind` to re-send.
 
 **Still open in this area:**
 - [ ] **Teardown script** (~15 min) — bulk delete after the exercise. Needs `delete_repo` scope, which the build token lacks.
@@ -77,16 +77,16 @@ Implemented in `fanout.sh`: per-repo outside-collaborator invitations at `permis
 - [ ] **Add partial-failure handling to the builder** (~30 min)
   Currently a mid-run failure leaves a half-built repo with no cleanup or resume. Tolerable for one repo, genuinely annoying at thirty. Either make it idempotent (detect and resume) or add a `--cleanup` path.
   Note the build token needs `delete_repo` scope for cleanup to work — it does not have it by default.
-- [ ] **Dry-run the full fan-out at real class size** (~30 min) — `fanout.sh` is verified at 2 students; 30 concurrent has not been run
+- [ ] **Dry-run the full fan-out at real class size** (~30 min) — `dwellkit class` is verified at 2 students; 30 concurrent has not been run
   Rate limits look comfortable on paper (~180 API calls for 30 students against 5,000/hour) but a 30-repo burst has never actually been run. Watch for secondary rate limits, which are triggered by burst *concurrency* rather than total volume and are not visible in the standard rate-limit headers.
-- [x] ~~**Decide how instructors receive the credential values**~~ → written to a gitignored `fanout-results-*.csv`, and re-derivable from `student_id` + `KIT_SALT` at any time.
+- [x] ~~**Decide how instructors receive the credential values**~~ → written to a gitignored `dwellkit-results-*.csv`, and re-derivable from `student_id` + `KIT_SALT` at any time.
 
 ---
 
 ## 5. Tuning and polish
 
 - [ ] **Consider softening the workflow failure message** (~2 min)
-  It currently reads *"STAGING_API_KEY still matches the value that leaked into git history"* — a strong hint delivered by CI at the exact moment the student should be working it out unaided. Something like *"deployment credential validation failed"* preserves the red/green signal without spoiling the reveal. One-line edit in `build-repo.sh`.
+  It currently reads *"STAGING_API_KEY still matches the value that leaked into git history"* — a strong hint delivered by CI at the exact moment the student should be working it out unaided. Something like *"deployment credential validation failed"* preserves the red/green signal without spoiling the reveal. One-line edit in `dwellkit build`.
 - [ ] **Consider the pre-red CI state** (~15 min of thought)
   Students clone a repository whose CI is *already* failing, before they have done anything. This may read as "the exercise is broken" rather than "there is a problem to solve." Worth either addressing in the brief or reconsidering whether the workflow should only start failing after the student's first push.
 - [ ] **Review tail commit dates** (~10 min)

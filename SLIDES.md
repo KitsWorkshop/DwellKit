@@ -436,7 +436,7 @@ The workflow compares a **SHA-256 hash** — it never contains the credential.
 ```bash
 export GH_TOKEN=<token>
 export GH_ORG=<your teaching org>
-./build-repo.sh alice
+./dwellkit build alice
 ```
 
 ⏱ **15–50 seconds** per repo — dominated by GitHub API latency, not local work.
@@ -546,9 +546,9 @@ Its template flow starts repos with a **single commit**. Our credential is 163 c
 ## Fan-out is built ✅
 
 ```bash
-./fanout.sh roster.csv --dry-run   # validate, create nothing
-./fanout.sh roster.csv             # build + invite everyone
-./check-invites.sh results.csv     # who hasn't accepted
+./dwellkit class roster.csv --dry-run   # validate, create nothing
+./dwellkit class roster.csv             # build + invite everyone
+./dwellkit status results.csv     # who hasn't accepted
 ```
 
 - Roster validated **before** anything is created
@@ -602,4 +602,4 @@ What's left is teaching materials and org setup — and the brief is the piece t
 | `TECHNICAL-NOTES.md` | Technical report |
 | `TODO.md` | Remaining work |
 
-**Scripts:** `build-repo.sh` (one repo) · `fanout.sh` (a class) · `check-invites.sh`
+**One script:** `./dwellkit` — `build` (one repo) · `class` (a cohort) · `status` (invitations)

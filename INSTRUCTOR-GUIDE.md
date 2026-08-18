@@ -171,14 +171,14 @@ export GH_TOKEN=<your token>
 export GH_ORG=<your teaching org>
 export KIT_PREFIX=hackathon-starter-   # optional; this is also the default
 
-./build-repo.sh alice
+./dwellkit build alice
 ```
 
 This produces a private repository named `<KIT_PREFIX>alice`, and takes roughly 15–50 seconds (the variance is GitHub API latency, not local work — applying all 203 patches locally accounts for only about 5 seconds of it). It prints the credential value at the end — **note it down or redact it**, depending on what you're doing with the output.
 
 The script is deliberately plain, linear shell with a commented step for each phase. It is meant to be read.
 
-> **For a whole class, use `fanout.sh` instead** — it wraps this builder with roster validation, per-student invitations, concurrency, and a results report. See `FANOUT-DESIGN.md`. `build-repo.sh` remains the right tool for one-off builds and for the push-protection pre-flight check.
+> **For a whole class, use `dwellkit class` instead** — it wraps this builder with roster validation, per-student invitations, concurrency, and a results report. See `FANOUT-DESIGN.md`. `dwellkit build` remains the right tool for one-off builds and for the push-protection pre-flight check.
 
 **What it does, in order:**
 
@@ -262,7 +262,7 @@ Students who already know this tooling will finish in ten minutes. Have the exte
 
 ### A tuning note
 
-When the workflow fails, its log says: *"STAGING_API_KEY still matches the value that leaked into git history."* That is a fairly strong hint toward the answer. Depending on how much you want students to discover unaided, consider softening it to something like *"deployment credential validation failed"* before running the exercise. It's a one-line edit in `build-repo.sh`.
+When the workflow fails, its log says: *"STAGING_API_KEY still matches the value that leaked into git history."* That is a fairly strong hint toward the answer. Depending on how much you want students to discover unaided, consider softening it to something like *"deployment credential validation failed"* before running the exercise. It's a one-line edit in `dwellkit build`.
 
 ### Marking
 
@@ -299,8 +299,8 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 
 | Gap | Severity | Notes |
 |---|---|---|
-| ~~Students cannot access the repos~~ | ✅ **Done** | `fanout.sh` invites each student as a collaborator at `permission=push`. |
-| ~~No per-student fan-out~~ | ✅ **Done** | `fanout.sh` builds a repo per student from a roster, concurrently, with deterministic credentials and idempotent re-runs. |
+| ~~Students cannot access the repos~~ | ✅ **Done** | `dwellkit class` invites each student as a collaborator at `permission=push`. |
+| ~~No per-student fan-out~~ | ✅ **Done** | `dwellkit class` builds a repo per student from a roster, concurrently, with deterministic credentials and idempotent re-runs. |
 | **GitHub Education verification** | **Blocking for a real cohort** | Private-repo collaborators consume paid seats — 30 students needs 31, versus the 1 a bare Team org has. Note the org is *already* on Team — that is the cause, not the cure. Education grants the same Team plan free with unlimited users. External lead time; start it early. See `FANOUT-DESIGN.md`. |
 | **Push protection format unvalidated** | **High risk** | See Part 3. Could cause every repo to fail to build in an org that enforces scanning. Cheapest mitigation: build one repo in your real target org and see if it pushes. |
 | **No student-facing brief** | Required | Was explicitly out of scope for the build. You need one, and it must state that marking is on ordering. |
@@ -327,9 +327,7 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 
 | File | Purpose |
 |---|---|
-| `build-repo.sh` | The builder. Produces one complete student repo. Plain, linear, commented — meant to be read. |
-| `fanout.sh` | Class-scale deployment: roster validation → build → invite → report. Concurrent, idempotent. |
-| `check-invites.sh` | Reports who hasn't accepted their invitation; `--remind` re-sends. |
+| `dwellkit` | The only script, with three subcommands:<br>`build <id>` — one complete student repo. Plain, linear, commented — meant to be read.<br>`class <roster>` — roster validation → build → invite → report. Concurrent, idempotent.<br>`status <results>` — who hasn't accepted their invitation; `--remind` re-sends. |
 | `roster.example.csv` | Roster format (`student_id,github_username`). |
 | `floor.bundle` | The 2,855-commit authentic history, serialised (16 MB). |
 | `tail/*.patch` | 203 numbered patches applied on top of the floor: 200 genuine upstream commits, plus the 3 exercise commits (plant at 41, scrub at 122, reintroduce at 198). The three exercise patches contain only the `__KIT_SECRET__` placeholder, never a real value. |

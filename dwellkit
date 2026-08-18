@@ -1,0 +1,445 @@
+#!/usr/bin/env bash
+#
+# dwellkit — deploy "The Secret You Can't Delete" to students.
+#
+#   ./dwellkit build   <student-id>              one repository
+#   ./dwellkit class   <roster.csv> [--dry-run]  a whole cohort
+#   ./dwellkit status  <results.csv> [--remind]  who hasn't accepted yet
+#
+# Environment:
+#   GH_TOKEN    required   token with repo + workflow scope on GH_ORG
+#   GH_ORG      required   organisation to build into
+#   KIT_SALT    see below  per-cohort secret; required by `class`
+#   KIT_PREFIX  optional   repo name prefix (default: hackathon-starter-)
+#   CONCURRENCY optional   parallel builds during `class` (default: 5)
+#
+# KIT_SALT makes credentials reproducible: a repo can be rebuilt identically
+# after a failure, and any student's value can be re-derived for marking
+# without having recorded thirty of them. `build` without a salt produces a
+# random credential, which is correct for one-off builds.
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+KIT_PREFIX="${KIT_PREFIX:-hackathon-starter-}"
+
+# ===========================================================================
+# Shared definitions.
+#
+# Everything below is defined exactly once and used by every subcommand.
+# Credential derivation and repo naming were previously duplicated across two
+# scripts; the prefix defaults had already silently drifted apart, which meant
+# a class built by fan-out got different repo names than one built directly.
+# ===========================================================================
+
+usage() { sed -n '3,20p' "$0" | sed 's/^# \?//'; }
+
+require_env() {
+  : "${GH_TOKEN:?GH_TOKEN is not set. Stop — do not fall back to a personal namespace.}"
+  : "${GH_ORG:?GH_ORG is not set. Stop — do not fall back to a personal namespace.}"
+  export GH_TOKEN
+}
+
+repo_name_for() { printf '%s%s' "$KIT_PREFIX" "$1"; }
+
+# WARNING: this credential format is UNVALIDATED against GitHub push
+# protection. No format testing was possible (the build org has no secret
+# scanning — see TECHNICAL-NOTES.md Phase 3). If you deploy to an org that HAS
+# push protection enabled, verify this format is not blocked before running a
+# class fan-out, or every student repo will fail to push at once.
+credential_for() {
+  if [ -n "${KIT_SALT:-}" ]; then
+    printf 'sk_staging_%s' "$(printf '%s' "${1}${KIT_SALT}" | sha256sum | cut -c1-40)"
+  else
+    printf 'sk_staging_%s' "$(python3 -c 'import secrets; print(secrets.token_hex(20))')"
+  fi
+}
+
+# ===========================================================================
+# build — one student repository, from bundle to red CI.
+#
+# Plain, linear shell by design. Every numbered step is a stand-in for a
+# future kitscript task/microtask; each comment names the eventual task.
+# ===========================================================================
+cmd_build() {
+  local SUFFIX="${1:?Usage: dwellkit build <student-id>}"
+  require_env
+
+  local REPO_NAME; REPO_NAME="$(repo_name_for "$SUFFIX")"
+  case "$REPO_NAME" in
+    "${KIT_PREFIX}"*) ;;
+    *) echo "refusing: computed repo name '$REPO_NAME' does not start with KIT_PREFIX '$KIT_PREFIX'" >&2; exit 1 ;;
+  esac
+
+  local WORKDIR; WORKDIR="$(mktemp -d)"
+  trap 'rm -rf "$WORKDIR"' EXIT
+
+  local CREDENTIAL_VALUE; CREDENTIAL_VALUE="$(credential_for "$SUFFIX")"
+
+  echo "==> Building $REPO_NAME in org $GH_ORG"
+
+  # -------------------------------------------------------------------------
+  # Step 1 — floor: unpack the authentic history bundle.
+  # Eventual kitscript task: git-bundle-checkout
+  # (does not exist yet; this is plain `git clone` against a bundle file,
+  # which is exactly what that task needs to wrap.)
+  # -------------------------------------------------------------------------
+  echo "==> [1/7] Unpacking floor bundle"
+  git clone --quiet "$SCRIPT_DIR/floor.bundle" "$WORKDIR/repo"
+  cd "$WORKDIR/repo"
+  git checkout --quiet -b main origin/floor
+  git remote remove origin
+
+  # -------------------------------------------------------------------------
+  # Step 2 — tail: apply the scripted patch series on top of the floor.
+  # Eventual kitscript task: git-tail-apply (out of scope to build as a
+  # reusable image for now — inline is correct here).
+  # Substitutes the __KIT_SECRET__ placeholder for the real credential value
+  # as each patch is applied, so no working credential is ever stored on disk.
+  # -------------------------------------------------------------------------
+  echo "==> [2/7] Applying tail patch series"
+  local patch
+  for patch in "$SCRIPT_DIR"/tail/*.patch; do
+    sed "s/__KIT_SECRET__/${CREDENTIAL_VALUE}/g" "$patch" > "$WORKDIR/patch.tmp"
+    # --whitespace=nowarn: most of these patches are real upstream commits and
+    # carry the upstream project's own whitespace quirks. The warnings are
+    # cosmetic and would otherwise bury the build output in noise.
+    git am --quiet --committer-date-is-author-date --whitespace=nowarn "$WORKDIR/patch.tmp"
+  done
+  rm -f "$WORKDIR/patch.tmp"
+  echo "    tail applied: $(ls "$SCRIPT_DIR"/tail/*.patch | wc -l | tr -d ' ') commits on top of floor"
+
+  # -------------------------------------------------------------------------
+  # Step 3 — create the private repo under the prefix.
+  # Eventual kitscript task: github-repo-create (with: services: github)
+  # The description is student-visible on the repo page: it must not hint
+  # that this is a constructed exercise.
+  # -------------------------------------------------------------------------
+  echo "==> [3/7] Creating private repo $GH_ORG/$REPO_NAME"
+  gh repo create "$GH_ORG/$REPO_NAME" --private --description "Hackathon starter application" >/dev/null
+
+  # -------------------------------------------------------------------------
+  # Step 4 — push floor + tail.
+  # Eventual kitscript task: git-push (generic, likely already exists)
+  # -------------------------------------------------------------------------
+  echo "==> [4/7] Pushing floor + tail"
+  # Auth via a per-invocation header rather than embedding the token in the
+  # remote URL — an embedded-token URL gets echoed back by things like
+  # `git remote -v`, .git/config, and tool notices (e.g. git-filter-repo's
+  # "removing origin remote" message), which is a needless leak surface.
+  local AUTH_HEADER
+  AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+  git remote add origin "https://github.com/${GH_ORG}/${REPO_NAME}.git"
+  git -c http.extraheader="$AUTH_HEADER" push --quiet origin main
+
+  # -------------------------------------------------------------------------
+  # Step 5 — set the Actions repo secret.
+  # Eventual kitscript task: github-repo-secret-set.
+  #
+  # The agent-spec assumed this needed hand-rolled libsodium sealed-box
+  # encryption against the repo's public key. It does not: `gh secret set`
+  # performs that encryption locally before transmitting. This replaced ~19
+  # lines of PyNaCl and one dependency with the line below.
+  # -------------------------------------------------------------------------
+  echo "==> [5/7] Setting STAGING_API_KEY repo secret"
+  gh secret set STAGING_API_KEY --body "$CREDENTIAL_VALUE" --repo "${GH_ORG}/${REPO_NAME}"
+
+  # -------------------------------------------------------------------------
+  # Step 6 — add the workflow that turns red/green on the credential.
+  # Eventual kitscript task: probably folds into the same repo-bootstrap task
+  # as step 3/4 — a file written into the tree before the first push, rather
+  # than a separate task. Written here as a second commit + push for clarity
+  # of what changed and when.
+  # -------------------------------------------------------------------------
+  echo "==> [6/7] Adding staging-deploy workflow"
+  mkdir -p .github/workflows
+  # Compare a hash of the known-leaked value, not the raw value itself — the
+  # workflow file is a tracked, permanent part of the repo, so embedding the
+  # plaintext credential here would defeat "invisible in the working tree"
+  # forever, even after the student deletes config/staging.env.
+  local LEAKED_VALUE_HASH
+  LEAKED_VALUE_HASH="$(printf '%s' "$CREDENTIAL_VALUE" | sha256sum | cut -d' ' -f1)"
+  cat > .github/workflows/staging-deploy.yml <<EOF
+name: staging-deploy
+on: [push]
+jobs:
+  check-secret-rotated:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if the secret still matches the known-leaked value
+        env:
+          STAGING_API_KEY: \${{ secrets.STAGING_API_KEY }}
+        run: |
+          ACTUAL_HASH=\$(printf '%s' "\$STAGING_API_KEY" | sha256sum | cut -d' ' -f1)
+          if [ "\$ACTUAL_HASH" = "${LEAKED_VALUE_HASH}" ]; then
+            echo "STAGING_API_KEY still matches the value that leaked into git history."
+            echo "Rotate the secret before this will pass."
+            exit 1
+          fi
+          echo "STAGING_API_KEY has been rotated. OK."
+EOF
+  git add .github/workflows/staging-deploy.yml
+  GIT_AUTHOR_NAME="Priya Natarajan" GIT_AUTHOR_EMAIL="pnatarajan@users.noreply.github.com" \
+  GIT_COMMITTER_NAME="Priya Natarajan" GIT_COMMITTER_EMAIL="pnatarajan@users.noreply.github.com" \
+    git commit --quiet -m "ci: add staging deploy workflow"
+  git -c http.extraheader="$AUTH_HEADER" push --quiet origin main
+
+  # -------------------------------------------------------------------------
+  # Step 7 — confirm branch protection is off, report the result.
+  # Students must be able to force-push; protection here would block the
+  # history rewrite the exercise depends on.
+  # -------------------------------------------------------------------------
+  echo "==> [7/7] Confirming branch protection is off"
+  if gh api "repos/${GH_ORG}/${REPO_NAME}/branches/main/protection" >/dev/null 2>&1; then
+    echo "    WARNING: branch protection is ON for main (expected off)"
+  else
+    echo "    OK: no branch protection on main"
+  fi
+
+  cd "$SCRIPT_DIR"
+  echo "==> Done: https://github.com/${GH_ORG}/${REPO_NAME}"
+  echo "    credential value (redact before sharing notes): ${CREDENTIAL_VALUE}"
+}
+
+# ===========================================================================
+# class — build and hand out one repository per student.
+#
+# Direct API fan-out with outside-collaborator invitations. Deliberately does
+# NOT use GitHub Classroom template assignments — those provision repos with a
+# single commit, which would destroy this kit's 3,059-commit history.
+# See FANOUT-DESIGN.md.
+#
+# Roster format (header required):
+#   student_id,github_username
+#   alice,alice-gh
+#
+# Re-runnable: students whose repo already exists are skipped (the invitation
+# is re-sent regardless, since PUT on collaborators is idempotent). Safe to
+# run again after a partial failure.
+# ===========================================================================
+cmd_class() {
+  local ROSTER="${1:?Usage: dwellkit class <roster.csv> [--dry-run]}"
+  local DRY_RUN=false
+  [ "${2:-}" = "--dry-run" ] && DRY_RUN=true
+
+  require_env
+  : "${KIT_SALT:?KIT_SALT is not set. Pick a per-cohort secret string and keep it: it is what makes credentials reproducible.}"
+  local CONCURRENCY="${CONCURRENCY:-5}"
+  export GH_ORG KIT_PREFIX KIT_SALT SCRIPT_DIR
+
+  [ -f "$ROSTER" ] || { echo "roster not found: $ROSTER" >&2; exit 1; }
+
+  echo "==> Fan-out: org=$GH_ORG prefix=$KIT_PREFIX concurrency=$CONCURRENCY"
+
+  # ---- Phase 1: preflight -------------------------------------------------
+  echo "==> [1/4] Preflight"
+  gh api "orgs/${GH_ORG}" --jq '.login' >/dev/null 2>&1 \
+    || { echo "    FAIL: cannot reach org '$GH_ORG' with this token" >&2; exit 1; }
+  echo "    org reachable: $GH_ORG"
+
+  local SCOPES
+  SCOPES="$(curl -sI -H "Authorization: token $GH_TOKEN" https://api.github.com/user \
+            | tr -d '\r' | awk -F': ' 'tolower($1)=="x-oauth-scopes"{print $2}')"
+  echo "    token scopes: ${SCOPES:-<none reported>}"
+  case "$SCOPES" in
+    *repo*) ;;
+    *) echo "    WARNING: token does not report the 'repo' scope; repo creation will likely fail" >&2 ;;
+  esac
+
+  # ---- Phase 2: validate the roster before creating anything --------------
+  # A typo caught here costs seconds; caught on the day it costs a student
+  # their session. This is why validation is a separate phase.
+  echo "==> [2/4] Validating roster"
+  local ROWS=() INVALID=0 SEEN_IDS="" LINE_NO=0
+  local student_id github_username _rest
+  while IFS=, read -r student_id github_username _rest; do
+    LINE_NO=$((LINE_NO+1))
+    student_id="$(echo "${student_id:-}" | tr -d ' \r')"
+    github_username="$(echo "${github_username:-}" | tr -d ' \r')"
+
+    [ "$LINE_NO" -eq 1 ] && [ "$student_id" = "student_id" ] && continue   # header
+    [ -z "$student_id" ] && continue                                       # blank line
+
+    if [ -z "$github_username" ]; then
+      echo "    INVALID line $LINE_NO: '$student_id' has no github_username"; INVALID=$((INVALID+1)); continue
+    fi
+    case " $SEEN_IDS " in *" $student_id "*)
+      echo "    INVALID line $LINE_NO: duplicate student_id '$student_id'"; INVALID=$((INVALID+1)); continue ;;
+    esac
+    SEEN_IDS="$SEEN_IDS $student_id"
+
+    if gh api "users/${github_username}" --jq '.login' >/dev/null 2>&1; then
+      ROWS+=("${student_id},${github_username}")
+    else
+      echo "    INVALID line $LINE_NO: GitHub user '$github_username' does not exist (student '$student_id')"
+      INVALID=$((INVALID+1))
+    fi
+  done < "$ROSTER"
+
+  echo "    valid: ${#ROWS[@]}    invalid: $INVALID"
+  if [ "$INVALID" -gt 0 ]; then
+    echo "    FAIL: fix the roster before running. Nothing has been created." >&2
+    exit 1
+  fi
+  [ "${#ROWS[@]}" -eq 0 ] && { echo "    FAIL: roster is empty" >&2; exit 1; }
+
+  if [ "$DRY_RUN" = true ]; then
+    echo "==> Dry run complete. Roster is valid. Nothing created."
+    exit 0
+  fi
+
+  # ---- Phase 3: build + invite, with bounded concurrency ------------------
+  # Concurrency is capped because GitHub's *secondary* rate limits trigger on
+  # burst concurrency rather than total volume, and are not visible in the
+  # standard rate-limit headers.
+  echo "==> [3/4] Building and inviting (${#ROWS[@]} students)"
+  local OUTDIR; OUTDIR="$(mktemp -d)"
+  trap 'rm -rf "$OUTDIR"' EXIT
+
+  printf '%s\n' "${ROWS[@]}" \
+    | xargs -P "$CONCURRENCY" -I{} bash -c \
+        'IFS=, read -r sid ghu <<< "{}"; "$SCRIPT_DIR/dwellkit" _deploy-one "$sid" "$ghu" "'"$OUTDIR"'"'
+
+  # ---- Phase 4: report ----------------------------------------------------
+  echo "==> [4/4] Results"
+  local RESULTS; RESULTS="dwellkit-results-$(date +%Y%m%d-%H%M%S).csv"
+  echo "student_id,github_username,repo,credential,status,note" > "$RESULTS"
+  cat "$OUTDIR"/*.row 2>/dev/null | sort >> "$RESULTS" || true
+
+  local OK FAILED
+  OK=$(grep -c ',ok,' "$RESULTS" || true)
+  FAILED=$(grep -cE ',(build-failed|invite-failed),' "$RESULTS" || true)
+
+  column -s, -t "$RESULTS" | sed 's/^/    /' | cut -c1-140
+  echo
+  echo "==> Wrote $RESULTS  (ok: $OK, failed: $FAILED)"
+  echo "    This file contains credential values — it is gitignored. Do not commit or share it."
+  if [ "$FAILED" -gt 0 ]; then
+    cp "$OUTDIR"/*.log . 2>/dev/null || true
+    echo "    Failure logs copied to the current directory."
+    echo "    Re-run the same command to retry — existing repos are skipped."
+  fi
+  echo
+  echo "    NEXT: students must ACCEPT their invitations before they can clone."
+  echo "          Run ./dwellkit status $RESULTS daily until everyone has."
+}
+
+# ---------------------------------------------------------------------------
+# _deploy-one — internal. One student, invoked by the concurrency layer above.
+# ---------------------------------------------------------------------------
+cmd_deploy_one() {
+  local STUDENT_ID="$1" GH_USER="$2" OUTDIR="$3"
+  local REPO_NAME; REPO_NAME="$(repo_name_for "$STUDENT_ID")"
+  local STATUS="ok" NOTE=""
+  local CREDENTIAL; CREDENTIAL="$(credential_for "$STUDENT_ID")"
+
+  if gh api "repos/${GH_ORG}/${REPO_NAME}" >/dev/null 2>&1; then
+    NOTE="repo already existed; build skipped"
+  else
+    if ! "$SCRIPT_DIR/dwellkit" build "$STUDENT_ID" >"$OUTDIR/$STUDENT_ID.build.log" 2>&1; then
+      printf '%s,%s,%s,,build-failed,see %s\n' \
+        "$STUDENT_ID" "$GH_USER" "$REPO_NAME" "$OUTDIR/$STUDENT_ID.build.log" > "$OUTDIR/$STUDENT_ID.row"
+      return 0
+    fi
+  fi
+
+  # PUT is idempotent: re-running does not create duplicate invitations.
+  if ! gh api -X PUT "repos/${GH_ORG}/${REPO_NAME}/collaborators/${GH_USER}" \
+        -f permission=push >"$OUTDIR/$STUDENT_ID.invite.log" 2>&1; then
+    STATUS="invite-failed"
+    NOTE="see $OUTDIR/$STUDENT_ID.invite.log"
+  fi
+
+  printf '%s,%s,%s,%s,%s,%s\n' \
+    "$STUDENT_ID" "$GH_USER" "$REPO_NAME" "$CREDENTIAL" "$STATUS" "$NOTE" > "$OUTDIR/$STUDENT_ID.row"
+}
+
+# ===========================================================================
+# status — who still hasn't accepted their repository invitation?
+#
+# An unaccepted invitation is the single most likely reason a student cannot
+# start the exercise. Run this daily in the week before class.
+# ===========================================================================
+cmd_status() {
+  local RESULTS="${1:?Usage: dwellkit status <results.csv> [--remind]}"
+  local REMIND=false
+  [ "${2:-}" = "--remind" ] && REMIND=true
+  require_env
+  [ -f "$RESULTS" ] || { echo "results file not found: $RESULTS" >&2; exit 1; }
+
+  local ACCEPTED=0 PENDING=0 MISSING=0
+  local PENDING_LIST=()
+  local student_id github_username repo credential status note
+
+  echo "==> Checking invitations against $RESULTS"
+  echo
+
+  while IFS=, read -r student_id github_username repo credential status note; do
+    [ "$student_id" = "student_id" ] && continue     # header
+    [ -z "${repo:-}" ] && continue
+
+    if ! gh api "repos/${GH_ORG}/${repo}" >/dev/null 2>&1; then
+      printf '  %-14s %-18s  ✗ REPO MISSING\n' "$student_id" "$github_username"
+      MISSING=$((MISSING+1)); continue
+    fi
+
+    # Accepted → appears as a collaborator. Not yet → appears under invitations.
+    if gh api "repos/${GH_ORG}/${repo}/collaborators" --jq '.[].login' 2>/dev/null \
+         | grep -qix "$github_username"; then
+      printf '  %-14s %-18s  ✓ accepted\n' "$student_id" "$github_username"
+      ACCEPTED=$((ACCEPTED+1))
+    else
+      local lower INV_ID
+      lower="$(echo "$github_username" | tr '[:upper:]' '[:lower:]')"
+      INV_ID="$(gh api "repos/${GH_ORG}/${repo}/invitations" \
+                --jq ".[] | select(.invitee.login | ascii_downcase == \"$lower\") | .id" 2>/dev/null | head -1)"
+      if [ -n "$INV_ID" ]; then
+        printf '  %-14s %-18s  … PENDING\n' "$student_id" "$github_username"
+        PENDING_LIST+=("${student_id},${github_username},${repo},${INV_ID}")
+        PENDING=$((PENDING+1))
+      else
+        printf '  %-14s %-18s  ✗ NO INVITATION — re-run `dwellkit class`\n' "$student_id" "$github_username"
+        MISSING=$((MISSING+1))
+      fi
+    fi
+  done < "$RESULTS"
+
+  echo
+  echo "==> accepted: $ACCEPTED    pending: $PENDING    problems: $MISSING"
+
+  if [ "$PENDING" -gt 0 ] && [ "$REMIND" = true ]; then
+    echo
+    echo "==> Re-sending pending invitations"
+    local row sid ghu repo_ inv_id
+    for row in "${PENDING_LIST[@]}"; do
+      IFS=, read -r sid ghu repo_ inv_id <<< "$row"
+      # Delete + recreate: GitHub re-sends the notification email.
+      gh api -X DELETE "repos/${GH_ORG}/${repo_}/invitations/${inv_id}" >/dev/null 2>&1 || true
+      if gh api -X PUT "repos/${GH_ORG}/${repo_}/collaborators/${ghu}" -f permission=push >/dev/null 2>&1; then
+        echo "    re-sent: $sid ($ghu)"
+      else
+        echo "    FAILED to re-send: $sid ($ghu)" >&2
+      fi
+    done
+  fi
+
+  if [ "$PENDING" -gt 0 ]; then
+    echo
+    echo "    Students listed PENDING cannot clone their repository yet."
+    echo "    Chase them, or re-send with:  ./dwellkit status $RESULTS --remind"
+  fi
+
+  [ "$MISSING" -gt 0 ] && exit 1 || exit 0
+}
+
+# ===========================================================================
+# Dispatch
+# ===========================================================================
+case "${1:-help}" in
+  build)       shift; cmd_build "$@" ;;
+  class)       shift; cmd_class "$@" ;;
+  status)      shift; cmd_status "$@" ;;
+  _deploy-one) shift; cmd_deploy_one "$@" ;;
+  help|-h|--help) usage ;;
+  *) echo "unknown subcommand: $1" >&2; echo >&2; usage >&2; exit 1 ;;
+esac

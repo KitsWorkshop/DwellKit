@@ -36,7 +36,7 @@ Requires `git`, `gh` (authenticated), `python3`, and a token with `repo` + `work
 ```bash
 export GH_TOKEN=...        # repo + workflow scope
 export GH_ORG=your-org
-./build-repo.sh alice      # → your-org/hackathon-starter-alice
+./dwellkit build alice      # → your-org/hackathon-starter-alice
 ```
 
 **A whole class:**
@@ -44,12 +44,12 @@ export GH_ORG=your-org
 ```bash
 cp roster.example.csv roster.csv     # student_id,github_username
 export KIT_SALT=...                  # per-cohort secret; makes credentials reproducible
-./fanout.sh roster.csv --dry-run     # validate the roster, create nothing
-./fanout.sh roster.csv               # build, invite, report to fanout-results-<ts>.csv
-./check-invites.sh fanout-results-*.csv --remind
+./dwellkit class roster.csv --dry-run     # validate the roster, create nothing
+./dwellkit class roster.csv               # build, invite, report to dwellkit-results-<ts>.csv
+./dwellkit status dwellkit-results-*.csv --remind
 ```
 
-Both scripts are re-runnable — an existing repo is skipped, and invitations are idempotent.
+Both are re-runnable — an existing repo is skipped, and invitations are idempotent.
 
 ---
 
@@ -68,15 +68,13 @@ Total: 3,059 commits. The plant and scrub sit far enough back that `git log` wil
 
 | File | Purpose |
 |---|---|
-| `build-repo.sh` | Builds one student repo end to end. Plain, linear, commented — meant to be read. |
-| `fanout.sh` | Class-scale: validate roster → build → invite → report. Concurrent, idempotent. |
-| `check-invites.sh` | Who hasn't accepted their invitation. `--remind` re-sends. |
+| `dwellkit` | The only script. `build` makes one repo (plain, linear, commented — meant to be read), `class` deploys a cohort, `status` reports invitation state. |
 | `roster.example.csv` | Roster format. |
 | `floor.bundle` | The authentic 2,855-commit history, serialised. |
 | `tail/*.patch` | The 203-patch series applied on top. |
 | `agent-spec.md` | The original build spec, kept unedited for intent. Superseded in places by `TECHNICAL-NOTES.md`. |
 
-`roster.csv`, `fanout-results-*.csv`, and build logs are gitignored — they contain student identities and live credential values.
+`roster.csv`, `dwellkit-results-*.csv`, and build logs are gitignored — they contain student identities and live credential values.
 
 ---
 

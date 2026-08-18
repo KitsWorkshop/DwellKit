@@ -4,7 +4,7 @@ Operational checklist for getting a working repository into one student's hands.
 
 For *why* any of this works the way it does, see `INSTRUCTOR-GUIDE.md`. This document assumes you have read it, or don't need to.
 
-**Scope:** one student. **For a whole class, use `fanout.sh`** — it wraps this same flow with roster validation, per-student invitations, concurrency, and a results report. See `FANOUT-DESIGN.md`. This runbook remains the right reference for a single build, for the push-protection pre-flight, and for understanding what `fanout.sh` does per student.
+**Scope:** one student. **For a whole class, use `dwellkit class`** — it wraps this same flow with roster validation, per-student invitations, concurrency, and a results report. See `FANOUT-DESIGN.md`. This runbook remains the right reference for a single build, for the push-protection pre-flight, and for understanding what `dwellkit class` does per student.
 
 ---
 
@@ -65,11 +65,11 @@ gh api "orgs/$GH_ORG" --jq '.login'
 **This can invalidate the whole approach, so do it before anything else.**
 
 ```bash
-./build-repo.sh pushcheck
+./dwellkit build pushcheck
 ```
 
 - **Succeeds** → the credential format gets through your org's scanning. Proceed.
-- **Fails with a push-protection / GH013 error** → **stop.** The planted credential format is being blocked. Every student repo will fail identically. You will need to change the credential format in `build-repo.sh` and re-test before going further.
+- **Fails with a push-protection / GH013 error** → **stop.** The planted credential format is being blocked. Every student repo will fail identically. You will need to change the credential format in `dwellkit build` and re-test before going further.
 
 This single command also validates your token permissions and org policy at the same time.
 
@@ -79,7 +79,7 @@ This single command also validates your token permissions and org policy at the 
 
 ```bash
 STUDENT=alice          # your label for the repo; not necessarily their username
-./build-repo.sh "$STUDENT"
+./dwellkit build "$STUDENT"
 ```
 
 Expected output ends with:
@@ -111,7 +111,7 @@ git log --all -p -S'sk_staging_' -- config/staging.env | grep STAGING_API_KEY | 
 
 ## §3 — Grant the student access
 
-> ⚠️ **Not performed by `build-repo.sh`.** This is a manual step; a built repo is private and unreachable until you do it.
+> ⚠️ **Not performed by `dwellkit build`.** This is a manual step; a built repo is private and unreachable until you do it.
 
 You need their **GitHub username** — not an email, not a student ID.
 
@@ -193,7 +193,7 @@ Give the student:
 The student's repository is now rotated and rewritten. **There is no reset path.** To run the exercise again, build a fresh repo with a new suffix:
 
 ```bash
-./build-repo.sh alice-retry
+./dwellkit build alice-retry
 ```
 
 ### Cleanup
@@ -213,8 +213,8 @@ gh repo delete "$GH_ORG/hackathon-starter-$STUDENT" --yes   # needs delete_repo 
 | `GH_TOKEN is not set` | Env var missing | `export GH_TOKEN=...` — the script refuses to guess |
 | `refusing: computed repo name ... does not start with KIT_PREFIX` | Prefix guard tripped | Check `KIT_PREFIX` and the suffix argument |
 | `Resource not accessible by integration` | Wrong token type (app token, not a PAT) | Use a classic/fine-grained PAT with `repo` + `workflow` |
-| Push rejected, mentions **push protection** / **GH013** | Org scanning recognises the credential format | **Stop.** Change the format in `build-repo.sh`, re-test. Affects every student. |
-| `Name already exists on this account` | Repo suffix reused | Pick a new suffix. `build-repo.sh` is not idempotent; `fanout.sh` is (it skips existing repos) |
+| Push rejected, mentions **push protection** / **GH013** | Org scanning recognises the credential format | **Stop.** Change the format in `dwellkit build`, re-test. Affects every student. |
+| `Name already exists on this account` | Repo suffix reused | Pick a new suffix. `dwellkit build` is not idempotent; `dwellkit class` is (it skips existing repos) |
 | Build fails partway, repo left half-made | No cleanup/resume logic | Delete the partial repo manually, re-run |
 | Student: `Repository not found` on clone | Invitation not accepted, or never sent | Check §4.1 |
 | Student cannot rotate the secret | Granted `pull` instead of `push` | Re-run §3 with `-f permission=push` |
