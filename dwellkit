@@ -2,7 +2,7 @@
 #
 # dwellkit — deploy "The Secret You Can't Delete" to students.
 #
-#   ./dwellkit build   <student-id>              one repository
+#   ./dwellkit build   <username> [seed]          one repository
 #   ./dwellkit class   <roster.csv> [--dry-run]  a whole cohort
 #   ./dwellkit status  <results.csv> [--remind]  who hasn't accepted yet
 #
@@ -10,7 +10,7 @@
 #   GH_TOKEN    required   token with repo + workflow scope on GH_ORG
 #   GH_ORG      required   organisation to build into
 #   KIT_SALT    see below  per-cohort secret; required by `class` (not by `class --dry-run`)
-#   KIT_PREFIX  optional   repo name prefix (default: hackathon-starter-)
+#   KIT_PREFIX  optional   repo name prefix (default: member-portal-)
 #   CONCURRENCY optional   parallel builds during `class` (default: 5)
 #
 # KIT_SALT makes credentials reproducible: a repo can be rebuilt identically
@@ -21,7 +21,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-KIT_PREFIX="${KIT_PREFIX:-hackathon-starter-}"
+KIT_PREFIX="${KIT_PREFIX:-member-portal-}"
 
 # ===========================================================================
 # Shared definitions.
@@ -179,7 +179,7 @@ cmd_build() {
   # that this is a constructed exercise.
   # -------------------------------------------------------------------------
   echo "==> [3/8] Creating private repo $GH_ORG/$REPO_NAME"
-  gh repo create "$GH_ORG/$REPO_NAME" --private --description "Hackathon starter application" >/dev/null
+  gh repo create "$GH_ORG/$REPO_NAME" --private --description "Internal member portal — accounts, sign-in, and third-party integrations" >/dev/null
 
   # -------------------------------------------------------------------------
   # Step 4 — push floor + tail.

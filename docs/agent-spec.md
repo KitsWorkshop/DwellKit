@@ -1,6 +1,6 @@
 # Agent Spec — Secret Kit, Day-One Spike
 
-> **Historical note:** this is the original specification, kept unedited. Names have since changed: `spike.sh` is now the `build` subcommand of a single `dwellkit` script (which also carries `class` and `status`), `SPIKE-FINDINGS.md` is now `TECHNICAL-NOTES.md`, the project is `DwellKit`, and the default `KIT_PREFIX` is `hackathon-starter-`. Several assumptions here were also revised during the build; where they conflict, `TECHNICAL-NOTES.md` is authoritative.
+> **Historical note:** this is the original specification, kept unedited. Names have since changed: `spike.sh` is now the `build` subcommand of a single `dwellkit` script (which also carries `class` and `status`), `SPIKE-FINDINGS.md` is now `TECHNICAL-NOTES.md`, the project is `DwellKit`, and the default `KIT_PREFIX` is `member-portal-`. Several assumptions here were also revised during the build; where they conflict, `TECHNICAL-NOTES.md` is authoritative.
 
 Hand this to Claude Code as the task. It assumes no prior context beyond what it can read on disk.
 

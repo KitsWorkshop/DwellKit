@@ -1,4 +1,4 @@
-# Staging Platform — Node.js service
+# Member Portal — Node.js service
 
 Internal web application built on the [hackathon-starter](https://github.com/sahat/hackathon-starter)
 boilerplate. Express, MongoDB, Passport-based auth, and a set of third-party API integrations.

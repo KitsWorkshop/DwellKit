@@ -121,7 +121,7 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
   `secretkit-spike-pushtest`, `-demo1`, `-demo2`, `-demo3`, `-demo5`, `-demo6`, and the fan-out test repos `secretkit-ft1`/`-ft2` in the build org. Requires manual deletion — the build token lacks `delete_repo` scope.
   **Confirm what actually still exists first:** `gh repo list <org> --limit 100`. This list is from the build session and has not been re-checked since; the Codespaces token cannot see other repos in the org.
   Also delete **`-demo4`** — it was built with the earlier shallow tail and is superseded.
-  **Keep `secretkit-spike-demo7`** — it is the preserved, correctly-staged demo repo, built with the current buried tail. *(These repos keep their literal `secretkit-spike-*` names because that is what they are actually called on GitHub — they predate the rename to the `hackathon-starter-` prefix.)*
+  **Keep `secretkit-spike-demo7`** — it is the preserved, correctly-staged demo repo, built with the current buried tail. *(These repos keep their literal `secretkit-spike-*` names because that is what they are actually called on GitHub — they predate the current `member-portal-` prefix.)*
 - [ ] **Move to an org-scoped credential for real rollout**
   Classic PATs are not org-scoped; they grant access to everything the issuing account can reach. Replace with a fine-grained PAT restricted to the teaching org, or preferably a GitHub App installation (not tied to any individual instructor, independently revocable, auditable). See `INSTRUCTOR-GUIDE.md` Part 3.
 

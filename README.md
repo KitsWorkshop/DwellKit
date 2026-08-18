@@ -44,7 +44,7 @@ export KIT_SALT=...        # any secret string, one per class/cohort
 #    This is the only way to test push protection, which fails ALL students at once.
 #    (delete needs delete_repo scope; otherwise remove it in the web UI)
 ./dwellkit build pilot1
-gh repo delete "$GH_ORG/hackathon-starter-pilot1" --yes
+gh repo delete "$GH_ORG/member-portal-pilot1" --yes
 
 # 3. Roster: one row per student, "student_id,github_username", header required.
 cp roster.example.csv roster.csv && $EDITOR roster.csv
@@ -86,7 +86,7 @@ Send the URLs through your own channel too; don't rely on either GitHub path alo
 <summary><strong>Building a single repository</strong> — rarely needed, two cases</summary>
 
 ```bash
-./dwellkit build amara-gh     # → $GH_ORG/hackathon-starter-amara-gh
+./dwellkit build amara-gh     # → $GH_ORG/member-portal-amara-gh
 ```
 
 `class` calls this once per roster row, so it is not a separate workflow. You would run it
@@ -134,7 +134,7 @@ start seeing secondary rate limits, which trigger on burst concurrency rather th
 ```bash
 KIT_PREFIX=comp2103- ./dwellkit class roster.csv
 ```
-Names repositories `comp2103-amara` instead of `hackathon-starter-amara`. Useful for separating
+Names repositories `comp2103-amara` instead of `member-portal-amara`. Useful for separating
 two cohorts in one org. **Use the same prefix for `status` afterwards**, or it won't find them.
 
 ### Checking on a cohort
@@ -186,20 +186,20 @@ call — this is why `KIT_SALT` is worth keeping. Same value the build used.
 ### Housekeeping
 
 ```bash
-gh repo list "$GH_ORG" --limit 100 --json name --jq '.[].name' | grep '^hackathon-starter-'
+gh repo list "$GH_ORG" --limit 100 --json name --jq '.[].name' | grep '^member-portal-'
 ```
 Lists everything the kit created in this org.
 
 ```bash
 gh repo list "$GH_ORG" --limit 100 --json name --jq '.[].name' \
-  | grep '^hackathon-starter-' \
+  | grep '^member-portal-' \
   | xargs -I{} gh repo delete "$GH_ORG/{}" --yes
 ```
 Deletes them all. Needs a token with `delete_repo` scope, which the build token lacks by default.
 **Also remove the students as collaborators** — they consume paid seats until you do.
 
 ```bash
-gh run list --repo "$GH_ORG/hackathon-starter-amara" --limit 1
+gh run list --repo "$GH_ORG/member-portal-amara" --limit 1
 ```
 Checks one student's CI state. Red is correct before they start; green means they have rotated.
 
@@ -242,7 +242,7 @@ fast; the waiting is not.
 
 **1. Build the roster.** One row per student.
 
-`github_username` becomes the repository name (`hackathon-starter-<username>`) — it is the identity
+`github_username` becomes the repository name (`member-portal-<username>`) — it is the identity
 the student recognises, and GitHub already guarantees it is unique. `student_id` is your own
 label: it seeds the credential and identifies the row for marking, and never appears on GitHub.
 
@@ -320,7 +320,7 @@ There is **no reset path** — a rotated and rewritten repo cannot be returned t
 state. To re-run, rebuild with fresh ids.
 
 ```bash
-gh repo list "$GH_ORG" --limit 100 --json name --jq '.[].name' | grep '^hackathon-starter-'
+gh repo list "$GH_ORG" --limit 100 --json name --jq '.[].name' | grep '^member-portal-'
 ```
 
 Delete them (needs `delete_repo` scope — the build token lacks it), remove students as

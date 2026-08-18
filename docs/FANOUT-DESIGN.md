@@ -53,7 +53,7 @@ Building the loop is trivial. These are not.
 Build each repo, then invite the student directly:
 
 ```bash
-gh api -X PUT "repos/$ORG/hackathon-starter-$STUDENT/collaborators/$GH_USER" -f permission=push
+gh api -X PUT "repos/$ORG/member-portal-$STUDENT/collaborators/$GH_USER" -f permission=push
 ```
 
 | | |

@@ -144,7 +144,7 @@ During development a **classic Personal Access Token** with `repo` and `workflow
 
 **For anything beyond a one-off test build, use one of these instead:**
 
-- **A fine-grained PAT** restricted to the teaching organisation. Note it cannot be scoped to a name *pattern* (`hackathon-starter-*`) because the repos don't exist when the token is created — you grant "all repositories in the org" plus Administration, Secrets, Contents, and Actions write. The benefit is that it cannot touch anything outside that org.
+- **A fine-grained PAT** restricted to the teaching organisation. Note it cannot be scoped to a name *pattern* (`member-portal-*`) because the repos don't exist when the token is created — you grant "all repositories in the org" plus Administration, Secrets, Contents, and Actions write. The benefit is that it cannot touch anything outside that org.
 - **A GitHub App installation** — the best option for a real rollout. Org-scoped, not tied to any individual instructor's account, independently revocable, and auditable.
 
 ### The push protection consideration — read this before deploying
@@ -193,7 +193,7 @@ Everything in this kit is parameterised by `GH_ORG`; nothing is hardcoded to any
 This part explains what `class` does per student, because `dwellkit build` is the thing it calls once per row:
 
 ```bash
-./dwellkit build amara-gh     # → $GH_ORG/hackathon-starter-amara-gh
+./dwellkit build amara-gh     # → $GH_ORG/member-portal-amara-gh
 ```
 
 Roughly 15–50 seconds per repository. The variance is GitHub API latency, not local work — applying all 203 patches locally accounts for only about 5 seconds of it. It prints the credential value at the end.
@@ -394,7 +394,7 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 
 ### Housekeeping
 
-- Several throwaway repositories from development remain in the build org (`secretkit-spike-pushtest`, `-demo1`, `-demo2`, `-demo3`, `-demo5`, `-demo6`). They need manual deletion; the build token lacks the `delete_repo` scope. `-demo4` should also go — it was built with the earlier shallow tail and is superseded. **`secretkit-spike-demo7`** is the intentionally-preserved demo repo. *(These repos keep their literal `secretkit-spike-*` names because that is what they are actually called on GitHub — they predate the rename to the `hackathon-starter-` prefix.)*
+- Several throwaway repositories from development remain in the build org (`secretkit-spike-pushtest`, `-demo1`, `-demo2`, `-demo3`, `-demo5`, `-demo6`). They need manual deletion; the build token lacks the `delete_repo` scope. `-demo4` should also go — it was built with the earlier shallow tail and is superseded. **`secretkit-spike-demo7`** is the intentionally-preserved demo repo. *(These repos keep their literal `secretkit-spike-*` names because that is what they are actually called on GitHub — they predate the current `member-portal-` prefix.)*
 - The classic PAT used during development was entered in plaintext into a chat transcript. It was never written to any file in this repository, but it should be revoked and reissued.
 
 ---
