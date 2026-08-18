@@ -16,15 +16,15 @@ Students receive a private repository with a real, plausible commit history. Som
 
 | If you want to… | Read |
 |---|---|
-| Understand the kit from zero — concepts, design decisions, infrastructure | [INSTRUCTOR-GUIDE.md](INSTRUCTOR-GUIDE.md) |
-| Deploy to one student | [DEPLOY-RUNBOOK.md](DEPLOY-RUNBOOK.md) |
-| Deploy to a whole class | [FANOUT-DESIGN.md](FANOUT-DESIGN.md) |
-| Trial it with colleagues before a real cohort | [PILOT-RUNBOOK.md](PILOT-RUNBOOK.md) |
-| Know what students actually experience, and how to mark it | [STUDENT-EXPERIENCE.md](STUDENT-EXPERIENCE.md) |
-| Brief colleagues or stakeholders | [SLIDES.md](SLIDES.md) (Marp) |
-| Know what still needs building | [TODO.md](TODO.md) |
-| Know what was tested, what broke, and what is still unproven | [TECHNICAL-NOTES.md](TECHNICAL-NOTES.md) |
-| Report status upward | [PROGRESS.md](PROGRESS.md) |
+| Understand the kit from zero — concepts, design decisions, infrastructure | [INSTRUCTOR-GUIDE.md](docs/INSTRUCTOR-GUIDE.md) |
+| Deploy to one student | [DEPLOY-RUNBOOK.md](docs/DEPLOY-RUNBOOK.md) |
+| Deploy to a whole class | [FANOUT-DESIGN.md](docs/FANOUT-DESIGN.md) |
+| Trial it with colleagues before a real cohort | [PILOT-RUNBOOK.md](docs/PILOT-RUNBOOK.md) |
+| Know what students actually experience, and how to mark it | [STUDENT-EXPERIENCE.md](docs/STUDENT-EXPERIENCE.md) |
+| Brief colleagues or stakeholders | [SLIDES.md](docs/SLIDES.md) (Marp) |
+| Know what still needs building | [TODO.md](docs/TODO.md) |
+| Know what was tested, what broke, and what is still unproven | [TECHNICAL-NOTES.md](docs/TECHNICAL-NOTES.md) |
+| Report status upward | [PROGRESS.md](docs/PROGRESS.md) |
 
 ---
 
@@ -65,16 +65,18 @@ The credential exists only as the literal `__KIT_SECRET__` in the patch files; t
 
 Total: 3,059 commits. The plant and scrub sit far enough back that `git log` will not surface them, which is what forces students to learn pickaxe search (`git log -S`).
 
-## Files
+## Layout
 
-| File | Purpose |
-|---|---|
-| `dwellkit` | The only script. `build` makes one repo (plain, linear, commented — meant to be read), `class` deploys a cohort, `status` reports invitation state. |
-| `roster.example.csv` | Roster format. |
-| `floor.bundle` | The authentic 2,855-commit history, serialised. |
-| `tail/*.patch` | The 203-patch series applied on top. |
-| `PILOT-RUNBOOK.md` | Running the kit with 3–8 colleagues as a dry run: setup, facilitation, what to capture, teardown. |
-| `agent-spec.md` | The original build spec, kept unedited for intent. Superseded in places by `TECHNICAL-NOTES.md`. |
+```
+dwellkit              The only script — build / class / status
+floor.bundle          The authentic 2,855-commit history, serialised
+tail/*.patch          The 203-patch series applied on top
+roster.example.csv    Roster format
+docs/                 Everything written; see the table above
+```
+
+`dwellkit` is meant to be read: `build` is seven numbered, commented steps.
+Run it from the repository root — it locates `floor.bundle` and `tail/` relative to itself.
 
 `roster.csv`, `dwellkit-results-*.csv`, and build logs are gitignored — they contain student identities and live credential values.
 
@@ -88,4 +90,4 @@ The deployment machinery is **built and verified against real GitHub**. The kit 
 - **The student brief** — not yet written, and the exercise depends on it. It must state that marking is on order of operations, not on whether the rewrite succeeded. Without that, expect flawless `filter-repo` runs and no rotations.
 - **Credential format validation** — `sk_staging_` + 40 hex has never been tested against a live push-protection scanner. If your teaching org enforces one and recognises the format, every student repo fails to build at once.
 
-See [TODO.md](TODO.md) for the full list, ordered by what blocks what.
+See [TODO.md](docs/TODO.md) for the full list, ordered by what blocks what.

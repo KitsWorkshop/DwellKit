@@ -44,7 +44,7 @@ repo_name_for() { printf '%s%s' "$KIT_PREFIX" "$1"; }
 
 # WARNING: this credential format is UNVALIDATED against GitHub push
 # protection. No format testing was possible (the build org has no secret
-# scanning — see TECHNICAL-NOTES.md Phase 3). If you deploy to an org that HAS
+# scanning — see docs/TECHNICAL-NOTES.md Phase 3). If you deploy to an org that HAS
 # push protection enabled, verify this format is not blocked before running a
 # class fan-out, or every student repo will fail to push at once.
 credential_for() {
@@ -207,7 +207,7 @@ EOF
 # Direct API fan-out with outside-collaborator invitations. Deliberately does
 # NOT use GitHub Classroom template assignments — those provision repos with a
 # single commit, which would destroy this kit's 3,059-commit history.
-# See FANOUT-DESIGN.md.
+# See docs/FANOUT-DESIGN.md.
 #
 # Roster format (header required):
 #   student_id,github_username

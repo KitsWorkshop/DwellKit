@@ -13,6 +13,10 @@ Ordered by what blocks what. Effort estimates assume familiarity with the codeba
   **This single action validates three separate unknowns at once:** whether push protection blocks the credential format, whether your token has sufficient permissions, and whether org policy (default branch protection, Actions restrictions, required workflows) interferes.
   *Acceptance: repo builds, push succeeds, workflow runs and reports red.*
 
+- [ ] **Then run a group pilot** (~2 hours including debrief) — see `PILOT-RUNBOOK.md`
+  3–8 colleagues acting as students. Closes item 1.1 (write-level rotate + force-push), item 2 (push-protection format), and part of item 4 (multi-repo build behaviour) in one sitting, and produces the observations the brief in §3.1 needs.
+  **Include at least one participant who is not an org member** — otherwise the invitation-acceptance path, the most common class-day failure, is never exercised.
+
 Everything below is easier to scope once this is done — in particular, item 2 may turn out to be a non-issue or may become the top priority.
 
 ---
@@ -38,7 +42,7 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
 - [x] ~~**Acceptance monitoring**~~ → `dwellkit status`, with `--remind` to re-send.
 
 **Still open in this area:**
-- [ ] **Teardown script** (~15 min) — bulk delete after the exercise. Needs `delete_repo` scope, which the build token lacks.
+- [ ] **Teardown subcommand** (~15 min) — bulk delete after the exercise. Working commands exist in `PILOT-RUNBOOK.md` §10 (list by prefix, pipe to `gh repo delete`); this item is now only about folding them into `dwellkit` as a subcommand. Needs `delete_repo` scope, which the build token lacks.
 - [ ] **Retry with backoff** (~30 min) — failures are reported and retryable by re-running, but there is no automatic backoff on secondary rate limits.
 - [ ] **⚠️ GitHub Education verification** (external, days) — private-repo collaborators consume paid seats; 30 students needs 31. The org is already on Team — that is what creates the cost. Education grants the same Team plan free with unlimited users. **Now the main blocker for a real cohort.** See `FANOUT-DESIGN.md`.
 
@@ -74,9 +78,10 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
 
 ## 4. Operational hardening
 
-- [ ] **Add partial-failure handling to the builder** (~30 min)
-  Currently a mid-run failure leaves a half-built repo with no cleanup or resume. Tolerable for one repo, genuinely annoying at thirty. Either make it idempotent (detect and resume) or add a `--cleanup` path.
-  Note the build token needs `delete_repo` scope for cleanup to work — it does not have it by default.
+- [ ] **⚠️ Fix the idempotency check — a half-built repo is silently reported as done** (~30 min)
+  `dwellkit class` decides a student is already handled by asking *does the repo exist* (`cmd_deploy_one`). But `gh repo create` happens at step 3 of 7. If a build fails at step 4, 5, or 6 — network blip, rate limit, token hiccup — the repo exists but has no history, no secret, or no workflow. **Re-running skips it and reports `ok`.** The student gets a broken repository and nobody finds out until class.
+  Fix: check for a completion marker rather than mere existence — e.g. that `main` has the expected commit count, or that the `STAGING_API_KEY` secret is set. Alternatively add a `--cleanup` path (needs `delete_repo` scope, which the build token lacks by default).
+  This is the most likely way a real 30-student fan-out goes wrong.
 - [ ] **Dry-run the full fan-out at real class size** (~30 min) — `dwellkit class` is verified at 2 students; 30 concurrent has not been run
   Rate limits look comfortable on paper (~180 API calls for 30 students against 5,000/hour) but a 30-repo burst has never actually been run. Watch for secondary rate limits, which are triggered by burst *concurrency* rather than total volume and are not visible in the standard rate-limit headers.
 - [x] ~~**Decide how instructors receive the credential values**~~ → written to a gitignored `dwellkit-results-*.csv`, and re-derivable from `student_id` + `KIT_SALT` at any time.
@@ -98,8 +103,9 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
 
 - [ ] **Revoke the development PATs — both of them**
   **Two** classic PATs were entered in plaintext into a chat transcript: the original build token, and a second one used to rename the repository. Neither was written to any file in this repository, but both must be considered exposed. Revoke both and reissue.
-- [ ] **Delete leftover development repositories**
-  `secretkit-spike-pushtest`, `-demo1`, `-demo2`, `-demo3`, `-demo5`, `-demo6` in the build org. Requires manual deletion — the build token lacks `delete_repo` scope.
+- [ ] **Delete leftover development repositories** — *list unverified, check before acting*
+  `secretkit-spike-pushtest`, `-demo1`, `-demo2`, `-demo3`, `-demo5`, `-demo6`, and the fan-out test repos `secretkit-ft1`/`-ft2` in the build org. Requires manual deletion — the build token lacks `delete_repo` scope.
+  **Confirm what actually still exists first:** `gh repo list <org> --limit 100`. This list is from the build session and has not been re-checked since; the Codespaces token cannot see other repos in the org.
   Also delete **`-demo4`** — it was built with the earlier shallow tail and is superseded.
   **Keep `secretkit-spike-demo7`** — it is the preserved, correctly-staged demo repo, built with the current buried tail. *(These repos keep their literal `secretkit-spike-*` names because that is what they are actually called on GitHub — they predate the rename to the `hackathon-starter-` prefix.)*
 - [ ] **Move to an org-scoped credential for real rollout**
@@ -124,10 +130,11 @@ Recorded so the reasoning is not lost, not because they need doing:
 | ~~Access + fan-out~~ | ✅ **done** |
 | GitHub Education verification | external, days — **start this first** |
 | Format validation (one repo in the real org) | ~15 min |
+| Group pilot + debrief (`PILOT-RUNBOOK.md`) | ~2 hours — closes 3 open unknowns |
 | Teaching materials (brief, rubric, debrief, prevention) | ~3–4 hours |
 | Operational hardening (teardown, retry, scale dry-run) | ~1.5 hours |
 | Polish + housekeeping | ~1 hour |
-| **Total remaining** | **~6 hours + Education lead time** |
+| **Total remaining** | **~8 hours + Education lead time** |
 
 **The engineering is essentially done.** What remains is teaching materials and org setup — and the brief is the piece the exercise most depends on.
 
