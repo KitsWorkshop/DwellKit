@@ -262,7 +262,22 @@ Students who already know this tooling will finish in ten minutes. Have the exte
 
 ### A tuning note
 
-When the workflow fails, its log says: *"STAGING_API_KEY still matches the value that leaked into git history."* That is a fairly strong hint toward the answer. Depending on how much you want students to discover unaided, consider softening it to something like *"deployment credential validation failed"* before running the exercise. It's a one-line edit in `dwellkit build`.
+When the workflow fails, its log reads as an ordinary deploy rejection:
+
+```
+Error: staging deploy failed — upstream returned 401 Unauthorized
+The credential in STAGING_API_KEY was rejected by the staging API.
+```
+
+**This is deliberately uninformative**, and it is worth understanding why before you soften it.
+
+GitHub Actions echoes the entire `run:` block into the log, and job and step names show in the checks UI — so *everything* in that workflow is student-visible. An earlier version said *"STAGING_API_KEY still matches the value that leaked into git history"*, which gave away the reveal (that the credential predates the file they are looking at) before the student had opened anything.
+
+The current version never mentions git history. A student who reads the workflow carefully learns only that the key must differ from a known-bad fingerprint — not that the old value is still recoverable. Reading CI config to diagnose a failure is a skill worth rewarding; being handed the diagnosis is not.
+
+The fiction is also true to life: secret-scanning partners really do auto-revoke leaked keys, so "this credential was rejected" is exactly what a leaked-then-revoked key looks like in production.
+
+> **If your cohort flounders**, add hints verbally rather than in CI — you can always become more helpful mid-session, but you cannot un-spoil a group that was already told the answer.
 
 ### Marking
 

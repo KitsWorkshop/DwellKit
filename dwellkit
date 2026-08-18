@@ -157,26 +157,41 @@ cmd_build() {
   # workflow file is a tracked, permanent part of the repo, so embedding the
   # plaintext credential here would defeat "invisible in the working tree"
   # forever, even after the student deletes config/staging.env.
+  #
+  # SPOILER DISCIPLINE. GitHub Actions echoes the entire `run:` block into the
+  # log, and the job and step names show in the checks UI. All of it is student-
+  # visible, so none of it may explain the exercise. This reads as an ordinary
+  # deploy rejecting a revoked credential — which is exactly what a leaked key
+  # looks like in production once a scanning partner has auto-revoked it.
+  #
+  # Specifically, nothing here may mention git history. A student who reads the
+  # workflow learns only "the key must differ from a known-bad one" — not that
+  # the old value is still recoverable. That reveal has to stay theirs to find.
   local LEAKED_VALUE_HASH
   LEAKED_VALUE_HASH="$(printf '%s' "$CREDENTIAL_VALUE" | sha256sum | cut -d' ' -f1)"
   cat > .github/workflows/staging-deploy.yml <<EOF
 name: staging-deploy
 on: [push]
 jobs:
-  check-secret-rotated:
+  deploy-staging:
     runs-on: ubuntu-latest
     steps:
-      - name: Fail if the secret still matches the known-leaked value
+      - name: Authenticate with staging API
         env:
           STAGING_API_KEY: \${{ secrets.STAGING_API_KEY }}
         run: |
-          ACTUAL_HASH=\$(printf '%s' "\$STAGING_API_KEY" | sha256sum | cut -d' ' -f1)
-          if [ "\$ACTUAL_HASH" = "${LEAKED_VALUE_HASH}" ]; then
-            echo "STAGING_API_KEY still matches the value that leaked into git history."
-            echo "Rotate the secret before this will pass."
+          # Pre-flight check. The provider revokes keys that have been reported
+          # as exposed; deploying with one just fails further down the pipeline.
+          KEY_FINGERPRINT=\$(printf '%s' "\$STAGING_API_KEY" | sha256sum | cut -d' ' -f1)
+          REVOKED_FINGERPRINT="${LEAKED_VALUE_HASH}"
+
+          if [ "\$KEY_FINGERPRINT" = "\$REVOKED_FINGERPRINT" ]; then
+            echo "::error::staging deploy failed — upstream returned 401 Unauthorized"
+            echo "The credential in STAGING_API_KEY was rejected by the staging API."
             exit 1
           fi
-          echo "STAGING_API_KEY has been rotated. OK."
+
+          echo "staging deploy: authenticated OK"
 EOF
   git add .github/workflows/staging-deploy.yml
   GIT_AUTHOR_NAME="Priya Natarajan" GIT_AUTHOR_EMAIL="pnatarajan@users.noreply.github.com" \

@@ -33,7 +33,14 @@ They will also notice **CI is already failing** before they have done anything. 
 
 ## Beat 2: The find
 
-Told a credential was committed, most students reach for a recursive grep almost immediately:
+The brief does not tell them what is wrong — only that CI is failing. So the first real move is to read the failing check, which reports a plain deploy rejection:
+
+```
+Error: staging deploy failed — upstream returned 401 Unauthorized
+The credential in STAGING_API_KEY was rejected by the staging API.
+```
+
+That names a thing to chase. Most students go looking for where `STAGING_API_KEY` is set, and reach for a recursive grep almost immediately:
 
 ```
 $ grep -rn "sk_staging_" . --exclude-dir=.git
@@ -175,13 +182,14 @@ A fully successful student does the following, in this order. The ordering is th
 
 The single most important instruction, and the one most students violate within two minutes.
 
-1. **Locate the live copy** — `grep -rn "sk_staging_" . --exclude-dir=.git`
-2. **Do not delete it yet.** Deleting is not urgent; understanding the blast radius is.
-3. **Enumerate every occurrence across all history:**
+1. **Read the failing check first.** It names `STAGING_API_KEY` and says the credential was rejected. That is the thread to pull — not the file tree.
+2. **Locate the live copy** — `grep -rn "STAGING_API_KEY" . --exclude-dir=.git`, then `grep -rn "sk_staging_" . --exclude-dir=.git`
+3. **Do not delete it yet.** Deleting is not urgent; understanding the blast radius is.
+4. **Enumerate every occurrence across all history:**
    ```bash
    git log --all --oneline -S'sk_staging_'
    ```
-4. **Establish the exposure window:**
+5. **Establish the exposure window:**
    ```bash
    git log --all --format='%h %ad %an %s' --date=short -S'sk_staging_'
    ```

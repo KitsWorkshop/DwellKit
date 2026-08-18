@@ -93,8 +93,10 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
 
 ## 5. Tuning and polish
 
-- [ ] **Consider softening the workflow failure message** (~2 min)
-  It currently reads *"STAGING_API_KEY still matches the value that leaked into git history"* — a strong hint delivered by CI at the exact moment the student should be working it out unaided. Something like *"deployment credential validation failed"* preserves the red/green signal without spoiling the reveal. One-line edit in `dwellkit build`.
+- [x] ~~**Soften the workflow failure message**~~ → done; it now fails as a plain 401 from the staging API.
+  The original message named git history and told the student to rotate, collapsing Beats 3 and 4 before they had opened a file. **The fix was not the one-line edit this item originally assumed:** Actions echoes the whole `run:` block into the log and shows job/step names in the checks UI, so the comparison logic, the job name (`check-secret-rotated`) and the step name were all student-visible too. All four were rewritten to read as an ordinary deploy rejecting a revoked credential. Nothing in the workflow now mentions git history.
+- [ ] **Check the new message lands** (~during the pilot)
+  It is now deliberately uninformative. Watch whether students diagnose it or stall — this is exactly what `PILOT-RUNBOOK.md` §7 is for. Becoming more helpful mid-session is easy; un-spoiling is not.
 - [ ] **Consider the pre-red CI state** (~15 min of thought)
   Students clone a repository whose CI is *already* failing, before they have done anything. This may read as "the exercise is broken" rather than "there is a problem to solve." Worth either addressing in the brief or reconsidering whether the workflow should only start failing after the student's first push.
 - [ ] **Review tail commit dates** (~10 min)
