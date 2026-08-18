@@ -108,6 +108,9 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
 
 ## 6. Housekeeping
 
+- [x] ~~**Fix the temp-directory leak on failed builds**~~ → the `EXIT` trap referenced a `local` variable that was out of scope by the time the trap ran, so under `set -u` every failed build printed `WORKDIR: unbound variable` and left a ~40 MB checkout in `/tmp`. Same bug in `class`.
+- [x] ~~**Validate the student id**~~ → the prefix guard passed anything that merely *started* with the prefix, so `build ../evil` did 30 seconds of local work before GitHub rejected the name. Ids are now checked against `[A-Za-z0-9._-]` before any work begins.
+
 - [ ] **Revoke the development PATs — both of them**
   **Two** classic PATs were entered in plaintext into a chat transcript: the original build token, and a second one used to rename the repository. Neither was written to any file in this repository, but both must be considered exposed. Revoke both and reissue.
 - [ ] **Delete leftover development repositories** — *list unverified, check before acting*

@@ -34,9 +34,24 @@ KIT_PREFIX="${KIT_PREFIX:-hackathon-starter-}"
 
 usage() { sed -n '3,20p' "$0" | sed 's/^# \?//'; }
 
+die() { echo >&2; printf '%s\n' "$@" >&2; echo >&2; exit 1; }
+
 require_env() {
-  : "${GH_TOKEN:?GH_TOKEN is not set. Stop — do not fall back to a personal namespace.}"
-  : "${GH_ORG:?GH_ORG is not set. Stop — do not fall back to a personal namespace.}"
+  local missing=()
+  [ -z "${GH_TOKEN:-}" ] && missing+=("GH_TOKEN")
+  [ -z "${GH_ORG:-}" ]   && missing+=("GH_ORG")
+  if [ "${#missing[@]}" -gt 0 ]; then
+    die "Missing required environment: ${missing[*]}" \
+        "" \
+        "  export GH_TOKEN=<token>   # needs 'repo' and 'workflow' scope on the org" \
+        "  export GH_ORG=<org>       # the organisation to build into" \
+        "" \
+        "Create a token at https://github.com/settings/tokens" \
+        "(If the org enforces SAML SSO, authorise the token for it there too.)" \
+        "" \
+        "These are deliberately not guessed: without GH_ORG the script would" \
+        "otherwise build student repositories in your personal namespace."
+  fi
   export GH_TOKEN
 }
 
@@ -62,17 +77,42 @@ credential_for() {
 # future kitscript task/microtask; each comment names the eventual task.
 # ===========================================================================
 cmd_build() {
-  local SUFFIX="${1:?Usage: dwellkit build <student-id>}"
+  [ $# -ge 1 ] || die "dwellkit build — build one student repository" \
+                       "" \
+                       "  usage: ./dwellkit build <student-id>" \
+                       "" \
+                       "  example: ./dwellkit build amara" \
+                       "           -> \$GH_ORG/${KIT_PREFIX}amara"
+  local SUFFIX="$1"
   require_env
+
+  case "$SUFFIX" in
+    *[!A-Za-z0-9._-]*|-*|.*|"")
+      die "Invalid student id: '$SUFFIX'" \
+          "" \
+          "  It becomes part of a GitHub repository name, so it may contain only" \
+          "  letters, digits, dot, dash and underscore, and may not start with" \
+          "  a dash or a dot." \
+          "" \
+          "  example: ./dwellkit build amara" ;;
+  esac
 
   local REPO_NAME; REPO_NAME="$(repo_name_for "$SUFFIX")"
   case "$REPO_NAME" in
     "${KIT_PREFIX}"*) ;;
-    *) echo "refusing: computed repo name '$REPO_NAME' does not start with KIT_PREFIX '$KIT_PREFIX'" >&2; exit 1 ;;
+    *) die "Refusing to build '$REPO_NAME'." \
+            "" \
+            "  It does not start with KIT_PREFIX ('$KIT_PREFIX')." \
+            "  This guard keeps the kit from creating or touching repositories" \
+            "  outside its own namespace. Check the student-id argument." ;;
   esac
 
-  local WORKDIR; WORKDIR="$(mktemp -d)"
-  trap 'rm -rf "$WORKDIR"' EXIT
+  # Deliberately NOT `local`: the EXIT trap fires after this function's scope
+  # is gone, so a local would be unbound by then — which under `set -u` both
+  # printed a confusing error and skipped the cleanup, leaking a ~40MB
+  # checkout on every failed build.
+  WORKDIR="$(mktemp -d)"
+  trap 'rm -rf "${WORKDIR:-}"' EXIT
 
   local CREDENTIAL_VALUE; CREDENTIAL_VALUE="$(credential_for "$SUFFIX")"
 
@@ -258,7 +298,16 @@ EOF
 # run again after a partial failure.
 # ===========================================================================
 cmd_class() {
-  local ROSTER="${1:?Usage: dwellkit class <roster.csv> [--dry-run]}"
+  [ $# -ge 1 ] || die "dwellkit class — deploy to a whole cohort" \
+                       "" \
+                       "  usage: ./dwellkit class <roster.csv> [--dry-run]" \
+                       "" \
+                       "  The roster is CSV with a header row:" \
+                       "      student_id,github_username" \
+                       "      amara,amara-gh" \
+                       "" \
+                       "  Start with:  cp roster.example.csv roster.csv"
+  local ROSTER="$1"
   local DRY_RUN=false
   [ "${2:-}" = "--dry-run" ] && DRY_RUN=true
 
@@ -282,7 +331,13 @@ cmd_class() {
   local CONCURRENCY="${CONCURRENCY:-5}"
   export GH_ORG KIT_PREFIX KIT_SALT SCRIPT_DIR
 
-  [ -f "$ROSTER" ] || { echo "roster not found: $ROSTER" >&2; exit 1; }
+  [ -f "$ROSTER" ] || die "Roster file not found: $ROSTER" \
+                          "" \
+                          "  Expected CSV with a header row:" \
+                          "      student_id,github_username" \
+                          "      amara,amara-gh" \
+                          "" \
+                          "  Start with:  cp roster.example.csv roster.csv"
 
   echo "==> Fan-out: org=$GH_ORG prefix=$KIT_PREFIX concurrency=$CONCURRENCY"
 
@@ -309,7 +364,10 @@ cmd_class() {
   fi
 
   gh api "orgs/${GH_ORG}" --jq '.login' >/dev/null 2>&1 \
-    || { echo "    FAIL: cannot reach org '$GH_ORG' with this token" >&2; exit 1; }
+    || die "Cannot reach organisation '$GH_ORG' with this token." \
+           "" \
+           "  Check that the org name is spelled correctly, that the token has" \
+           "  'repo' scope, and that you are a member of the org."
   echo "    ✓ org reachable: $GH_ORG"
 
   local SCOPES
@@ -350,7 +408,11 @@ cmd_class() {
   ACT="$(gh api "orgs/${GH_ORG}/actions/permissions" --jq '.enabled_repositories' 2>/dev/null || true)"
   case "$ACT" in
     all|selected) echo "    ✓ Actions enabled for org repositories ($ACT)" ;;
-    none)         echo "    FAIL: GitHub Actions is disabled for this org. CI cannot run." >&2; exit 1 ;;
+    none)         die "GitHub Actions is disabled for organisation '$GH_ORG'." \
+                      "" \
+                      "  The exercise depends on a failing CI check. Without Actions" \
+                      "  there is nothing for students to diagnose." \
+                      "  Enable it under Settings -> Actions -> General." ;;
     *)            echo "    ⚠ could not verify Actions policy (needs admin:org) — confirm CI runs on a test build" ;;
   esac
 
@@ -392,7 +454,9 @@ cmd_class() {
     echo "    FAIL: fix the roster before running. Nothing has been created." >&2
     exit 1
   fi
-  [ "${#ROWS[@]}" -eq 0 ] && { echo "    FAIL: roster is empty" >&2; exit 1; }
+  [ "${#ROWS[@]}" -eq 0 ] && die "Roster has no usable rows: $ROSTER" \
+                                 "" \
+                                 "  A header line alone is not enough — add one row per student."
 
   if [ "$DRY_RUN" = true ]; then
     echo "==> Dry run complete. Roster is valid. Nothing created."
@@ -404,8 +468,8 @@ cmd_class() {
   # burst concurrency rather than total volume, and are not visible in the
   # standard rate-limit headers.
   echo "==> [3/4] Building and inviting (${#ROWS[@]} students)"
-  local OUTDIR; OUTDIR="$(mktemp -d)"
-  trap 'rm -rf "$OUTDIR"' EXIT
+  OUTDIR="$(mktemp -d)"          # not `local`, for the same reason as WORKDIR
+  trap 'rm -rf "${OUTDIR:-}"' EXIT
 
   printf '%s\n' "${ROWS[@]}" \
     | xargs -P "$CONCURRENCY" -I{} bash -c \
@@ -556,11 +620,22 @@ cmd_deploy_one() {
 # start the exercise. Run this daily in the week before class.
 # ===========================================================================
 cmd_status() {
-  local RESULTS="${1:?Usage: dwellkit status <results.csv> [--remind]}"
+  [ $# -ge 1 ] || die "dwellkit status — who has accepted their invitation" \
+                       "" \
+                       "  usage: ./dwellkit status <results.csv> [--remind]" \
+                       "" \
+                       "  The results file is written by 'dwellkit class':" \
+                       "      ./dwellkit status dwellkit-results-\$GH_ORG-*.csv" \
+                       "" \
+                       "  --remind re-sends every pending invitation."
+  local RESULTS="$1"
   local REMIND=false
   [ "${2:-}" = "--remind" ] && REMIND=true
   require_env
-  [ -f "$RESULTS" ] || { echo "results file not found: $RESULTS" >&2; exit 1; }
+  [ -f "$RESULTS" ] || die "Results file not found: $RESULTS" \
+                           "" \
+                           "  'dwellkit class' writes one per run. Find yours with:" \
+                           "      ls dwellkit-results-*.csv"
 
   local ACCEPTED=0 PENDING=0 MISSING=0
   local PENDING_LIST=()
