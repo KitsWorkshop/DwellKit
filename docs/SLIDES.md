@@ -382,9 +382,9 @@ The source project made ~200 real commits in the six months above our floor poin
 
 | Commit | Distance from HEAD | In `git log -20`? |
 |---|---|---|
-| **PLANT** | ~163 back | No |
-| **SCRUB** | ~82 back | No |
-| **REINTRODUCE** | ~6 back | Yes — intentionally |
+| **PLANT** | ~164 back | No |
+| **SCRUB** | ~83 back | No |
+| **REINTRODUCE** | ~7 back | Yes — intentionally |
 
 ---
 
@@ -436,10 +436,13 @@ The workflow compares a **SHA-256 hash** — it never contains the credential.
 ```bash
 export GH_TOKEN=<token>
 export GH_ORG=<your teaching org>
-./dwellkit build alice
+export KIT_SALT=<per-cohort secret>
+
+./dwellkit class roster.csv --dry-run   # validate, create nothing
+./dwellkit class roster.csv             # build + invite everyone
 ```
 
-⏱ **15–50 seconds** per repo — dominated by GitHub API latency, not local work.
+⏱ **15–50 seconds** per repo, five at a time — dominated by GitHub API latency, not local work.
 
 Applying all 203 patches locally: **~5 seconds**.
 
@@ -535,7 +538,7 @@ Several things are missing — none of them the core mechanic.
 ## Two constraints worth knowing
 
 **1. GitHub Classroom can't deliver this kit**
-Its template flow starts repos with a **single commit**. Our credential is 163 commits back. Templates would erase the entire exercise.
+Its template flow starts repos with a **single commit**. Our credential is 164 commits back. Templates would erase the entire exercise.
 
 **2. Private-repo collaborators cost seats**
 30 students = 31 seats on Team.

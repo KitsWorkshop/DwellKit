@@ -67,9 +67,9 @@ The student repository is built in four layers.
 
 | Commit | Distance from HEAD | Visible in `git log -20`? |
 |---|---|---|
-| **PLANT** — `chore: add staging config` | ~163 commits back | No |
-| **SCRUB** — `chore: move staging config out of the repo` | ~82 commits back | No |
-| **REINTRODUCE** — `chore: re-add staging config for local testing` | ~6 commits back | Yes — intentionally |
+| **PLANT** — `chore: add staging config` | ~164 commits back | No |
+| **SCRUB** — `chore: move staging config out of the repo` | ~83 commits back | No |
+| **REINTRODUCE** — `chore: re-add staging config for local testing` | ~7 commits back | Yes — intentionally |
 
 Only the reintroduce commit is casually visible, and it is *meant* to be: it is the live copy the student is supposed to find and delete. The plant and the scrub cannot be found by scrolling. They require actually searching history — which is the skill the exercise is teaching.
 
@@ -211,8 +211,9 @@ The script is deliberately plain, linear shell with a commented step for each ph
 3. Creates the private repository
 4. Pushes floor + tail
 5. Sets the `STAGING_API_KEY` Actions secret
-6. Adds and pushes the workflow
-7. Confirms branch protection is off (students must be able to force-push)
+6. Adds the staging-deploy workflow
+7. Replaces the upstream README with the student brief (`templates/student-README.md`), then pushes both
+8. Pins the default branch to `main` and confirms branch protection is off (students must be able to force-push)
 
 **Safety properties worth knowing:**
 
@@ -221,7 +222,11 @@ The script is deliberately plain, linear shell with a commented step for each ph
 - Every repository it creates is private.
 - It never writes the credential to any file in this repo — the patches contain only the `__KIT_SECRET__` placeholder.
 
-**Failure behaviour to be aware of:** the script has no cleanup or resume logic. If it fails partway (a transient API error, say), it leaves a partially-built repository behind. You'll need to delete that repo manually and re-run. Note that deleting requires a `delete_repo` scope that the standard build token does not have.
+**Failure behaviour to be aware of:** the script has no cleanup or resume logic. If it fails partway (a transient API error, say), it leaves a partially-built repository behind — the repo exists, but may have no history, no secret, or no workflow.
+
+> ⚠️ **This matters more at class scale than it looks.** `dwellkit class` decides a student is already handled by asking *does the repo exist*, and the repo is created at step 3 of 8. A build that dies at step 4 or later leaves a repo that a re-run will **skip and report as `ok`** — so a student receives a broken repository and nobody finds out until class. Delete any partially-built repo manually before re-running. Tracked in `TODO.md` §4.
+
+Note that deleting requires a `delete_repo` scope that the standard build token does not have.
 
 ---
 

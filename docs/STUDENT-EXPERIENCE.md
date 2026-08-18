@@ -103,7 +103,7 @@ d749105  2026-03-23  Lena Ostrowski    chore: add staging config
 
 Three commits, not one. The same credential was committed in **March**, "removed" in **June**, and quietly reintroduced in **August**. Nobody noticed for five months.
 
-Note these commits are ~163 and ~82 commits back — they are *not* visible by scrolling `git log`. A student can only find them by actually searching history.
+Note these commits are ~164 and ~83 commits back — they are *not* visible by scrolling `git log`. A student can only find them by actually searching history.
 
 **The reframe this forces:** this is not "a file I need to delete." It is a credential that has been sitting in a shared repository for months, through an unknown number of clones, CI runs, and forks. It is not *at risk* of being compromised. It **is** compromised, and has been since March.
 

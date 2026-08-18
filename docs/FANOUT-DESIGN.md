@@ -14,7 +14,7 @@ Classroom's standard assignment flow provisions student repositories from a **te
 
 > *"A new fork includes the entire commit history of the parent repository, while a repository created from a template **starts with a single commit**."*
 
-This kit is 3,060 commits, with the credential planted **163 commits back**. Template instantiation would collapse all of that into one commit — the student would open a repo with the credential sitting in plain view, no history to search, and no exercise.
+This kit is 3,060 commits, with the credential planted **164 commits back**. Template instantiation would collapse all of that into one commit — the student would open a repo with the credential sitting in plain view, no history to search, and no exercise.
 
 **Classroom can still be used for roster and identity. It cannot be used to provision the repository content.**
 

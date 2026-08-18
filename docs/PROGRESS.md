@@ -6,10 +6,13 @@ Status as of 2026-08-18: **working; deployment machinery complete.** The exercis
 
 - **A real demo repo**: [KitsWorkshop/secretkit-spike-demo7](https://github.com/KitsWorkshop/secretkit-spike-demo7) (private) — clean, unrotated, ready to walk through live.
 - **`dwellkit build`** — one command builds a complete student repo from scratch: real project history (2,855 commits) + 203 more on top (200 real upstream commits with 3 exercise commits buried among them) + a GitHub Actions workflow that goes red/green on rotation. Re-runnable, ~15–50 seconds per repo.
-- **`tail/`** — 203 numbered patch files: 200 genuine upstream commits plus the 3 exercise commits (plant at ~163 back from HEAD, scrub at ~82, live copy at ~6), reusable across every repo `dwellkit build` builds.
+- **`tail/`** — 203 numbered patch files: 200 genuine upstream commits plus the 3 exercise commits (plant at ~164 back from HEAD, scrub at ~83, live copy at ~7), reusable across every repo `dwellkit build` builds.
 - **`floor.bundle`** — the real project history, captured once, reused every run (no network needed to rebuild).
 - **`dwellkit class`** — class-scale deployment: validates a roster, builds a repo per student, invites each as a collaborator, reports results. Concurrent and re-runnable.
 - **`dwellkit status`** — reports who hasn't accepted their invitation yet; `--remind` re-sends.
+- **`templates/student-README.md`** — the student brief, installed as each repo's README at build time. Replaces the 1,568-line upstream README, states the three completion conditions, and requires an ordered log (which is what makes order-of-operations markable).
+- **A CI failure that doesn't spoil itself** — the workflow fails as a plain `401 Unauthorized` from the staging API. Nothing student-visible mentions git history or rotation, including the job name, step name, and the `run:` block Actions echoes into the log.
+- **Multi-org safety** — results files are named and stamped with the org and `dwellkit status` refuses a mismatched pair; preflight probes SAML authorisation, org role, outside-collaborator policy and Actions availability; `build` pins the default branch explicitly.
 - **`TECHNICAL-NOTES.md`** — full phase-by-phase report: what was tested, what broke, timings, open questions.
 
 ## Verified working, live, on real GitHub

@@ -50,9 +50,9 @@ Commit roles:
 
 | Position in tail | Distance from HEAD | Role | Message |
 |---|---|------|---------|
-| 41 of 203 | ~163 back | **PLANT** | `chore: add staging config` |
-| 122 of 203 | ~82 back | **SCRUB** | `chore: move staging config out of the repo` |
-| 198 of 203 | ~6 back | **REINTRODUCE** (live copy at HEAD) | `chore: re-add staging config for local testing` |
+| 41 of 203 | ~164 back | **PLANT** | `chore: add staging config` |
+| 122 of 203 | ~83 back | **SCRUB** | `chore: move staging config out of the repo` |
+| 198 of 203 | ~7 back | **REINTRODUCE** (live copy at HEAD) | `chore: re-add staging config for local testing` |
 
 All other 200 tail commits are genuine upstream project commits, unmodified.
 
