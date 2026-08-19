@@ -203,7 +203,11 @@ Now check how far back that is:
 git log --oneline | grep -n d749105     # ~164 commits back
 ```
 
-> **Observation checkpoint.** These commits are **not reachable by scrolling**. `git log -50` shows nothing. The only route is `-S` (or `log -p --follow`, or a full-history grep). If a student has not been taught pickaxe search, this step is invisible to them — decide beforehand whether that is the lesson or a prerequisite you need to cover.
+> **Observation checkpoint.** These commits are **not reachable by scrolling**. `git log -50` shows nothing. The only route is `-S` (or `log -p --follow`, or a full-history grep).
+>
+> **The brief now signposts this.** The Tooling reference lists `git log --all -S'<string>'` with the gloss *"every commit that added or removed a string"*, followed by *"Searching the files and searching the history are not the same operation."* So the tool is no longer invisible — but **nothing tells them to use it here**, or that the answer spans five months. Judgement about when to reach for it is still theirs.
+>
+> If a cohort clears this too easily, that gloss line is the first thing to cut: the command stays listed, the insight goes back to being theirs to find.
 
 **The sentence to listen for:**
 
@@ -225,7 +229,7 @@ gh secret set STAGING_API_KEY \
 
 > **Two routes, both available at `push`.** GitHub's docs are explicit: *"To create secrets or variables on GitHub for an organization repository, you must have `write` access"*, and the repository-roles table lists "create, update, and delete" Actions secrets at Write and above. So students invited at `permission=push` (`dwellkit:705`) can rotate either way:
 >
-> - **CLI** — the command above. Requires `gh` installed and authenticated; the student README lists only Node, MongoDB, and git, so **`gh` is unmentioned**.
+> - **CLI** — the command above. Requires `gh` installed and authenticated. The brief's Tooling reference lists `gh` as **optional**, and says so explicitly, precisely because the UI route below exists.
 > - **UI** — Settings → Secrets and variables → Actions → `STAGING_API_KEY` → Update. A Write-level collaborator sees a **reduced** Settings page, not the full admin one: the roles table grants settings capabilities section by section rather than wholesale, and secrets is one of the sections Write gets. If the tab does not render for them, the page is still reachable directly at `https://github.com/<org>/<repo>/settings/secrets/actions`.
 >
 > The roles table lists these as **two separate rows** — "...on GitHub.com" and "...using the REST API" — both granted at Write/Maintain/Admin. The existence of a distinct GitHub.com row is what establishes there is a web route at Write at all.
@@ -263,12 +267,13 @@ git filter-repo --path config/staging.env --invert-paths --force
 
 # filter-repo DELETES the origin remote as a safety measure. Without this,
 # the push below fails with "'origin' does not appear to be a git repository".
-# Students reliably hit this and read it as "I broke my repo."
+# The brief now warns about this, so it should cost them seconds, not minutes —
+# check whether it actually does.
 git remote add origin https://github.com/$GH_ORG/member-portal-walkthrough1.git
 git push --force origin main
 ```
 
-> **Tooling note.** `git filter-repo` is not bundled with git — it needs `pip install git-filter-repo` (or `brew`/`apt`). Decide whether you are pre-installing it, teaching the install, or accepting `git filter-branch` as an answer.
+> **Tooling note.** `git filter-repo` is not bundled with git — it needs `pip install git-filter-repo` (or `brew`/`apt`). The brief lists it as *"only if you decide you need it"* with the install line, so students are not blocked — but decide whether you are pre-installing it, teaching the install, or accepting `git filter-branch` as an answer.
 
 Verify on a **fresh clone**, never the working copy — yours still holds reflogs and unreachable objects and will tell you a comfortable lie:
 
@@ -345,8 +350,8 @@ Walk it before you judge these — they are much more visible from inside the ex
 |---|---|---|
 | The bridge from *stale key* → *leaked key* is a **`#` comment** in the run block | §2 | **High** — gates the whole exercise |
 | `config/staging.env` has **no consumer**; careful students correctly rule it out | §3 | Medium — punishes rigor |
-| **Nothing forces the all-history search**; §4 offers a complete-feeling stopping point | §4→§5 | **High** — this is the lesson |
+| **Nothing forces the all-history search**; §4 offers a complete-feeling stopping point | §4→§5 | **Medium** — the tool is now listed in the brief, the prompt to use it is not |
 | **CI stops pressuring at green**, before rewrite/prevent/write-up | §6 | Medium — brief must carry it |
-| **`gh` unmentioned** in the student README (the UI route works at `push`, but is unsignposted) | §6 | Low — worth one README line |
+| ~~**`gh` unmentioned** in the student README~~ | §6 | ✅ **Closed** — the brief now carries a Tooling reference covering `gh`, `git-filter-repo`, and the secrets UI path |
 
 Cheapest fixes, in order of value: promote "reported as exposed" from a comment to an emitted `echo` line (keeps spoiler discipline — still no mention of git history); give `config/staging.env` a real consumer in the app's config loader; add a fourth completion condition to the brief requiring the student to state *how long* the credential was exposed and how they established it.
