@@ -223,9 +223,16 @@ gh secret set STAGING_API_KEY \
   --repo $GH_ORG/member-portal-walkthrough1
 ```
 
-> **⚠️ Verify this works at `push` permission.** Students are invited at `permission=push` (`dwellkit:705`), which means **no Settings tab** — the web UI route to secrets is admin-only. `gh secret set` against the REST API is their only path, and the student README lists Node, MongoDB, and git as prerequisites — **`gh` is never mentioned.**
+> **Two routes, both available at `push`.** GitHub's docs are explicit: *"To create secrets or variables on GitHub for an organization repository, you must have `write` access"*, and the repository-roles table lists "create, update, and delete" Actions secrets at Write and above. So students invited at `permission=push` (`dwellkit:705`) can rotate either way:
 >
-> If this command fails for a write-level collaborator, the exercise has no completable central action. This is the single highest-risk unknown in the kit (`TODO.md` §1.1) and walking it yourself as an org admin **does not test it** — you need a second, non-admin account.
+> - **CLI** — the command above. Requires `gh` installed and authenticated; the student README lists only Node, MongoDB, and git, so **`gh` is unmentioned**.
+> - **UI** — Settings → Secrets and variables → Actions → `STAGING_API_KEY` → Update. A Write-level collaborator sees a **reduced** Settings page, not the full admin one: the roles table grants settings capabilities section by section rather than wholesale, and secrets is one of the sections Write gets. If the tab does not render for them, the page is still reachable directly at `https://github.com/<org>/<repo>/settings/secrets/actions`.
+>
+> The roles table lists these as **two separate rows** — "...on GitHub.com" and "...using the REST API" — both granted at Write/Maintain/Admin. The existence of a distinct GitHub.com row is what establishes there is a web route at Write at all.
+>
+> **Still unverified live** (`TODO.md` §1.1). Walking it yourself as an org admin **does not test it** — you need a second account at `push`. Three outcomes to look for: tab visible (done); tab hidden but the direct URL loads (put the URL in the brief); direct URL 404s (docs wrong for your org — `gh` becomes a hard prerequisite).
+>
+> **The secret cannot be read back by anyone, at any role.** Rotation is write-only, so no permission level lets a student peek at the planted value.
 
 Rotation you have not verified is an assumption, not a fix:
 
@@ -253,8 +260,15 @@ Before force-pushing, the coordination point — this is marked, not optional:
 
 ```bash
 git filter-repo --path config/staging.env --invert-paths --force
+
+# filter-repo DELETES the origin remote as a safety measure. Without this,
+# the push below fails with "'origin' does not appear to be a git repository".
+# Students reliably hit this and read it as "I broke my repo."
+git remote add origin https://github.com/$GH_ORG/member-portal-walkthrough1.git
 git push --force origin main
 ```
+
+> **Tooling note.** `git filter-repo` is not bundled with git — it needs `pip install git-filter-repo` (or `brew`/`apt`). Decide whether you are pre-installing it, teaching the install, or accepting `git filter-branch` as an answer.
 
 Verify on a **fresh clone**, never the working copy — yours still holds reflogs and unreachable objects and will tell you a comfortable lie:
 
@@ -333,6 +347,6 @@ Walk it before you judge these — they are much more visible from inside the ex
 | `config/staging.env` has **no consumer**; careful students correctly rule it out | §3 | Medium — punishes rigor |
 | **Nothing forces the all-history search**; §4 offers a complete-feeling stopping point | §4→§5 | **High** — this is the lesson |
 | **CI stops pressuring at green**, before rewrite/prevent/write-up | §6 | Medium — brief must carry it |
-| **`gh` unmentioned** in the student README, and no Settings tab at `push` | §6 | **Blocking if unverified** |
+| **`gh` unmentioned** in the student README (the UI route works at `push`, but is unsignposted) | §6 | Low — worth one README line |
 
 Cheapest fixes, in order of value: promote "reported as exposed" from a comment to an emitted `echo` line (keeps spoiler discipline — still no mention of git history); give `config/staging.env` a real consumer in the app's config loader; add a fourth completion condition to the brief requiring the student to state *how long* the credential was exposed and how they established it.
