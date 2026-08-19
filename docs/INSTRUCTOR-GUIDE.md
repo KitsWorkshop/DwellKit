@@ -429,7 +429,7 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 | `tail/*.patch` | 203 numbered patches applied on top of the floor: 200 genuine upstream commits, plus the 3 exercise commits (plant at 41, scrub at 122, reintroduce at 198). The three exercise patches contain only the `__KIT_SECRET__` placeholder, never a real value. |
 | `INSTRUCTOR-GUIDE.md` | This document. |
 | `STUDENT-EXPERIENCE.md` | **Instructor-only.** Beat-by-beat walkthrough of what students experience, the model solution path, common wrong turns, and marking guidance. Contains all the answers — do not distribute. |
-| `SLIDES.md` | Marp-format deck covering the whole kit — pedagogy, student journey, delivery, architecture, findings, readiness. **Spoils the exercise**; for instructor briefings and stakeholder demos, not for a cohort. |
+| `SLIDES.md` | Marp-format deck, ~10 slides, covering the whole kit — pedagogy, student journey, delivery, architecture, findings, readiness. **Spoils the exercise**; for instructor briefings and stakeholder demos, not for a cohort. |
 | `PILOT-RUNBOOK.md` | Running the kit with 3–8 colleagues acting as students, before it meets a real cohort. Closes three of the four open unknowns in one sitting. |
 | `FANOUT-DESIGN.md` | Scaling to a class: access models, the GitHub Education/billing constraint, why Classroom's template flow can't deliver this kit, and what to build. |
 | `TODO.md` | Remaining work before classroom-ready, ordered by what blocks what. |

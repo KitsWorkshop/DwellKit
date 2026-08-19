@@ -8,7 +8,7 @@ The README covers deploying to a cohort. This covers running a *rehearsal* with 
 
 ## Why bother — what a pilot actually buys you
 
-Four things are currently unproven, and **three of them a pilot closes in one sitting**:
+Five things are currently unproven, and **a pilot closes most of them in one sitting**:
 
 | Open question | Closed by a pilot? |
 |---|---|
@@ -41,6 +41,14 @@ Options, cheapest first:
 3. **Keep the pilot to 2–3 people.** Enough to close the write-level rotation question, which is the point.
 
 Do not skip this decision. Discovering the bill after inviting eight colleagues is a bad afternoon.
+
+---
+
+## §0 — Walk it yourself first
+
+**Do not facilitate this cold.** `SOLUTION-WALKTHROUGH.md` takes you through the exercise as the student sees it — build a repo, take the wrong turn deliberately, rotate, rewrite, and hit the capstone. Roughly an hour, and it is the difference between recognising a wrong turn in the room and noticing it in the debrief.
+
+It also tells you where participants are likely to stall (§4 and §7 in particular), which is what §7 of this runbook asks you to time.
 
 ---
 
@@ -81,6 +89,8 @@ export KIT_PREFIX=pilot-      # → pilot-amara-gh, pilot-devin-codes, …
 
 Use the same `KIT_PREFIX` for every later command in this runbook, or they will not find the repos.
 
+> The default prefix is `member-portal-`, which is deliberately in-fiction — the repo is supposed to look like an inherited internal project. A bare `pilot-` breaks that fiction in the repo name. `KIT_PREFIX=pilot-member-portal-` keeps both: unambiguous at teardown, still plausible on arrival.
+
 > Any file matching `*roster*.csv` is gitignored (except `roster.example.csv`), so `pilot-roster.csv` is safe to leave in the working directory.
 
 ---
@@ -109,7 +119,14 @@ printf 'sk_staging_%s\n' "$(printf '%s' "${PARTICIPANT_ID}${KIT_SALT}" | sha256s
 ./dwellkit class pilot-roster.csv --dry-run
 ```
 
-Validates every GitHub username exists and creates **nothing**. A typo caught here costs seconds; caught on the day it costs someone their session.
+Two phases run before anything is created. **Phase 1 checks the org, not the roster**: SAML authorisation of your token, token scopes, your org role, whether outside collaborators are readable, and whether Actions is enabled org-wide. **Phase 2 validates every GitHub username exists.** A typo caught here costs seconds; caught on the day it costs someone their session.
+
+Two preflight results deserve a stop:
+
+- `Actions is enabled only for SELECTED repositories` — new student repos will not be on the allowlist, their CI never runs, and they inherit a repo with visibly nothing wrong with it.
+- `enforces SAML SSO and this token is not authorised` — fatal, and every build would 403.
+
+Preflight prints its own caveat: **push protection against the credential format is not checked**. Nothing automated closes that one; only a real build in this org does (`./dwellkit build pilot1`).
 
 Expect:
 
@@ -135,11 +152,22 @@ Writes `dwellkit-results-<org>-<timestamp>.csv` containing **live credential val
 
 Re-runnable: if anything fails, run the identical command again. Existing repos are skipped, invitations are re-sent.
 
+**Read the two warning blocks at the end of the run — they are the ones that void a pilot silently:**
+
+| Warning | What it means |
+|---|---|
+| `⚠ N student(s) were added SILENTLY` | Those participants are **already org members**. GitHub sent them nothing — no invitation, no email. This is the org-member case from the top of this runbook, now named participant by participant. Their repo's assigned issue does notify; send them the URL yourself as well. |
+| `⚠ N repo(s) have NO WORKING CI` | Those repos have no failing check, so there is nothing to diagnose and no exercise. Fix Actions policy and re-run before anyone arrives. |
+
+The results CSV records this per row in the **`notified`** column: `invited` (a real invitation to accept) / `added-silently` (org member) / `none`. That column is the answer to "did the invitation flow actually get tested" — if every row reads `added-silently`, it did not.
+
 ---
 
-## §5 — Facilitator pre-flight
+## §5 — Facilitator spot-check
 
-Do this **before** anyone touches anything. Ten minutes here saves the session.
+Distinct from the tool's own preflight in §3, which checks the *org*. This checks a *built repo*, before anyone touches anything. Ten minutes here saves the session.
+
+`dwellkit build` already asserts branch protection is off (step 8/9) and that a CI run was queued (step 9/9), and `class` surfaces failures of both in its summary. Repeat them anyway on one repo — the build-time check is a snapshot, and org policy can change between the build and the day.
 
 ```bash
 RESULTS=dwellkit-results-<org>-<timestamp>.csv
@@ -247,7 +275,7 @@ Write these down while they are fresh. They unblock items in `TODO.md`:
 - [ ] **Push protection did not block the credential format** — in the real teaching org (`TODO.md` §2)
 - [ ] **Build timings** at this group size, and any failures or rate limiting (`TODO.md` §4)
 - [ ] **Invitation acceptance** — only meaningful if you included a non-org-member
-- [ ] **Did the assigned issue actually reach them?** Ask each participant how they first learned the repo existed — email, the issue, or you telling them. That answer decides how much you can rely on GitHub for a real cohort.
+- [ ] **Did the assigned issue actually reach them?** Ask each participant how they first learned the repo existed — email, the issue, or you telling them. Cross-check against the `notified` column of the results CSV; `added-silently` rows are the ones where the issue was the *only* channel. That answer decides how much you can rely on GitHub for a real cohort.
 - [ ] **How many rotated before rewriting** — the baseline the exercise exists to move
 - [ ] **Brief wording that misled or under-specified** (`TODO.md` §3.1)
 - [ ] **Whether the pre-red CI read as "broken" rather than "a problem to solve"** (`TODO.md` §5)
@@ -274,7 +302,7 @@ the pilot's repositories easy to pick out.
 **Then:**
 
 - [ ] Remove pilot participants from the org / as collaborators — **they consume paid seats until you do**
-- [ ] Delete `dwellkit-results-*.csv` and any `*.build.log` — they contain live credential values
+- [ ] Delete `dwellkit-results-*.csv` and any `*.build.log` / `*.invite.log` — `class` copies failure logs into the working directory, and the results file contains live credential values
 - [ ] Revoke the PAT if it was created just for this
 
 To run again with the same people, rebuild under a fresh prefix (`KIT_PREFIX=pilot2-`).
