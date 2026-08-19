@@ -225,9 +225,11 @@ fast; the waiting is not.
       **private** repos consume paid seats — 20 students needs 21. Education grants the same Team
       plan free with unlimited users. It has external lead time, so start it first.
       *(Being on Team is what creates the cost; it is not something to upgrade away from.)*
-- [ ] **Get a token scoped to the teaching org** — a fine-grained PAT or a GitHub App install,
-      with `repo` + `workflow`. Not a personal classic PAT: those reach every repo the issuing
-      account can see.
+- [ ] **Create a classic PAT with `repo` + `workflow` scope.** It isn't restricted to the
+      teaching org — it reaches every repo the issuing account can see — so treat it as
+      short-lived: create it for this deployment, export it, and **revoke it once the class
+      is fully built** (see "Afterwards" below). That bounds the exposure without the setup
+      overhead of a fine-grained PAT or GitHub App install.
 - [ ] **Run one build in the real teaching org** — `./dwellkit build pilot1`. This single action
       checks push protection, token permissions, and org policy at once. Delete it afterwards.
 - [ ] **Run a group pilot** — [PILOT-RUNBOOK.md](docs/PILOT-RUNBOOK.md). Optional, but it closes
@@ -264,7 +266,7 @@ you want, but it means getting them right matters.
 **2. Set the environment.**
 
 ```bash
-export GH_TOKEN=<org-scoped token: repo + workflow>
+export GH_TOKEN=<classic PAT: repo + workflow scope — revoke it once the class is built>
 export GH_ORG=<teaching org>
 export KIT_SALT=<any secret string — write it down and keep it>
 ```
@@ -326,6 +328,12 @@ gh repo list "$GH_ORG" --limit 100 --json name --jq '.[].name' | grep '^member-p
 
 Delete them (needs `delete_repo` scope — the build token lacks it), remove students as
 collaborators so they stop consuming seats, and delete the results CSV and any build logs.
+
+**Revoke `GH_TOKEN` now.** It's a classic PAT with `repo` scope, meaning it reaches every
+repo the issuing account can see, not just this org — there's no reason to leave it live
+once the deployment is done. Revoke it at
+[github.com/settings/tokens](https://github.com/settings/tokens) and cut a fresh one next
+time.
 
 ---
 

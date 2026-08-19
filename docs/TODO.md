@@ -124,8 +124,7 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
   **Confirm what actually still exists first:** `gh repo list <org> --limit 100`. This list is from the build session and has not been re-checked since; the Codespaces token cannot see other repos in the org.
   Also delete **`-demo4`** — it was built with the earlier shallow tail and is superseded.
   **Keep `secretkit-spike-demo7`** — it is the preserved, correctly-staged demo repo, built with the current buried tail. *(These repos keep their literal `secretkit-spike-*` names because that is what they are actually called on GitHub — they predate the current `member-portal-` prefix.)*
-- [ ] **Move to an org-scoped credential for real rollout**
-  Classic PATs are not org-scoped; they grant access to everything the issuing account can reach. Replace with a fine-grained PAT restricted to the teaching org, or preferably a GitHub App installation (not tied to any individual instructor, independently revocable, auditable). See `INSTRUCTOR-GUIDE.md` Part 3.
+- [x] ~~**Move to an org-scoped credential for real rollout**~~ → decided against. Classic PATs are not org-scoped — they grant access to everything the issuing account can reach — but the accepted mitigation is to treat the token as short-lived rather than switch credential types: create it per deployment, export it, and revoke it once the class is built (README's "Afterwards" step). A fine-grained PAT or GitHub App remains documented as an option in `INSTRUCTOR-GUIDE.md` Part 3 for anyone who wants a narrower credential instead of relying on revocation discipline.
 
 ---
 

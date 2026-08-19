@@ -143,12 +143,24 @@ Notably **not** required: PyNaCl or any cryptography library. An earlier version
 
 The token is an **instructor/CI-side credential**, used to create repositories and set secrets. Students authenticate as themselves with their own GitHub accounts and never touch it.
 
-During development a **classic Personal Access Token** with `repo` and `workflow` scopes was used. Be aware of what that means: **classic PATs are not scoped to an organisation.** A classic PAT with `repo` grants access to every repository the issuing account can reach, everywhere — not just your teaching org. The restriction to one org and one repo-name prefix is enforced by the *script's* logic, not by the token.
+The recommended approach is a **classic Personal Access Token** with `repo` and `workflow`
+scopes — it's what was used during development, and it's simplest to create: no org opt-in
+step, no permission matrix to get right. Be aware of what that means: **classic PATs are not
+scoped to an organisation.** A classic PAT with `repo` grants access to every repository the
+issuing account can reach, everywhere — not just your teaching org. The restriction to one
+org and one repo-name prefix is enforced by the *script's* logic, not by the token.
 
-**For anything beyond a one-off test build, use one of these instead:**
+Because the token isn't scoped, treat it as **short-lived, not standing infrastructure**:
+create it right before a deployment, export it for that session, and **revoke it once the
+class is fully built** (README's "Afterwards" step). That bounds the exposure window to the
+deployment itself instead of leaving a broad-access credential live indefinitely.
 
-- **A fine-grained PAT** restricted to the teaching organisation. Note it cannot be scoped to a name *pattern* (`member-portal-*`) because the repos don't exist when the token is created — you grant "all repositories in the org" plus Administration, Secrets, Contents, and Actions write. The benefit is that it cannot touch anything outside that org.
-- **A GitHub App installation** — the best option for a real rollout. Org-scoped, not tied to any individual instructor's account, independently revocable, and auditable.
+If you'd rather not rely on remembering to revoke it — for a larger rollout, a shared
+institutional account, or anywhere the token might sit around longer than one build session —
+two narrower alternatives exist:
+
+- **A fine-grained PAT** restricted to the teaching organisation. Note it cannot be scoped to a name *pattern* (`member-portal-*`) because the repos don't exist when the token is created — you grant "all repositories in the org" plus Administration, Contents, Secrets, and Workflows write (and Actions read). The benefit is that it cannot touch anything outside that org even while it's live.
+- **A GitHub App installation** — org-scoped, not tied to any individual instructor's account, independently revocable, and auditable. The most setup, but the best fit for a recurring institutional deployment.
 
 ### The push protection consideration — read this before deploying
 

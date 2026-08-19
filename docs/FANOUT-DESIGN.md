@@ -120,7 +120,7 @@ Plus `roster.example.csv`, which documents the roster format.
 ### Usage
 
 ```bash
-export GH_TOKEN=<org-scoped token: repo + workflow>   # fine-grained PAT or GitHub App
+export GH_TOKEN=<classic PAT: repo + workflow scope>  # revoke it once the class is built
 export GH_ORG=<your teaching org>
 export KIT_SALT=<per-cohort secret string — keep it>
 
