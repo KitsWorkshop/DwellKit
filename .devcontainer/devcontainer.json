@@ -2,9 +2,10 @@
   "name": "DwellKit",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/python:1": {}
   },
-  "postCreateCommand": "for t in git gh curl sha256sum; do command -v \"$t\" >/dev/null 2>&1 || echo \"WARNING: missing required tool: $t\"; done; [ -x ./dwellkit ] || chmod +x ./dwellkit",
+  "postCreateCommand": "for t in git gh curl sha256sum python3; do command -v \"$t\" >/dev/null 2>&1 || echo \"WARNING: missing required tool: $t\"; done; [ -x ./dwellkit ] || chmod +x ./dwellkit",
   "customizations": {
     "vscode": {
       "extensions": [

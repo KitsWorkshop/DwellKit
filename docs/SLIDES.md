@@ -190,3 +190,20 @@ Two hard constraints:
 
 **Docs:** `INSTRUCTOR-GUIDE.md` · `SOLUTION-WALKTHROUGH.md` ⚠️ · `STUDENT-EXPERIENCE.md` ⚠️ · `FANOUT-DESIGN.md` · `PILOT-RUNBOOK.md` · `TECHNICAL-NOTES.md` · `TODO.md`
 **One script:** `./dwellkit` — `build` · `class` · `status`
+
+---
+
+## Things left to do
+
+| Category | Open items |
+|---|---|
+| 🔴 **Blocking** | GitHub Education verification (external lead time) |
+| 🟠 **Validate** | Push-protection format check · invited students can force-push |
+| 🟡 **Full lesson** | Brief read by a real cohort · marking rubric · debrief · prevention artifact (step 3 of 3) |
+| ⚙️ **Hardening** | Idempotency check (half-built repo reports `ok`) · 30-student dry-run · teardown subcommand · rate-limit backoff |
+| 🧹 **Housekeeping** | Revoke exposed dev PATs · delete leftover demo repos · move to org-scoped credential |
+| 🕰️ **On the clock** | Pin build-time commit dates before the gap since 18 Aug 2026 grows further |
+
+**Full detail:** `TODO.md` — ordered by what blocks what, with effort estimates.
+
+**Bottom line:** the engineering is done; what's left is teaching materials and org setup, ~8 hours + Education lead time.
