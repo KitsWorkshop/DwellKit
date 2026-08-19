@@ -125,7 +125,7 @@ Ran as a student would, against `secretkit-spike-demo2` (used for this destructi
 ```
 $ gh api repos/<org>/<repo>/commits/d7491058a717e8300df78b4e7f6f11473beb609c \
     --jq '.files[] | select(.filename=="config/staging.env") | .patch'
-+STAGING_API_KEY=sk_staging_23066a9c39d6929d2442b066700a3da4e174ed50
++STAGING_API_KEY=sk_staging_23066a9c39d6929d...
 ```
 
 The full credential comes back. Anyone who cloned before the rewrite knows that SHA. Purging it requires contacting GitHub Support to force garbage collection — nothing the student (or instructor) can do from the CLI removes it.

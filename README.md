@@ -336,7 +336,7 @@ Two phases. **Upstream is never contacted at build time**, so builds are offline
 1. **Floor** — `floor.bundle` (16 MB) holds 2,855 genuine commits of [`sahat/hackathon-starter`](https://github.com/sahat/hackathon-starter). Cloned as-is.
 2. **Tail** — 203 patches applied on top: 200 real upstream commits, with 3 hand-authored exercise commits interleaved at positions **41** (plant), **122** (scrub), and **198** (reintroduce).
 
-The credential exists only as the literal `__KIT_SECRET__` in the patch files; the real value is substituted as each patch is applied, so no working credential is ever stored in this repository. It is written to the student's repo *and* set as an Actions secret, and CI fails while the two still match — comparing SHA-256 hashes, never the raw value.
+The credential exists only as the literal `__KIT_SECRET__` in the patch files; the real value is substituted as each patch is applied, so no working credential is ever stored in the patch files, the bundle, or the build script. It is written to the student's repo *and* set as an Actions secret, and CI fails while the two still match — comparing SHA-256 hashes, never the raw value.
 
 Total: 3,060 commits. The plant and scrub sit far enough back that `git log` will not surface them, which is what forces students to learn pickaxe search (`git log -S`).
 

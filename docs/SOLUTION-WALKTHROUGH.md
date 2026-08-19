@@ -106,7 +106,7 @@ grep -rn "STAGING_API_KEY" . --exclude-dir=.git
 
 ```
 .github/workflows/staging-deploy.yml:12:  STAGING_API_KEY: ${{ secrets.STAGING_API_KEY }}
-config/staging.env:2:STAGING_API_KEY=sk_staging_23066a9c39d6929d2442b066700a3da4e174ed50
+config/staging.env:2:STAGING_API_KEY=sk_staging_23066a9c39d6929d...
 ```
 
 Now grep the value's format, which you could not have done thirty seconds ago:
@@ -161,7 +161,7 @@ git show HEAD~1:config/staging.env
 
 ```
 # Staging environment overrides — do not commit to a public repo.
-STAGING_API_KEY=sk_staging_23066a9c39d6929d2442b066700a3da4e174ed50
+STAGING_API_KEY=sk_staging_23066a9c39d6929d...
 STAGING_BASE_URL=https://staging.internal.example.com
 ```
 
@@ -185,6 +185,14 @@ e78e88d  2026-06-08  Lena Ostrowski    chore: move staging config out of the rep
 d749105  2026-03-23  Lena Ostrowski    chore: add staging config
 ```
 
+> **These SHAs are from the reference build, not yours.** §0 had you `unset KIT_SALT`, so your
+> credential is random and every commit below the plant hashes differently. Take the third SHA
+> from *your* output and keep it — §8 needs it:
+>
+> ```bash
+> PLANT=<the oldest SHA from your own output above>
+> ```
+
 Three commits, not one:
 
 - **23 Mar** — committed.
@@ -194,13 +202,13 @@ Three commits, not one:
 Confirm the March copy is still live:
 
 ```bash
-git show d749105:config/staging.env
+git show $PLANT:config/staging.env
 ```
 
 Now check how far back that is:
 
 ```bash
-git log --oneline | grep -n d749105     # ~164 commits back
+git log --oneline | grep -n $PLANT      # ~164 commits back
 ```
 
 > **Observation checkpoint.** These commits are **not reachable by scrolling**. `git log -50` shows nothing. The only route is `-S` (or `log -p --follow`, or a full-history grep).
@@ -227,7 +235,7 @@ gh secret set STAGING_API_KEY \
   --repo $GH_ORG/member-portal-walkthrough1
 ```
 
-> **Two routes, both available at `push`.** GitHub's docs are explicit: *"To create secrets or variables on GitHub for an organization repository, you must have `write` access"*, and the repository-roles table lists "create, update, and delete" Actions secrets at Write and above. So students invited at `permission=push` (`dwellkit:705`) can rotate either way:
+> **Two routes, both available at `push`.** GitHub's docs are explicit: *"To create secrets or variables on GitHub for an organization repository, you must have `write` access"*, and the repository-roles table lists "create, update, and delete" Actions secrets at Write and above. So students invited at `permission=push` (the collaborator call in `cmd_deploy_one`) can rotate either way:
 >
 > - **CLI** — the command above. Requires `gh` installed and authenticated. The brief's Tooling reference lists `gh` as **optional**, and says so explicitly, precisely because the UI route below exists.
 > - **UI** — Settings → Secrets and variables → Actions → `STAGING_API_KEY` → Update. A Write-level collaborator sees a **reduced** Settings page, not the full admin one: the roles table grants settings capabilities section by section rather than wholesale, and secrets is one of the sections Write gets. If the tab does not render for them, the page is still reachable directly at `https://github.com/<org>/<repo>/settings/secrets/actions`.
@@ -290,17 +298,18 @@ Clean.
 
 ## §8 — The capstone
 
-Spring this only *after* victory is declared. Use the SHA you noted in §5:
+Spring this only *after* victory is declared. Use the `PLANT` SHA you captured in §5 — the
+rewrite deleted the commit from your branch, but GitHub still serves it:
 
 ```bash
-gh api repos/$GH_ORG/member-portal-walkthrough1/commits/d749105... \
+gh api repos/$GH_ORG/member-portal-walkthrough1/commits/$PLANT \
   --jq '.files[] | select(.filename=="config/staging.env") | .patch'
 ```
 
 ```
 @@ -0,0 +1,3 @@
 +# Staging environment overrides — do not commit to a public repo.
-+STAGING_API_KEY=sk_staging_23066a9c39d6929d2442b066700a3da4e174ed50
++STAGING_API_KEY=sk_staging_23066a9c39d6929d...
 +STAGING_BASE_URL=https://staging.internal.example.com
 ```
 

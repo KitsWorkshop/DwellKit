@@ -8,7 +8,7 @@ This document has two halves:
 1. **Part 1 — The journey.** What a student actually experiences, beat by beat, including what they see on screen. Use this to anticipate where they will get stuck, where they will feel clever, and where they will go wrong.
 2. **Part 2 — The optimal path.** What a fully successful student does, in order. Use this as the model answer and marking aid.
 
-Everything below was executed against a real built repository. The outputs are real, not illustrative.
+Everything below was executed against a real built repository. The outputs are real, not illustrative — credential values are abridged, nothing else is.
 
 ---
 
@@ -44,7 +44,7 @@ That names a thing to chase. Most students go looking for where `STAGING_API_KEY
 
 ```
 $ grep -rn "sk_staging_" . --exclude-dir=.git
-config/staging.env:2:STAGING_API_KEY=sk_staging_23066a9c39d6929d2442b066700a3da4e174ed50
+config/staging.env:2:STAGING_API_KEY=sk_staging_23066a9c39d6929d...
 ```
 
 One file. One credential. It looks exactly like an API key. This takes about ninety seconds.
@@ -78,7 +78,7 @@ Someone — usually prompted — tries to look at what they just deleted:
 ```
 $ git show HEAD~1:config/staging.env
 # Staging environment overrides — do not commit to a public repo.
-STAGING_API_KEY=sk_staging_23066a9c39d6929d2442b066700a3da4e174ed50
+STAGING_API_KEY=sk_staging_23066a9c39d6929d...
 STAGING_BASE_URL=https://staging.internal.example.com
 ```
 
@@ -162,7 +162,7 @@ $ gh api repos/<org>/<repo>/commits/d7491058a717e8300df78b4e7f6f11473beb609c \
     --jq '.files[] | select(.filename=="config/staging.env") | .patch'
 @@ -0,0 +1,3 @@
 +# Staging environment overrides — do not commit to a public repo.
-+STAGING_API_KEY=sk_staging_23066a9c39d6929d2442b066700a3da4e174ed50
++STAGING_API_KEY=sk_staging_23066a9c39d6929d...
 +STAGING_BASE_URL=https://staging.internal.example.com
 ```
 
