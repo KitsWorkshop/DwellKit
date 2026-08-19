@@ -21,6 +21,7 @@ Students receive a private repository with a real, plausible commit history. Som
 | Understand the class-scale constraints (billing, GitHub Classroom) | [FANOUT-DESIGN.md](docs/FANOUT-DESIGN.md) |
 | Trial it with colleagues before a real cohort | [PILOT-RUNBOOK.md](docs/PILOT-RUNBOOK.md) |
 | Know what students actually experience, and how to mark it | [STUDENT-EXPERIENCE.md](docs/STUDENT-EXPERIENCE.md) |
+| Walk the exercise yourself, start to finish, with a terminal open | [SOLUTION-WALKTHROUGH.md](docs/SOLUTION-WALKTHROUGH.md) |
 | Brief colleagues or stakeholders | [SLIDES.md](docs/SLIDES.md) (Marp) |
 | Know what still needs building | [TODO.md](docs/TODO.md) |
 | Know what was tested, what broke, and what is still unproven | [TECHNICAL-NOTES.md](docs/TECHNICAL-NOTES.md) |
