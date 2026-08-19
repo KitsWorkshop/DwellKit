@@ -13,8 +13,7 @@
         "mechatroner.rainbow-csv",
         "GitHub.vscode-pull-request-github",
         "GitHub.github-vscode-theme",
-        "yzhang.markdown-all-in-one",
-        "davidanson.vscode-markdownlint"
+        "yzhang.markdown-all-in-one"
       ]
     }
   }
