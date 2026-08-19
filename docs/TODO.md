@@ -61,7 +61,7 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
 ## 3. Required for the full lesson
 
 ### 3.1 Student-facing brief
-- [x] ~~**Write the brief**~~ → `templates/student-README.md`, installed as the student repo's README at build time (step 7 of 8).
+- [x] ~~**Write the brief**~~ → `templates/student-README.md`, installed as the student repo's README at build time (step 7 of 9).
   States the scenario, the three completion conditions, and explicitly that **marking is on order of operations, not on whether the history rewrite succeeded.** Deliberately avoids the words *rotate*, *credential*, and any mention of history search — working those out is the exercise.
   It also requires an **ordered log** (`Time | What I did | Why I did it then`), written before each action. That log is what makes order-of-operations actually markable; without it, ordering has to be reconstructed from GitHub's event feed, which was rejected as unreliable (see §7).
 - [ ] **Review the brief wording against a real cohort** (~30 min after the first run)
@@ -83,7 +83,7 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
 ## 4. Operational hardening
 
 - [ ] **⚠️ Fix the idempotency check — a half-built repo is silently reported as done** (~30 min)
-  `dwellkit class` decides a student is already handled by asking *does the repo exist* (`cmd_deploy_one`). But `gh repo create` happens at step 3 of 7. If a build fails at step 4, 5, or 6 — network blip, rate limit, token hiccup — the repo exists but has no history, no secret, or no workflow. **Re-running skips it and reports `ok`.** The student gets a broken repository and nobody finds out until class.
+  `dwellkit class` decides a student is already handled by asking *does the repo exist* (`cmd_deploy_one`). But `gh repo create` happens at step 3 of 9. If a build fails at step 4 or later — network blip, rate limit, token hiccup — the repo exists but has no history, no secret, or no workflow. **Re-running skips it and reports `ok`.** The student gets a broken repository and nobody finds out until class.
   Fix: check for a completion marker rather than mere existence — e.g. that `main` has the expected commit count, or that the `STAGING_API_KEY` secret is set. Alternatively add a `--cleanup` path (needs `delete_repo` scope, which the build token lacks by default).
   This is the most likely way a real 30-student fan-out goes wrong.
 - [ ] **Dry-run the full fan-out at real class size** (~30 min) — `dwellkit class` is verified at 2 students; 30 concurrent has not been run

@@ -163,7 +163,7 @@ export KIT_SALT=<per-cohort secret string — keep it>
 | Built repo contains the derived credential | ✅ |
 | `dwellkit status` reports status correctly | ✅ |
 | Re-run skips existing repos | ✅ 1.5s |
-| Results CSV well-formed | ✅ every row exactly 6 fields |
+| Results CSV well-formed | ✅ every row exactly 7 fields |
 
 ### Not yet built
 

@@ -143,7 +143,7 @@ Only needed if you want to run it. **You do not have to get the app running to c
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org) 20 or newer
+- [Node.js](https://nodejs.org) 24.18 or newer (check `engines` in `package.json`)
 - [MongoDB](https://www.mongodb.com/docs/manual/installation/) running locally, or a connection string
 - A command line with `git`
 

@@ -20,11 +20,11 @@ The student clones their repository and looks around. What they find is an ordin
 
 ```
 $ git log --oneline -5
+7f1e0a2 docs: replace README with project overview and task brief
 0523c64 ci: add staging deploy workflow
 054d3a1 chore(deps): bump the patch-updates group with 3 updates (#1746)
 00435f3 chore(deps): bump the patch-updates group with 4 updates (#1745)
 9cb5e93 chore(deps): bump the minor-updates group with 2 updates (#1744)
-4aa1521 chore(deps): bump mongoose in the patch-updates group (#1743)
 ```
 
 Nothing here signals "exercise." That is deliberate.

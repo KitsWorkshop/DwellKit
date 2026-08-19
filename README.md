@@ -31,7 +31,7 @@ Students receive a private repository with a real, plausible commit history. Som
 
 ## Quick start
 
-Requires `git`, `gh` (authenticated), `python3`, and a token with `repo` + `workflow` scope on the target org.
+Requires `git`, `gh` (authenticated), `curl`, `sha256sum`, and a token with `repo` + `workflow` scope on the target org. `python3` is needed only for builds without `KIT_SALT`, which derive a random credential.
 
 Deploying to a class.
 
@@ -353,7 +353,7 @@ templates/            student-README.md — the brief students see
 docs/                 Everything written; see the table above
 ```
 
-`dwellkit` is meant to be read: `build` is eight numbered, commented steps.
+`dwellkit` is meant to be read: `build` is nine numbered, commented steps.
 Run it from the repository root — it locates `floor.bundle` and `tail/` relative to itself.
 
 `roster.csv`, `dwellkit-results-*.csv`, and build logs are gitignored — they contain student identities and live credential values.
@@ -365,7 +365,7 @@ Run it from the repository root — it locates `floor.bundle` and `tail/` relati
 The deployment machinery is **built and verified against real GitHub**. The kit is **not yet classroom-ready**. Three things gate a real cohort:
 
 - **GitHub Education verification** — external lead time, start it first. Private-repo collaborators consume paid seats on Team; 20 students needs 21. Education grants the same Team plan free with unlimited users.
-- **The student brief** — not yet written, and the exercise depends on it. It must state that marking is on order of operations, not on whether the rewrite succeeded. Without that, expect flawless `filter-repo` runs and no rotations.
+- **The student brief, unread by a real cohort** — it ships in `templates/student-README.md` and already states that marking is on order of operations rather than on whether the rewrite succeeded. It has never been in front of an actual student, and the pilot is the cheapest way to find where it misleads. The **rubric and debrief** are still unwritten ([TODO.md](docs/TODO.md) §3.1).
 - **Credential format validation** — `sk_staging_` + 40 hex has never been tested against a live push-protection scanner. If your teaching org enforces one and recognises the format, every student repo fails to build at once.
 
 See [TODO.md](docs/TODO.md) for the full list, ordered by what blocks what.

@@ -131,7 +131,8 @@ The repository has an Actions secret, `STAGING_API_KEY`, set to the same credent
 | **A provisioning token** | See below. Used once per build; **students never see or need this.** |
 | **`git`** | Any recent version. |
 | **`gh` (GitHub CLI)** | Used for repo creation and secret setting. Must be authenticated or given a token. |
-| **`python3`** | Used only to generate a random credential value. |
+| **`curl`**, **`sha256sum`** | Usually preinstalled (coreutils). Checked up front alongside `git` and `gh`. |
+| **`python3`** | Only for builds with no `KIT_SALT` set, which generate a random credential value. Not checked up front, because a salted build never invokes it. |
 | **`git-filter-repo`** | Only needed by *students* (for the history-rewrite step), not for building. |
 
 Notably **not** required: PyNaCl or any cryptography library. An earlier version hand-rolled libsodium sealed-box encryption to set the Actions secret; this turned out to be unnecessary because `gh secret set` performs that encryption locally itself. That removed a dependency and about nineteen lines of code.
@@ -225,7 +226,7 @@ The script is deliberately plain, linear shell with a commented step for each ph
 
 **Failure behaviour to be aware of:** the script has no cleanup or resume logic. If it fails partway (a transient API error, say), it leaves a partially-built repository behind — the repo exists, but may have no history, no secret, or no workflow.
 
-> ⚠️ **This matters more at class scale than it looks.** `dwellkit class` decides a student is already handled by asking *does the repo exist*, and the repo is created at step 3 of 8. A build that dies at step 4 or later leaves a repo that a re-run will **skip and report as `ok`** — so a student receives a broken repository and nobody finds out until class. Delete any partially-built repo manually before re-running. Tracked in `TODO.md` §4.
+> ⚠️ **This matters more at class scale than it looks.** `dwellkit class` decides a student is already handled by asking *does the repo exist*, and the repo is created at step 3 of 9. A build that dies at step 4 or later leaves a repo that a re-run will **skip and report as `ok`** — so a student receives a broken repository and nobody finds out until class. Delete any partially-built repo manually before re-running. Tracked in `TODO.md` §4.
 
 Note that deleting requires a `delete_repo` scope that the standard build token does not have.
 
@@ -380,7 +381,8 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 | ~~No per-student fan-out~~ | ✅ **Done** | `dwellkit class` builds a repo per student from a roster, concurrently, with deterministic credentials and idempotent re-runs. |
 | **GitHub Education verification** | **Blocking for a real cohort** | Private-repo collaborators consume paid seats — 30 students needs 31, versus the 1 a bare Team org has. Note the org is *already* on Team — that is the cause, not the cure. Education grants the same Team plan free with unlimited users. External lead time; start it early. See `FANOUT-DESIGN.md`. |
 | **Push protection format unvalidated** | **High risk** | See Part 3. Could cause every repo to fail to build in an org that enforces scanning. Cheapest mitigation: build one repo in your real target org and see if it pushes. |
-| **No student-facing brief** | Required | Was explicitly out of scope for the build. You need one, and it must state that marking is on ordering. |
+| **Brief never read by a student** | Needs a pilot | The brief itself is built (`templates/student-README.md`, installed as the repo README at build time) and states that marking is on ordering. What is missing is evidence it reads clearly to someone seeing it cold. |
+| **No marking rubric or debrief** | Required to mark | Suggested criteria are in Part 5, but neither has been written up. `TODO.md` §3.1. |
 | **No prevention artifact** | Needed for the full lesson | Step 3 of the three-step lesson (rotate → rewrite → prevent) has no built component — no pre-commit hook, scanner config, or equivalent. Also the designated extension for fast finishers. |
 | **No partial-failure handling** | Operational | A failed build leaves a half-made repo needing manual cleanup. Tolerable for a handful of repos; annoying at thirty. |
 | **Untested at class scale** | Operational | Built and verified for a handful of repos. Rate limits look comfortable on paper (~180 API calls for 30 students against a 5,000/hour limit) but a 30-repo burst has not actually been run. |
@@ -389,7 +391,7 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 
 1. **Build one repo in your real target organisation.** This single action validates the push protection question, the token permissions, and the org configuration all at once. Highest information per unit effort by a wide margin.
 2. **Apply for GitHub Education verification.** External lead time, and it removes the per-seat cost of a class. Now the main non-content blocker.
-3. **Write the student brief**, stating the marking basis explicitly. The largest remaining piece of work.
+3. **Write the marking rubric and the debrief.** The brief itself is done; these are not, and they are the largest remaining piece of work.
 4. **Design the prevention extension** for fast finishers.
 5. **Test a write-level collaborator end to end** with a second account — confirm they can rotate the secret and force-push.
 
@@ -437,4 +439,4 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 | `PROGRESS.md` | Short status summary suitable for reporting. |
 | `agent-spec.md` | The original build specification. Useful for understanding intent; note that several of its assumptions were revised during the build, and where they conflict, `TECHNICAL-NOTES.md` is authoritative. |
 
-A built student repository contains **3,060 commits**: 2,855 floor + 203 tail + 1 workflow commit added at build time.
+A built student repository contains **3,060 commits**: 2,855 floor + 203 tail + 2 commits added at build time (the staging-deploy workflow, then the student README).
