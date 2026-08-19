@@ -66,7 +66,7 @@ Send this ahead of time — people arriving unprepared is the main way a pilot l
 ## §1 — Build the roster
 
 ```bash
-cd /path/to/DwellKit
+cd <your checkout of this repo>      # run every command from the repository root
 cp roster.example.csv pilot-roster.csv
 ```
 

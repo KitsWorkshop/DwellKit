@@ -101,8 +101,10 @@ Implemented in `dwellkit class`: per-repo outside-collaborator invitations at `p
   It is now deliberately uninformative. Watch whether students diagnose it or stall — this is exactly what `PILOT-RUNBOOK.md` §7 is for. Becoming more helpful mid-session is easy; un-spoiling is not.
 - [ ] **Consider the pre-red CI state** (~15 min of thought)
   Students clone a repository whose CI is *already* failing, before they have done anything. This may read as "the exercise is broken" rather than "there is a problem to solve." Worth either addressing in the brief or reconsidering whether the workflow should only start failing after the student's first push.
-- [ ] **Review tail commit dates** (~10 min)
-  The 203 tail commits are dated Feb–Aug 2026 (real upstream dates), but the workflow commit is stamped at build time. Once real build dates drift well past August 2026, there will be a visible gap in the log. Cosmetic, but exactly the sort of thing an observant student notices.
+- [ ] **⏳ Pin the build-time commit dates — this one is now on the clock** (~10 min)
+  The 203 tail commits carry real upstream dates ending **18 Aug 2026**. The two commits `build` adds on top (the staging-deploy workflow, then the student README) set no date, so they take wall-clock time at build. The gap between them is therefore however long it has been since 18 Aug 2026 — it was days when this was written and grows by one day per day.
+  A student running plain `git log` (listed in the brief's tooling reference) sees the whole history land in a six-month run, then two commits stamped months later. That reads as staged.
+  Fix: export `GIT_AUTHOR_DATE` and `GIT_COMMITTER_DATE` for both commits, set a short interval after the last tail patch, so the top of the log is continuous with the rest. Alternatively refresh the tail from upstream, which resets the clock but is the larger job.
 
 ---
 

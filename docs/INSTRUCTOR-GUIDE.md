@@ -427,20 +427,26 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 
 ## Appendix — Files in this repository
 
+Everything ending in `.md` below lives in `docs/`, apart from the templates, which are in `templates/`.
+
 | File | Purpose |
 |---|---|
 | `dwellkit` | The only script, with three subcommands:<br>`build <id>` — one complete student repo. Plain, linear, commented — meant to be read.<br>`class <roster>` — roster validation → build → invite → report. Concurrent, idempotent.<br>`status <results>` — who hasn't accepted their invitation; `--remind` re-sends. |
 | `roster.example.csv` | Roster format (`student_id,github_username`). |
+| `templates/student-README.md` | The student brief. Installed as each student repo's README at build time (step 7), replacing the upstream one. **Edit this, not the script,** to change what students read on arrival. |
+| `templates/student-issue.md` | The ticket filed in each student repo and assigned to them. `__STUDENT__` is replaced with their GitHub username. |
 | `floor.bundle` | The 2,855-commit authentic history, serialised (16 MB). |
 | `tail/*.patch` | 203 numbered patches applied on top of the floor: 200 genuine upstream commits, plus the 3 exercise commits (plant at 41, scrub at 122, reintroduce at 198). The three exercise patches contain only the `__KIT_SECRET__` placeholder, never a real value. |
 | `INSTRUCTOR-GUIDE.md` | This document. |
 | `STUDENT-EXPERIENCE.md` | **Instructor-only.** Beat-by-beat walkthrough of what students experience, the model solution path, common wrong turns, and marking guidance. Contains all the answers — do not distribute. |
+| `SOLUTION-WALKTHROUGH.md` | **Instructor-only.** The answer key in executable form — walk the exercise yourself with a terminal open, including the wrong turn. Ends with the known weaknesses the walkthrough exposes. |
 | `SLIDES.md` | Marp-format deck, ~10 slides, covering the whole kit — pedagogy, student journey, delivery, architecture, findings, readiness. **Spoils the exercise**; for instructor briefings and stakeholder demos, not for a cohort. |
 | `PILOT-RUNBOOK.md` | Running the kit with 3–8 colleagues acting as students, before it meets a real cohort. Closes three of the four open unknowns in one sitting. |
 | `FANOUT-DESIGN.md` | Scaling to a class: access models, the GitHub Education/billing constraint, why Classroom's template flow can't deliver this kit, and what to build. |
 | `TODO.md` | Remaining work before classroom-ready, ordered by what blocks what. |
 | `TECHNICAL-NOTES.md` | Full technical report — what was tested, what broke, timings, open questions. |
 | `PROGRESS.md` | Short status summary suitable for reporting. |
+| `.gitignore` | Keeps student data out of git: any `*roster*.csv` (except the example), `dwellkit-results-*.csv`, and build/invite logs. The results file holds live credential values, so this is load-bearing, not housekeeping. |
 | `agent-spec.md` | The original build specification. Useful for understanding intent; note that several of its assumptions were revised during the build, and where they conflict, `TECHNICAL-NOTES.md` is authoritative. |
 
 A built student repository contains **3,060 commits**: 2,855 floor + 203 tail + 2 commits added at build time (the staging-deploy workflow, then the student README).
