@@ -120,7 +120,7 @@ Plus `roster.example.csv`, which documents the roster format.
 ### Usage
 
 ```bash
-export GH_TOKEN=<classic PAT: repo + workflow>
+export GH_TOKEN=<org-scoped token: repo + workflow>   # fine-grained PAT or GitHub App
 export GH_ORG=<your teaching org>
 export KIT_SALT=<per-cohort secret string — keep it>
 
@@ -132,9 +132,9 @@ export KIT_SALT=<per-cohort secret string — keep it>
 
 ### What it does
 
-**Phase 1 — Preflight.** Verifies the org is reachable and reports token scopes, warning if `repo` is absent.
+**Phase 1 — Preflight.** Probes the *org*, not the roster: SAML authorisation of the token, token scopes, your role in the org, whether outside collaborators are readable, and whether Actions is enabled org-wide. Anything needing `admin:org` to read is reported as "could not verify" rather than failing, since a build token legitimately may not have it. Only two conditions are hard errors — an unreachable org, and a token SAML has not authorised. Push protection is deliberately **not** probed; see "Still unverified" below. Full table in `INSTRUCTOR-GUIDE.md` Part 3.5.
 
-**Phase 2 — Roster validation, before creating anything.** Every username is checked to exist via the API; blank usernames and duplicate student IDs are rejected. **If any row is invalid, nothing is created.** A typo caught here costs seconds; caught on the day it costs a student their session.
+**Phase 2 — Roster validation, before creating anything.** Every username is checked to exist via the API; blank usernames, duplicate student IDs, and duplicate GitHub usernames (which would collide two students onto one repo) are all rejected. **If any row is invalid, nothing is created.** A typo caught here costs seconds; caught on the day it costs a student their session.
 
 **Phase 3 — Build and invite,** at a default concurrency of 5. Capped deliberately: GitHub's *secondary* rate limits trigger on burst concurrency rather than total volume and are invisible in the standard headers.
 
@@ -173,7 +173,7 @@ export KIT_SALT=<per-cohort secret string — keep it>
 ## Operational realities
 
 - **Expect 10–20% non-acceptance** by the day before, in any cohort. Build in a chase cycle; don't discover it at the start of class.
-- **Rate limits** look comfortable on paper (~200 API calls for 30 students against 5,000/hour), but bursts can trip *secondary* rate limits, which are triggered by concurrency rather than volume and aren't visible in the standard headers. Cap concurrency around 5 and add backoff.
+- **Rate limits** look comfortable on paper (~450–650 REST calls for 30 students against 5,000/hour — roughly 13–21 per student, plus preflight), but bursts can trip *secondary* rate limits, which are triggered by concurrency rather than volume and aren't visible in the standard headers. Cap concurrency around 5 and add backoff.
 - **Build repos 2–3 days ahead**, not on the day. 30 repos at 15–50s each is 8–25 minutes serially — fine, but not something to run with a room waiting.
 - **Have 2–3 spare repos pre-built.** Someone will turn up with no account, a broken account, or an unaccepted invitation, and a spare they can be dropped into is worth more than a fix.
 - **Students need `git-filter-repo` installed.** Tell them in advance; it is not a default install.

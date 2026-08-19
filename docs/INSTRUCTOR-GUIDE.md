@@ -92,9 +92,11 @@ Three of the 203 tail commits carry the exercise:
 | 122 of 203 | `chore: move staging config out of the repo` | **SCRUB** — deletes that file |
 | 198 of 203 | `chore: re-add staging config for local testing` | **REINTRODUCE** — adds it back, same value |
 
-In calendar terms the credential is planted in late March, "removed" in early June — roughly **two and a half months of exposure** — then reintroduced in mid-August. Several further commits sit above the last of these, so nothing exercise-related is the most recent thing in the log.
+In calendar terms the credential is planted in late March, "removed" in early June — a gap of about eleven weeks in which somebody believed it had been dealt with — then reintroduced in mid-August and still live at HEAD. Total exposure is therefore **roughly five months and still running**, not the eleven weeks the plant-to-scrub gap suggests. Several further commits sit above the reintroduction, so nothing exercise-related is the most recent thing in the log.
 
-That exposure window is worth drawing out in the debrief. *"This was live in a public-ish repo for ten weeks. Who had access during that time? What did CI have access to? Can you enumerate everyone who cloned it?"* The answer to the last question is no, and that is precisely why rotation cannot wait for the rewrite.
+That exposure window is worth drawing out in the debrief. *"This has been retrievable by anyone with read access since March — five months, and it was still there when you cloned it this morning. Who had access in that window? What did CI have access to? Can you enumerate everyone who cloned it?"* The answer to the last question is no, and that is precisely why rotation cannot wait for the rewrite.
+
+Use the five-month figure, not the eleven-week one. The June "removal" is the thing that makes people *think* the window closed; saying eleven weeks out loud repeats the mistake the exercise is about.
 
 **Why two copies rather than one.** This is the most important structural decision in the kit, and it creates two distinct discoveries:
 
@@ -270,7 +272,9 @@ Tell them in advance — neither is a default install, and discovering it at the
 
 **Deliver it live, in class.** This exercise is unusually sensitive to delivery format. The collective reaction when the first student recovers the "deleted" credential does more teaching than any written brief. Set as homework, it becomes a mechanical `filter-repo` exercise and the ordering lesson evaporates.
 
-**Time box:** 45–60 minutes. **Class size:** any.
+**Time box:** 65 minutes — about 40 of hands-on work, then 25 of discussion. **Class size:** any.
+
+If you are tight, the two 10-minute buffers (false summit, deeper find) are what compress; the 15-minute argument is not, because it is the exercise.
 
 ### Suggested shape
 
@@ -385,7 +389,7 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 | **No marking rubric or debrief** | Required to mark | Suggested criteria are in Part 5, but neither has been written up. `TODO.md` §3.1. |
 | **No prevention artifact** | Needed for the full lesson | Step 3 of the three-step lesson (rotate → rewrite → prevent) has no built component — no pre-commit hook, scanner config, or equivalent. Also the designated extension for fast finishers. |
 | **No partial-failure handling** | Operational | A failed build leaves a half-made repo needing manual cleanup. Tolerable for a handful of repos; annoying at thirty. |
-| **Untested at class scale** | Operational | Built and verified for a handful of repos. Rate limits look comfortable on paper (~180 API calls for 30 students against a 5,000/hour limit) but a 30-repo burst has not actually been run. |
+| **Untested at class scale** | Operational | Built and verified for a handful of repos. Rate limits look comfortable on paper (~450–650 REST calls for 30 students against a 5,000/hour limit) but a 30-repo burst has not actually been run. |
 
 ### Recommended next steps, in order
 
@@ -397,7 +401,7 @@ A working demo repository exists and is in the correct pre-exercise state: **[`K
 
 ### Housekeeping
 
-- Several throwaway repositories from development remain in the build org (`secretkit-spike-pushtest`, `-demo1`, `-demo2`, `-demo3`, `-demo5`, `-demo6`). They need manual deletion; the build token lacks the `delete_repo` scope. `-demo4` should also go — it was built with the earlier shallow tail and is superseded. **`secretkit-spike-demo7`** is the intentionally-preserved demo repo. *(These repos keep their literal `secretkit-spike-*` names because that is what they are actually called on GitHub — they predate the current `member-portal-` prefix.)*
+- Several throwaway repositories from development remain in the build org and need manual deletion; the build token lacks the `delete_repo` scope. **`secretkit-spike-demo7`** is the intentionally-preserved demo repo — keep it. `TODO.md` §6 holds the working list, which is the one to act from; it was written during the build session and has not been re-checked, so run `gh repo list <org> --limit 100` before deleting anything. *(These repos keep their literal `secretkit-spike-*` names because that is what they are actually called on GitHub — they predate the current `member-portal-` prefix.)*
 - The classic PAT used during development was entered in plaintext into a chat transcript. It was never written to any file in this repository, but it should be revoked and reissued.
 
 ---

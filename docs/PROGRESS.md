@@ -36,7 +36,7 @@ First version of the workflow file accidentally hardcoded the leaked credential 
 - **Push-protection format not empirically validated.** The credential format (`sk_staging_` + 40 hex) is untested against a live GitHub secret scanner — this sandbox org's plan doesn't include that feature. Biggest open risk before running this on a different GitHub environment.
 - **No "prevention" step.** The full lesson (rotate → rewrite → prevent) needs a third artifact that hasn't been built — explicitly deferred.
 - **GitHub Education verification not yet applied for.** Private-repo collaborators consume paid seats — a class of 30 needs 31, versus the 1 a bare Team org has. Education verification gives free Team with unlimited users. External lead time, so start it early.
-- **A few throwaway repos in the org need manual deletion** (`secretkit-spike-pushtest`, `-demo1` through `-demo6`; keep `-demo7`) — the build token lacks `delete_repo` scope.
+- **A few throwaway repos in the org need manual deletion** (keep `-demo7`, the preserved demo) — the build token lacks `delete_repo` scope. `TODO.md` §6 carries the working list; it has not been re-checked against the org, so confirm with `gh repo list` before deleting anything.
 
 ## Recommended next steps
 

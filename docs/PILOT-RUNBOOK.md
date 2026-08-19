@@ -46,7 +46,7 @@ Do not skip this decision. Discovering the bill after inviting eight colleagues 
 
 ## §0 — Walk it yourself first
 
-**Do not facilitate this cold.** `SOLUTION-WALKTHROUGH.md` takes you through the exercise as the student sees it — build a repo, take the wrong turn deliberately, rotate, rewrite, and hit the capstone. Roughly an hour, and it is the difference between recognising a wrong turn in the room and noticing it in the debrief.
+**Do not facilitate this cold.** `SOLUTION-WALKTHROUGH.md` takes you through the exercise as the student sees it — build a repo, take the wrong turn deliberately, rotate, rewrite, and hit the capstone. Roughly 35–50 minutes at instructor pace, and it is the difference between recognising a wrong turn in the room and noticing it in the debrief.
 
 It also tells you where participants are likely to stall (§4 and §7 in particular), which is what §7 of this runbook asks you to time.
 

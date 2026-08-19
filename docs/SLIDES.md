@@ -20,7 +20,7 @@ FANOUT-DESIGN.md and TECHNICAL-NOTES.md.
 ### DwellKit — a teaching kit for credential-leak response
 
 **Status:** working prototype, verified end to end against real GitHub
-**Time box:** 45–60 min, delivered live in class
+**Time box:** ~65 min, delivered live in class
 
 ⚠️ **This deck spoils the exercise.** Instructor briefings only.
 
@@ -80,7 +80,7 @@ It is not *at risk* of compromise. It **is** compromised, and has been since Mar
 
 ---
 
-## The student arc — 45–60 minutes
+## The student arc — about 65 minutes
 
 | Phase | Time | What happens |
 |---|---|---|
