@@ -61,6 +61,82 @@ it is how ordering gets marked, and reconstructing it from memory at the end def
 
 ---
 
+## 🧰 Tooling reference
+
+These are the tools this task is likely to involve. The list tells you what exists — **not which to
+use, when to use it, or in what order.** That is the part you are marked on.
+
+If you want to do something that isn't listed here, look it up. Nothing below is exhaustive.
+
+### What you need installed
+
+| Tool | Needed? |
+|---|---|
+| `git` | Yes |
+| A GitHub account with access to this repository | Yes — the web interface is enough for most things |
+| [`gh`](https://cli.github.com) (GitHub CLI) | Optional. Everything it does here can also be done in the browser |
+| [`git-filter-repo`](https://github.com/newren/git-filter-repo) | Only if you decide you need it. **Not bundled with git** — `pip install git-filter-repo` |
+| Node.js / MongoDB | **No.** You do not need the application running |
+
+> ⚠️ If you use `git-filter-repo`, note that it **deletes your `origin` remote** when it runs, as a
+> safety measure. Your next push will fail with *"'origin' does not appear to be a git repository"*.
+> That is expected, not a broken repo — restore it with `git remote add origin <url>`.
+
+### Reading CI
+
+The **Actions** tab shows every workflow run. Click into a failed run and **expand the step** — the
+collapsed view shows you considerably less than the expanded one.
+
+```
+gh run list                gh run view --log-failed
+```
+
+### Searching the files as they are now
+
+```
+grep -rn "<string>" . --exclude-dir=.git
+```
+
+### Looking at the repository's past
+
+```
+git log                    git log --oneline
+git show <commit>:<path>          # a file as it was at that commit
+git log --all -S'<string>'        # every commit that added or removed a string
+```
+
+Searching the files and searching the history are not the same operation. They can return very
+different answers.
+
+### Repository settings you have access to
+
+You have **write access**, which is more than read-only. Among other things you can reach
+**Settings → Secrets and variables → Actions**, directly at:
+
+```
+https://github.com/<org>/<this-repo>/settings/secrets/actions
+```
+
+Secret *values* can be updated but never read back — not by you, not by anyone. That is by design.
+
+### Changing what is already committed (destructive)
+
+```
+git rm             git filter-repo             git push --force
+```
+
+> ⚠️ A force-push rewrites the branch for **everyone**, not just you. Anyone else with a clone will
+> have a broken one, and if they push a stale branch afterwards they can undo your work. Whether and
+> when to use these is a judgement call, and that judgement is being assessed.
+
+### Stopping things getting into a repository
+
+```
+.gitignore         .git/hooks/pre-commit         gitleaks         trufflehog
+```
+
+---
+
 ## Running the application
 
 Only needed if you want to run it. **You do not have to get the app running to complete the task.**
